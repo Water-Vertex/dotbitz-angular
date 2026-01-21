@@ -1,0 +1,192 @@
+<div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">
+        Add New Course
+      </h1>
+      <p class="text-gray-600 mt-1">
+        Create a new course with all details
+      </p>
+    </div>
+
+    <a routerLink="/admin/course/list" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium">
+      <i class="fas fa-arrow-left"></i>
+      <span>Back</span>
+    </a>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="isSubmitting" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+  <p class="text-gray-500 mt-2">Saving course details...</p>
+</div>
+
+<!-- Form Content -->
+<div *ngIf="!isSubmitting" class="space-y-6">
+  <div class="bg-white rounded-lg border border-gray-200 p-6">
+    <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+       <!-- Course Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Course Name <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            formControlName="course_name"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter course name"
+            [class.border-red-300]="course_name?.invalid && course_name?.touched"
+            [class.focus:ring-red-500]="course_name?.invalid && course_name?.touched"
+          >
+          <div *ngIf="course_name?.invalid && course_name?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+            <div *ngIf="course_name?.errors?.['required']" class="flex items-center space-x-1">
+              <i class="fas fa-exclamation-circle text-xs"></i>
+              <span>Course name is required</span>
+            </div>
+            <div *ngIf="course_name?.errors?.['minlength']" class="flex items-center space-x-1">
+              <i class="fas fa-exclamation-circle text-xs"></i>
+              <span>Minimum 3 characters required</span>
+            </div>
+          </div>
+        </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+       
+
+        
+
+        <!-- Course Code -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Course Code <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            formControlName="course_code"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter course code"
+            [class.border-red-300]="course_code?.invalid && course_code?.touched"
+            [class.focus:ring-red-500]="course_code?.invalid && course_code?.touched"
+          >
+          <div *ngIf="course_code?.invalid && course_code?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+            <div *ngIf="course_code?.errors?.['required']" class="flex items-center space-x-1">
+              <i class="fas fa-exclamation-circle text-xs"></i>
+              <span>Course code is required</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+  <label class="block text-sm font-medium text-gray-700 mb-2">Instructor <span class="text-red-500">*</span></label>
+  
+  <select
+    formControlName="instructor_id"
+    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  >
+    <option value="">Select Instructor</option>
+    <option *ngFor="let inst of instructors" [value]="inst.id">
+      {{ inst.first_name }} {{ inst.last_name }}
+    </option>
+  </select>
+
+  <div *ngIf="instructor_id?.invalid && instructor_id?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+    <div *ngIf="instructor_id?.errors?.['required']" class="flex items-center space-x-1">
+      <i class="fas fa-exclamation-circle text-xs"></i>
+      <span>Instructor is required</span>
+    </div>
+  </div>
+</div>
+
+
+        <!-- Course Level -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Course Level</label>
+          <input type="text" formControlName="course_level"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter course level">
+        </div>
+
+        <!-- Course Fee -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Course Fee</label>
+          <input type="number" formControlName="course_fee"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter course fee">
+        </div>
+
+        <!-- Course Duration -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Course Duration (hrs)</label>
+          <input type="number" formControlName="course_duration"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter duration">
+        </div>
+
+        <!-- Start Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+          <input type="date" formControlName="start_date"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <!-- End Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+          <input type="date" formControlName="end_date"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+          <select formControlName="status"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <!-- Featured -->
+        <div class="flex items-center mt-6">
+          <input type="checkbox" formControlName="is_featured" class="mr-2">
+          <label class="text-sm text-gray-700">Is Featured</label>
+        </div>
+
+        <!-- Thumbnail Image -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Thumbnail Image URL</label>
+          <input type="text" formControlName="thumbnail_image"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter image URL">
+        </div>
+
+        <!-- Course Description -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Course Description</label>
+          <textarea formControlName="course_description" rows="4"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter course description"></textarea>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <button type="button" (click)="cancel()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-times"></i>
+          <span>Cancel</span>
+        </button>
+
+        <button type="submit" [disabled]="courseForm.invalid || isSubmitting"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!isSubmitting" class="flex items-center space-x-2">
+            <i class="fas fa-save"></i>
+            <span>Create Course</span>
+          </span>
+          <span *ngIf="isSubmitting" class="flex items-center space-x-2">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <span>Saving...</span>
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

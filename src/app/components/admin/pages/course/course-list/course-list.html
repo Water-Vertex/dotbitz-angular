@@ -1,0 +1,125 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Course Management</h1>
+        <p class="text-gray-600 mt-1">Manage courses and their details</p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button
+          (click)="refreshData()"
+          [disabled]="isLoading"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center text-sm font-medium disabled:opacity-50"
+        >
+          <i class="fas fa-sync-alt mr-2" [class.animate-spin]="isLoading"></i>
+          {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+        </button>
+
+        <a
+          routerLink="/admin/course/add"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center text-sm font-medium"
+        >
+          <i class="fas fa-plus mr-2"></i>
+          Add Course
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Loading Courses...</p>
+  </div>
+
+  <!-- Search -->
+  <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <div class="relative">
+      <div class="flex items-center bg-gray-100 rounded-lg px-3 py-2 w-full">
+        <i class="fas fa-search text-gray-400 mr-2"></i>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()"
+          placeholder="Search courses..."
+          class="bg-transparent border-none focus:outline-none focus:ring-0 w-full text-sm"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="!isLoading && courses.length === 0" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i class="fas fa-question-circle text-gray-400 text-2xl"></i>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No Courses Found</h3>
+    <p class="text-gray-600 mb-4">Start by adding a new course</p>
+    <div class="space-x-4">
+      <button
+        (click)="refreshData()"
+        [disabled]="isLoading"
+        class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors inline-flex items-center text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <i class="fas fa-sync-alt mr-2" [class.animate-spin]="isLoading"></i>
+        {{ isLoading ? 'Loading...' : 'Check Again' }}
+      </button>
+      <a
+        routerLink="/admin/course/add"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors inline-flex items-center text-sm font-medium"
+      >
+        <i class="fas fa-plus mr-2"></i>
+        Add New Course
+      </a>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading && courses.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Name</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Code</th>
+             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+  <tr *ngFor="let course of courses; trackBy: trackById" class="hover:bg-gray-50">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ course.id }}</td>
+    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ course.course_name }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">{{ course.course_code }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">{{ course.instructor?.first_name }} {{ course.instructor?.last_name }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">
+      <span class="px-2 py-1 rounded text-xs"
+            [ngClass]="{
+              'bg-green-100 text-green-700': course.status === 'active',
+              'bg-red-100 text-red-700': course.status !== 'active'
+            }">
+        {{ course.status || 'inactive' }}
+      </span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm">
+      <div class="flex space-x-2">
+        <a routerLink="/admin/course/edit/{{ course.id }}"
+           class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium transition-colors">Edit</a>
+        <button (click)="deleteCourse(course.id)"
+                class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors">Delete</button>
+      </div>
+    </td>
+  </tr>
+</tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-between items-center">
+      Showing {{ courses.length }} of {{ totalItems }} courses
+    </div>
+  </div>
+</div>
