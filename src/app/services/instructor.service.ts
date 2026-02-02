@@ -13,7 +13,7 @@ import {
 })
 export class InstructorService {
 
-  private apiUrl = 'http://localhost:8000/api/instructors';
+  private apiUrl = 'https://dotbitz.com/api/instructors';
 
   constructor(private http: HttpClient) {}
 
@@ -136,5 +136,5 @@ getInstructors(search: string = ''): Observable<any> {
       })
     );
   }
-  
+
 }

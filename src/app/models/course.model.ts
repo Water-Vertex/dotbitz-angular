@@ -26,6 +26,7 @@ export interface Course {
     course_duration?: number;
     course_fee?: string | number;
     course_level?: string;
+    age_limit?: string;
     start_date?: string;
     end_date?: string;
     status?: string;
@@ -42,6 +43,7 @@ export interface CoursePayload {
     course_duration?: number;
     course_fee?: string | number;
     course_level?: string;
+    age_limit?: string;
     start_date?: string;
     end_date?: string;
     status?: string;

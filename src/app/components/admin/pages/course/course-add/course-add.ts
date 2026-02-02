@@ -1,24 +1,31 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { CourseService } from '../../../../../services/course.service';
 import { InstructorService } from '../../../../../services/instructor.service';
 import { ToastService } from '../../../../../services/toast.service';
-import { Course, CoursePayload } from '../../../../../models/course.model';
 
 @Component({
   selector: 'app-course-add',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './course-add.html'
+  templateUrl: './course-add.html',
 })
 export class CourseAdd implements OnInit {
-
   courseForm!: FormGroup;
-  isSubmitting: boolean = false;
+  isSubmitting = false;
   instructors: { id: number; first_name: string; last_name: string }[] = [];
-  isLoadingInstructors: boolean = true;
+  isLoadingInstructors = true;
+
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -26,15 +33,10 @@ export class CourseAdd implements OnInit {
     private instructorService: InstructorService,
     private toast: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.initForm();
-    this.loadInstructors();
-  }
-
-  initForm(): void {
     this.courseForm = this.fb.group({
       course_name: ['', [Validators.required, Validators.minLength(3)]],
       course_code: ['', Validators.required],
@@ -42,6 +44,7 @@ export class CourseAdd implements OnInit {
       course_duration: [''],
       course_fee: [''],
       course_level: [''],
+      age_limit: [''],
       start_date: [''],
       end_date: [''],
       status: ['active'],
@@ -49,10 +52,11 @@ export class CourseAdd implements OnInit {
       instructor_id: ['', Validators.required],
       thumbnail_image: [''],
     });
+
+    this.loadInstructors();
   }
 
-  // Fetch instructors dynamically from API
-  loadInstructors(): void {
+  loadInstructors() {
     this.instructorService.getInstructors().subscribe({
       next: (res) => {
         this.instructors = Array.isArray(res.data) ? res.data : [];
@@ -62,13 +66,35 @@ export class CourseAdd implements OnInit {
       error: () => {
         this.toast.error('Error', 'Failed to load instructors');
         this.isLoadingInstructors = false;
-      }
+      },
     });
   }
 
-  get instructor_id() { return this.courseForm.get('instructor_id'); }
-  get course_name() { return this.courseForm.get('course_name'); }
-  get course_code() { return this.courseForm.get('course_code'); }
+  get instructor_id() {
+    return this.courseForm.get('instructor_id');
+  }
+  get course_name() {
+    return this.courseForm.get('course_name');
+  }
+  get course_code() {
+    return this.courseForm.get('course_code');
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0]; // Capture it in a local constant
+
+    if (file) {
+      this.selectedFile = file;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+        this.cdr.detectChanges();
+      };
+      // Use the local 'file' constant which TypeScript knows is not null
+      reader.readAsDataURL(file);
+    }
+  }
 
   onSubmit(): void {
     if (this.courseForm.invalid) {
@@ -77,24 +103,50 @@ export class CourseAdd implements OnInit {
     }
 
     this.isSubmitting = true;
+    const formData = new FormData();
 
-    this.courseService.createCourse(this.courseForm.value).subscribe({
-      next: res => {
+    // Iterate through form controls
+    Object.keys(this.courseForm.value).forEach((key) => {
+      if (key !== 'thumbnail_image') {
+        let value = this.courseForm.value[key];
+
+        // FIX: Convert booleans to '1' or '0'
+        // FormData sends everything as a string; '1'/'0' is the safest format for APIs
+        if (typeof value === 'boolean') {
+          value = value ? '1' : '0';
+        }
+
+        if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      }
+    });
+
+    // Append file safely
+    if (this.selectedFile) {
+      formData.append('thumbnail_image', this.selectedFile, this.selectedFile.name);
+    }
+
+    // Submit
+    this.courseService.createCourse(formData).subscribe({
+      next: (res) => {
         this.toast.success('Success', res.message || 'Course added successfully');
         this.router.navigate(['/admin/course/list']);
       },
-      error: err => {
+      error: (err) => {
+        // Improved error logging to help you see the "1 more error"
+        console.error('Upload error:', err);
         this.toast.error('Error', err.error?.message || 'Failed to add course');
         this.isSubmitting = false;
         this.cdr.detectChanges();
       },
       complete: () => {
         this.isSubmitting = false;
-      }
+      },
     });
   }
 
-  cancel(): void {
+  cancel() {
     this.router.navigate(['/admin/course/list']);
   }
 }
