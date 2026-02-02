@@ -10,6 +10,8 @@ import { Instructor, Course, CourseApiResponse } from '../models/course.model';
 export class CourseService {
   private apiUrl = 'http://localhost:8000/api/courses';
 
+  // private apiUrl = 'https://dotbitz.com/api/courses';
+
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {

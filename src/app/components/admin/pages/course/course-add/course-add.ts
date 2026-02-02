@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { QuillModule } from 'ngx-quill';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -15,7 +16,7 @@ import { ToastService } from '../../../../../services/toast.service';
 @Component({
   selector: 'app-course-add',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, QuillModule],
   templateUrl: './course-add.html',
 })
 export class CourseAdd implements OnInit {
@@ -26,6 +27,23 @@ export class CourseAdd implements OnInit {
 
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ header: 1 }, { header: 2 }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ script: 'sub' }, { script: 'super' }],
+      [{ indent: '-1' }, { indent: '+1' }],
+      [{ direction: 'rtl' }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      [{ color: [] }, { background: [] }],
+      [{ font: [] }],
+      [{ align: [] }],
+      ['clean'],
+      ['link', 'image', 'video'],
+    ],
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -44,12 +62,15 @@ export class CourseAdd implements OnInit {
       course_duration: [''],
       course_fee: [''],
       course_level: [''],
+      age_limit: [''],
       start_date: [''],
       end_date: [''],
       status: ['active'],
       is_featured: [false],
       instructor_id: ['', Validators.required],
       thumbnail_image: [''],
+      benefits: [''],
+      short_description: [''],
     });
 
     this.loadInstructors();

@@ -7,7 +7,7 @@ import { catchError, map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class FaqService {
-  private apiUrl = 'http://localhost:8000/api/faqs';
+  private apiUrl = 'https://dotbitz.com/api/faqs';
 
   constructor(private http: HttpClient) {}
 
@@ -17,11 +17,11 @@ export class FaqService {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     });
-    
+
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    
+
     return headers;
   }
 
@@ -29,21 +29,21 @@ export class FaqService {
   // In FaqService - update the getFAQ method
 getFAQ(id: number): Observable<any> {
   console.log(`Fetching FAQ ${id} from ${this.apiUrl}/${id}`);
-  
+
   return this.http.get<any>(`${this.apiUrl}/${id}`, {
     headers: this.getHeaders()
   }).pipe(
     map(response => {
       console.log('Raw FAQ response:', response);
-      
+
       // Handle both response structures
       if (response.success !== undefined) {
         // Format 1: { success: true, data: {...}, message: '...' }
         return response;
       } else if (response.id) {
         // Format 2: Direct FAQ object { id: 1, question: '...', ... }
-        return { 
-          success: true, 
+        return {
+          success: true,
           data: response,
           message: 'FAQ retrieved successfully'
         };
