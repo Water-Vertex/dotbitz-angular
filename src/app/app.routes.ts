@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/auth/login/login';
 import { AdminLayout } from './components/admin/layouts/admin-layout/admin-layout';
-import { Dashboard } from './components/admin/pages//dashboard/dashboard';
+import { Dashboard } from './components/admin/pages/dashboard/dashboard';
 import { authGuard } from './guards/auth-guard';
 import { FaqList } from './components/admin/pages/faq/faq-list/faq-list';
 import { FaqAdd } from './components/admin/pages/faq/faq-add/faq-add';
@@ -12,6 +12,9 @@ import { InstructorEdit } from './components/admin/pages/instructor/instructor-e
 import { CourseList } from './components/admin/pages/course/course-list/course-list';
 import { CourseAdd } from './components/admin/pages/course/course-add/course-add';
 import { CourseEdit } from './components/admin/pages/course/course-edit/course-edit';
+import { CourseCurriculumList } from './components/admin/pages/course-curriculum/course-curriculum-list/course-curriculum-list';
+import { CourseCurriculumAdd } from './components/admin/pages/course-curriculum/course-curriculum-add/course-curriculum-add';
+import { CourseCurriculumEdit } from './components/admin/pages/course-curriculum/course-curriculum-edit/course-curriculum-edit';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -37,8 +40,13 @@ export const routes: Routes = [
       { path: 'admin/course/add', component: CourseAdd },
       { path: 'admin/course/edit/:id', component: CourseEdit },
 
-      { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
-    ]
+      //  Course Curriculum routes
+      { path: 'admin/course-curriculum/list', component: CourseCurriculumList },
+      { path: 'admin/course-curriculum/add', component: CourseCurriculumAdd },
+      { path: 'admin/course-curriculum/edit/:id', component: CourseCurriculumEdit },
+
+      { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
+    ],
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
 ];
