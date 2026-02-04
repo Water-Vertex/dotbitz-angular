@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { QuillModule } from 'ngx-quill';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -15,7 +16,7 @@ import { CourseApiResponse, Instructor } from '../../../../../models/course.mode
 @Component({
   selector: 'app-course-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, QuillModule],
   templateUrl: './course-edit.html',
 })
 export class CourseEdit implements OnInit {
@@ -26,6 +27,25 @@ export class CourseEdit implements OnInit {
   instructors: Instructor[] = [];
   selectedFile: File | null = null;
   isEditMode: boolean = true;
+
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ header: 1 }, { header: 2 }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ script: 'sub' }, { script: 'super' }],
+      [{ indent: '-1' }, { indent: '+1' }],
+      [{ direction: 'rtl' }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      [{ color: [] }, { background: [] }],
+      [{ font: [] }],
+      [{ align: [] }],
+      ['clean'],
+      ['link', 'image', 'video'],
+    ],
+  };
+
   constructor(
     private fb: FormBuilder,
     private courseService: CourseService,
@@ -58,6 +78,8 @@ export class CourseEdit implements OnInit {
       is_featured: [false],
       instructor_id: ['', Validators.required],
       thumbnail_image: [''],
+      benefits: [''],
+      short_description: [''],
     });
   }
 

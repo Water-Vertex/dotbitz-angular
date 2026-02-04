@@ -1,7 +1,8 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router'; // Add Router
 import { LoginRequest, LoginResponse, AuthResponse, User } from '../models/user.model';
 import { environment } from '../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
@@ -17,6 +18,7 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
+    private router: Router, // Inject Router
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     // Initialize immediately
@@ -42,18 +44,50 @@ export class AuthService {
   );
 }
 
- logout() {
-  const token = localStorage.getItem('token');
-  return this.http.post(`${this.apiUrl}/logout`, {}, {
-    headers: { Authorization: `Bearer ${token}` }
-  }).pipe(
-    tap(() => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      this.currentUserSubject.next(null);
-    })
-  );
-}
+  logout(): Observable<any> {
+    const token = this.getToken();
+
+    // Prepare headers
+    let headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.post(`${this.apiUrl}/logout`, {}, { headers }).pipe(
+      tap({
+        next: (response: any) => {
+          console.log('Logout successful:', response);
+          this.clearAuthData();
+          this.router.navigate(['/login']); // Redirect after successful logout
+        },
+        error: (error) => {
+          console.error('Logout error:', error);
+          // Even if API call fails, clear local data
+          this.clearAuthData();
+          this.router.navigate(['/login']);
+        },
+        complete: () => {
+          // Fallback - ensure data is cleared
+          this.clearAuthData();
+        }
+      })
+    );
+  }
+
+  // Clear auth data and redirect
+  clearAuthData(): void {
+    this.clearStorage();
+    this.currentUserSubject.next(null);
+
+    // Navigate to login page
+    setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 100);
+  }
 
   isLoggedIn(): boolean {
     if (isPlatformBrowser(this.platformId)) {

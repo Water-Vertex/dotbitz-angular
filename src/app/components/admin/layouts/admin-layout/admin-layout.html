@@ -8,11 +8,11 @@
         z-index: 1000;
         transition: left 0.3s ease;
     }
-    
+
     .sidebar-mobile.active {
         left: 0;
     }
-    
+
     .mobile-overlay {
         display: none;
         position: fixed;
@@ -22,11 +22,11 @@
         bottom: 0;
         z-index: 999;
     }
-    
+
     .mobile-overlay.active {
         display: block;
     }
-    
+
     .mobile-user-dropdown {
         position: fixed;
         top: 70px;
@@ -36,74 +36,74 @@
         z-index: 1001;
         display: none;
     }
-    
+
     .mobile-user-dropdown.active {
         display: block;
     }
-    
+
     .responsive-table-container {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
+
     /* Responsive adjustments */
     @media (max-width: 1024px) {
         .desktop-sidebar {
             display: none;
         }
-        
+
         .mobile-menu-btn {
             display: block !important;
         }
-        
+
         .mobile-user-menu {
             display: none !important;
         }
-        
+
         .mobile-only {
             display: block !important;
         }
-        
+
         .desktop-only {
             display: none !important;
         }
-        
+
         .search-bar {
             max-width: 200px;
         }
     }
-    
+
     @media (max-width: 768px) {
         .search-bar {
             display: none !important;
         }
-        
+
         .mobile-search-btn {
             display: block !important;
         }
-        
+
         .breadcrumb-text {
             display: none !important;
         }
-        
+
         .header-title {
             font-size: 1rem;
         }
-        
+
         .main-content {
             padding: 1rem !important;
         }
     }
-    
+
     @media (max-width: 640px) {
         .header-right > :not(:last-child) {
             display: none !important;
         }
-        
+
         .notifications-btn, .help-btn {
             display: none !important;
         }
-        
+
         .mobile-user-btn {
             display: block !important;
         }
@@ -120,16 +120,16 @@
         <p class="text-sm font-semibold text-gray-900">Admin User</p>
         <p class="text-xs text-gray-500 mt-1">admin@example.com</p>
     </div>
-    
+
     <!-- Menu Items -->
     <a href="" wire:navigate class="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
         <i class="fas fa-user-circle mr-3 text-gray-400 w-5"></i>
         <span>Profile</span>
     </a>
-    
+
     <div class="border-t border-gray-100 my-1"></div>
-    
-    <a href="" wire:navigate class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+
+    <a routerLink="/admin/logout" data-nav-item data-href="/admin/logout" class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
         <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
         <span>Sign Out</span>
     </a>
@@ -150,9 +150,9 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Navigation -->
-        <nav class="flex-1 mt-4 overflow-y-auto">
+        <nav class="flex-1 mt-4 overflow-y-hidden">
             <div class="px-4 space-y-1">
                 <!-- Main Navigation Section -->
                 <div class="mb-6">
@@ -183,13 +183,21 @@
                         <span>Courses</span>
                         <i class="fas fa-chevron-right text-xs text-gray-300 ml-auto group-hover:text-blue-500"></i>
                     </a>
+                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
+                     class="flex items-center px-4 py-3.5 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm group">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200">
+                            <i class="fas fa-file text-blue-600 text-sm"></i>
+                        </div>
+                        <span>Policies</span>
+                        <i class="fas fa-chevron-right text-xs text-gray-300 ml-auto group-hover:text-blue-500"></i>
+                    </a>
                     <a routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
-                     class="flex items-center px-4 py-3.5 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-green-50 hover:text-green-600 hover:shadow-sm group">
-                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200">
-                            <i class="fas fa-question-circle text-green-600 text-sm"></i>
+                     class="flex items-center px-4 py-3.5 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm group">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200">
+                            <i class="fas fa-question-circle text-blue-600 text-sm"></i>
                         </div>
                         <span>FAQ</span>
-                        <i class="fas fa-chevron-right text-xs text-gray-300 ml-auto group-hover:text-green-500"></i>
+                        <i class="fas fa-chevron-right text-xs text-gray-300 ml-auto group-hover:text-blue-500"></i>
                     </a>
                 </div>
 
@@ -243,7 +251,7 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        
+
         <!-- Mobile Navigation -->
         <nav class="flex-1 mt-4 overflow-y-auto">
             <div class="px-4 space-y-1">
@@ -323,7 +331,7 @@
                     <button class="mobile-menu-btn hidden text-gray-600 hover:text-blue-600 text-lg p-2 rounded-lg hover:bg-gray-100 transition-colors" id="mobileMenuBtn">
                         <i class="fas fa-bars"></i>
                     </button>
-                    
+
                     <!-- Breadcrumb and Title -->
                     <div class="flex items-center space-x-2 text-sm text-gray-600 breadcrumb-text">
                         <span class="desktop-only">Admin Console</span>
@@ -331,14 +339,14 @@
                         <span class="font-semibold text-gray-900 header-title truncate">Dashboard</span>
                     </div>
                 </div>
-                
+
                 <!-- Right side actions -->
                 <div class="flex items-center space-x-2 lg:space-x-4 header-right">
                     <!-- Mobile Search Button -->
                     <button class="mobile-search-btn hidden text-gray-600 hover:text-blue-600 p-2 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-search"></i>
                     </button>
-                    
+
                     <!-- Notifications -->
                     <button class="notifications-btn relative p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-bell"></i>
@@ -362,7 +370,7 @@
                             </div>
                             <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                         </button>
-                        
+
                         <!-- Desktop Dropdown Menu -->
                         <div class="user-dropdown absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50" style="display: none;">
                             <!-- User Info -->
@@ -370,22 +378,22 @@
                                 <p class="text-sm font-semibold text-gray-900">Admin User</p>
                                 <p class="text-xs text-gray-500 mt-1">admin@example.com</p>
                             </div>
-                            
+
                             <!-- Menu Items -->
                             <a href="" wire:navigate class="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
                                 <i class="fas fa-user-circle mr-3 text-gray-400 w-5"></i>
                                 <span>Profile</span>
                             </a>
-                            
+
                             <div class="border-t border-gray-100 my-1"></div>
-                            
-                            <a href="" wire:navigate class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+
+                            <a routerLink="/admin/logout" data-nav-item data-href="/admin/logout" class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
                                 <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
                                 <span>Sign Out</span>
                             </a>
                         </div>
                     </div>
-                    
+
                     <!-- Mobile User Button -->
                     <button class="mobile-user-btn hidden w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm" id="mobileUserBtn">
                         A
