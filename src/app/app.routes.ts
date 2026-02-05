@@ -18,6 +18,12 @@ import { PolicyEdit } from './components/admin/pages/policy/policy-edit/policy-e
 import { Logout } from './components/auth/logout/logout';
 import { StudentRegistration } from './components/student/pages/registration/student-registration/student-registration';
 import { StudentLayout } from './components/student/layouts/student-layout/student-layout/student-layout';
+import { StudentAdd } from './components/admin/pages/student/student-add/student-add';
+import { StudentEdit } from './components/admin/pages/student/student-edit/student-edit';
+import { StudentList } from './components/admin/pages/student/student-list/student-list';
+
+
+
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -51,6 +57,10 @@ export const routes: Routes = [
       { path: 'admin/policy/list', component: PolicyList },
       { path: 'admin/policy/add', component: PolicyAdd },
       { path: 'admin/policy/edit/:id', component: PolicyEdit },
+//Admin Student routes
+      { path: 'admin/student/list', component: StudentList },
+      { path: 'admin/student/add', component: StudentAdd },
+      { path: 'admin/student/edit/:id', component: StudentEdit },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]

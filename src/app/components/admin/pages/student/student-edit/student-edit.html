@@ -1,0 +1,118 @@
+<div class="max-w-4xl mx-auto mt-12 bg-white p-6 rounded-lg shadow-lg">
+  <h2 class="text-2xl font-semibold mb-6">Edit Student</h2>
+
+  <!-- Step Navigation -->
+  <div class="flex justify-between mb-6">
+    <div *ngFor="let step of [1,2,3]; let i = index" class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center"
+           [ngClass]="currentStep === i+1 ? 'bg-[#161950] text-white' :
+                      currentStep > i+1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'">
+        {{ i+1 }}
+      </div>
+      <span class="text-sm">{{ i === 0 ? 'Personal' : i === 1 ? 'Education' : showGuardianInfo ? 'Guardian' : 'Security' }}</span>
+    </div>
+  </div>
+
+  <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+    <!-- Step 1: Personal Info -->
+    <div *ngIf="currentStep === 1" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label>First Name</label>
+          <input type="text" formControlName="firstName" class="input-field"/>
+        </div>
+        <div>
+          <label>Last Name</label>
+          <input type="text" formControlName="lastName" class="input-field"/>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label>Username</label>
+          <input type="text" formControlName="userName" class="input-field"/>
+        </div>
+        <div>
+          <label>Email</label>
+          <input type="email" formControlName="email" class="input-field"/>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label>Phone</label>
+          <input type="tel" formControlName="phone" class="input-field"/>
+        </div>
+        <div>
+          <label>Date of Birth</label>
+          <input type="date" formControlName="dateOfBirth" (change)="calculateAge()" class="input-field"/>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label>Gender</label>
+          <select formControlName="gender" class="input-field">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div *ngIf="age !== null">Age: {{age}} years</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Education -->
+    <div *ngIf="currentStep === 2" class="space-y-4">
+      <div formArrayName="studentDetails">
+        <div *ngFor="let edu of studentDetails.controls; let i = index" [formGroupName]="i" class="border p-4 rounded">
+          <div class="flex justify-between items-center mb-2">
+            <h4>Education {{i+1}}</h4>
+            <button type="button" (click)="removeStudentDetail(i)" *ngIf="studentDetails.controls.length>1">Remove</button>
+          </div>
+          <input type="text" placeholder="Institution" formControlName="institution" class="input-field mb-2"/>
+          <input type="text" placeholder="Degree" formControlName="degree" class="input-field mb-2"/>
+          <input type="text" placeholder="Field of Study" formControlName="fieldOfStudy" class="input-field mb-2"/>
+          <input type="date" formControlName="startDate" class="input-field mb-2"/>
+          <input type="date" formControlName="endDate" [disabled]="edu.get('isCurrent')?.value" class="input-field mb-2"/>
+          <label>
+            <input type="checkbox" formControlName="isCurrent" (change)="onCurrentStudyChange(i)"/>
+            Currently studying
+          </label>
+        </div>
+      </div>
+      <button type="button" (click)="addStudentDetail()">Add Education</button>
+    </div>
+
+    <!-- Step 3: Guardian / Password -->
+    <div *ngIf="currentStep === 3" class="space-y-4">
+      <div *ngIf="showGuardianInfo">
+        <h4>Guardian Info</h4>
+        <input type="text" formControlName="guardianFirstName" placeholder="First Name" class="input-field"/>
+        <input type="text" formControlName="guardianLastName" placeholder="Last Name" class="input-field"/>
+        <input type="email" formControlName="guardianEmail" placeholder="Email" class="input-field"/>
+        <input type="tel" formControlName="guardianPhone" placeholder="Phone" class="input-field"/>
+        <select formControlName="guardianRelationship" class="input-field">
+          <option value="">Select Relationship</option>
+          <option value="parent">Parent</option>
+          <option value="legal_guardian">Legal Guardian</option>
+          <option value="sibling">Sibling</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <h4>Set Password</h4>
+      <input type="password" formControlName="password" placeholder="••••••••" class="input-field"/>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between mt-6">
+      <button type="button" (click)="prevStep()" [disabled]="currentStep === 1" class="btn-secondary">Back</button>
+      <div>
+        <button type="button" (click)="nextStep()" *ngIf="currentStep < 3" class="btn-primary">Next</button>
+        <button type="submit" *ngIf="currentStep === 3" class="btn-primary">Update</button>
+      </div>
+    </div>
+  </form>
+</div>
