@@ -22,6 +22,9 @@ import { StudentAdd } from './components/admin/pages/student/student-add/student
 import { StudentEdit } from './components/admin/pages/student/student-edit/student-edit';
 import { StudentList } from './components/admin/pages/student/student-list/student-list';
 
+import { McqsList } from './components/admin/pages/mcqs/mcqs-list/mcqs-list';
+import { McqsAdd } from './components/admin/pages/mcqs/mcqs-add/mcqs-add';
+import { McqsEdit } from './components/admin/pages/mcqs/mcqs-edit/mcqs-edit';
 
 
 
@@ -43,6 +46,9 @@ export const routes: Routes = [
       { path: 'admin/faq/add', component: FaqAdd },
       { path: 'admin/faq/edit/:id', component: FaqEdit },
 
+      { path: 'admin/mcqs', component: McqsList },
+      { path: 'admin/mcqs/add', component: McqsAdd },
+      { path: 'admin/mcqs/edit/:id', component: McqsEdit },
       // Instructor routes
       { path: 'admin/instructor/list', component: InstructorList },
       { path: 'admin/instructor/add', component: InstructorAdd },
