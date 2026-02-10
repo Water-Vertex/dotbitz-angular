@@ -38,16 +38,27 @@ export class McqsAdd implements OnInit {
       mcqs: this.fb.array([this.createSingleMcq()])
     });
   }
-
   createSingleMcq(): FormGroup {
-    return this.fb.group({
-      question: ['', [Validators.required, Validators.minLength(10)]],
-      issingle: [true, Validators.required],
-      options: this.fb.array([this.createOption(), this.createOption()]),
-      correctAnswers: this.fb.array([]),
-      status: ['active', Validators.required]
-    });
-  }
+  return this.fb.group({
+    question: ['', [Validators.required, Validators.minLength(10)]],
+    answer: ['', Validators.required],
+    issingle: [true, Validators.required],
+    options: this.fb.array([this.createOption(), this.createOption()]),
+    correctAnswers: this.fb.array([]), 
+    status: ['active', Validators.required]
+  });
+}
+
+
+  // createSingleMcq(): FormGroup {
+  //   return this.fb.group({
+  //     question: ['', [Validators.required, Validators.minLength(10)]],
+  //     issingle: [true, Validators.required],
+  //     options: this.fb.array([this.createOption(), this.createOption()]),
+  //     correctAnswers: this.fb.array([]),
+  //     status: ['active', Validators.required]
+  //   });
+  // }
 
   createOption(): FormGroup {
     return this.fb.group({
@@ -196,26 +207,28 @@ onSubmit() {
     const mcqValue = mcqControl.value;
     const opts = mcqValue.options.map((o: any) => o.value);
 
-    let answer: string;
-    if (mcqValue.issingle) {
-      if (mcqValue.correctAnswers.length === 0) {
-        throw alert('Please select a correct answer for each MCQ');
-      }
-      answer = opts[mcqValue.correctAnswers[0]];
-    } else {
-      if (mcqValue.correctAnswers.length === 0) {
-        throw alert('Please select at least one correct answer for each MCQ');
-      }
-      answer = mcqValue.correctAnswers
-        .sort((a: number, b: number) => a - b)
-        .map((i: number) => opts[i])
-        .join(',');
-    }
+    // let answer: string;
+    // if (mcqValue.issingle) {
+    //   if (mcqValue.correctAnswers.length === 0) {
+    //     throw alert('Please select a correct answer for each MCQ');
+    //   }
+    //   answer = opts[mcqValue.correctAnswers[0]];
+    // } else {
+    //   if (mcqValue.correctAnswers.length === 0) {
+    //     throw alert('Please select at least one correct answer for each MCQ');
+    //   }
+    //   answer = mcqValue.correctAnswers
+    //     .sort((a: number, b: number) => a - b)
+    //     .map((i: number) => opts[i])
+    //     .join(',');
+    // }
+ 
+
 
     const mcqData: Mcq = {
       question: mcqValue.question,
       options: opts,
-      answer: answer,
+      answer: mcqValue.answer,
       course_id: courseId,
       status: mcqValue.status,
       issingle: mcqValue.issingle
