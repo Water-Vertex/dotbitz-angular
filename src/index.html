@@ -9,7 +9,7 @@
    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -30,190 +30,330 @@
     </style>
 </head>
 <body>
-  
+
   <app-root></app-root>
    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
    <script>
-    $(document).ready(function() {
-        // Mobile sidebar toggle
-        $('#mobileMenuBtn').on('click', function() {
-            $('.sidebar-mobile').addClass('active');
-            $('#mobileOverlay').addClass('active');
-            $('body').css('overflow', 'hidden');
+  $(document).ready(function() {
+    console.log('Navigation script loaded - using event delegation');
+
+    // Initialize all active states immediately
+    updateActiveNavItems();
+
+    // ==================== EVENT DELEGATION ====================
+    // All events are bound to document level for dynamic elements
+
+    // Mobile sidebar toggle
+    $(document).on('click', '#mobileMenuBtn', function() {
+        console.log('Mobile menu button clicked');
+        $('.sidebar-mobile').addClass('active');
+        $('#mobileOverlay').addClass('active');
+        $('body').css('overflow', 'hidden');
+    });
+
+    // Close sidebar
+    $(document).on('click', '.close-sidebar, #mobileOverlay', function() {
+        console.log('Closing sidebar');
+        $('.sidebar-mobile').removeClass('active');
+        $('#mobileOverlay').removeClass('active');
+        $('body').css('overflow', 'auto');
+
+        // Reset submenus in mobile sidebar
+        $('.sidebar-mobile .submenu').removeClass('active').hide();
+        $('.sidebar-mobile .menu-toggle-btn').removeClass('active');
+        $('.sidebar-mobile .fa-chevron-down').css('transform', 'rotate(0deg)');
+    });
+
+    // Desktop user menu toggle
+    $(document).on('click', '.user-menu-btn', function(e) {
+        e.stopPropagation();
+        console.log('Desktop user menu clicked');
+        const $dropdown = $(this).closest('.desktop-user-menu').find('.user-dropdown');
+        $dropdown.toggle();
+    });
+
+    // Mobile user menu toggle
+    $(document).on('click', '#mobileUserBtn', function(e) {
+        e.stopPropagation();
+        console.log('Mobile user menu clicked');
+        $('#mobileUserDropdown').toggleClass('active');
+        $('#mobileOverlay').toggleClass('active');
+    });
+
+    // Mobile search button functionality
+    $(document).on('click', '.mobile-search-btn', function() {
+        const searchTerm = prompt('Enter search term:');
+        if (searchTerm) {
+            console.log('Searching for:', searchTerm);
+            // Implement your search logic here
+        }
+    });
+
+    // Submenu toggle functionality
+    $(document).on('click', '.menu-toggle-btn', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log('Menu toggle clicked');
+
+        const $parent = $(this).closest('[data-has-submenu="true"]');
+        const $submenu = $parent.find('.submenu');
+        const $icon = $(this).find('.fa-chevron-down');
+
+        // Close all other submenus in the same sidebar
+        $parent.siblings('[data-has-submenu="true"]').each(function() {
+            $(this).find('.submenu').removeClass('active').slideUp(200);
+            $(this).find('.menu-toggle-btn').removeClass('active');
+            $(this).find('.fa-chevron-down').css('transform', 'rotate(0deg)');
         });
-        
-        $('.close-sidebar, #mobileOverlay').on('click', function() {
-            $('.sidebar-mobile').removeClass('active');
-            $('#mobileOverlay').removeClass('active');
-            $('body').css('overflow', 'auto');
-        });
-        
-        // Close sidebar when clicking a nav item on mobile
-        $('.sidebar-mobile [data-nav-item]').on('click', function() {
+
+        // Toggle current submenu
+        if ($submenu.hasClass('active')) {
+            $submenu.removeClass('active').slideUp(200);
+            $(this).removeClass('active');
+            $icon.css('transform', 'rotate(0deg)');
+        } else {
+            $submenu.addClass('active').slideDown(200);
+            $(this).addClass('active');
+            $icon.css('transform', 'rotate(180deg)');
+        }
+    });
+
+    // Nav item clicks (for both main and submenu items)
+    $(document).on('click', '[data-nav-item]', function() {
+        console.log('Nav item clicked:', $(this).attr('data-href'));
+
+        // Update active states after click
+        setTimeout(function() {
+            updateActiveNavItems();
+        }, 100);
+
+        // If on mobile, close sidebar after click
+        if ($(window).width() < 1024) {
             setTimeout(function() {
                 $('.sidebar-mobile').removeClass('active');
                 $('#mobileOverlay').removeClass('active');
                 $('body').css('overflow', 'auto');
             }, 300);
-        });
-        
-        // Desktop user menu toggle
-        $('.user-menu-btn').on('click', function(e) {
-            e.stopPropagation();
-            const $dropdown = $(this).closest('.desktop-user-menu').find('.user-dropdown');
-            $dropdown.toggle();
-        });
-        
-        // Close desktop dropdown when clicking elsewhere
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('.desktop-user-menu').length) {
-                $('.user-dropdown').hide();
-            }
-        });
-        
-        // Mobile user menu toggle
-        $('#mobileUserBtn').on('click', function(e) {
-            e.stopPropagation();
-            $('#mobileUserDropdown').toggleClass('active');
-            $('#mobileOverlay').toggleClass('active');
-        });
-        
+        }
+    });
+
+    // ==================== CLOSE DROPDOWNS WHEN CLICKING ELSEWHERE ====================
+    $(document).on('click', function(e) {
+        // Close desktop user dropdown
+        if (!$(e.target).closest('.desktop-user-menu').length) {
+            $('.user-dropdown').hide();
+        }
+
+        // Close submenus (except when clicking on submenu toggle)
+        if (!$(e.target).closest('[data-has-submenu="true"]').length) {
+            $('.submenu').removeClass('active').slideUp(200);
+            $('.menu-toggle-btn').removeClass('active');
+            $('.fa-chevron-down').css('transform', 'rotate(0deg)');
+        }
+
         // Close mobile user dropdown
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#mobileUserBtn').length && !$(e.target).closest('#mobileUserDropdown').length) {
-                $('#mobileUserDropdown').removeClass('active');
-                $('#mobileOverlay').removeClass('active');
+        if (!$(e.target).closest('#mobileUserBtn').length && !$(e.target).closest('#mobileUserDropdown').length) {
+            $('#mobileUserDropdown').removeClass('active');
+            $('#mobileOverlay').removeClass('active');
+        }
+    });
+
+    // ==================== HELPER FUNCTIONS ====================
+    // Update active nav items on navigation
+    function updateActiveNavItems() {
+        console.log('Updating active nav items');
+        const currentUrl = window.location.href;
+        const currentPath = window.location.pathname;
+
+        // Reset all active states first
+        $('[data-nav-item]').removeClass('active');
+        $('[data-has-submenu="true"] .menu-toggle-btn').removeClass('active');
+        $('.fa-chevron-down').css('transform', 'rotate(0deg)');
+
+        // Check all regular nav items
+        $('[data-nav-item]').each(function() {
+            const $item = $(this);
+            const href = $item.attr('data-href');
+
+            // Check if current URL matches this item
+            if (href && (currentUrl.includes(href) || currentPath.startsWith(href))) {
+                $item.addClass('active');
+                applyActiveStyling($item);
+            } else {
+                removeActiveStyling($item);
             }
         });
-        
-        // Mobile search button functionality
-        $('.mobile-search-btn').on('click', function() {
-            const searchTerm = prompt('Enter search term:');
-            if (searchTerm) {
-                console.log('Searching for:', searchTerm);
-            }
-        });
-        
-        // Update active nav items on navigation
-        function updateActiveNavItems() {
-            const currentUrl = window.location.href;
-            
-            $('[data-nav-item]').each(function() {
+
+        // Check all submenu items and their parents
+        $('[data-has-submenu="true"]').each(function() {
+            const $parent = $(this);
+            const $submenu = $parent.find('.submenu');
+            let hasActiveChild = false;
+
+            // Check each submenu item
+            $submenu.find('[data-nav-item]').each(function() {
                 const $item = $(this);
                 const href = $item.attr('data-href');
-                const isActive = currentUrl === href || currentUrl.startsWith(href);
-                
-                if (isActive) {
-                    $item
-                        .addClass('bg-blue-50 text-blue-600 border-l-4 border-blue-500')
-                        .removeClass('text-gray-700 hover:bg-blue-50 border-transparent');
-                    
-                    const $iconContainer = $item.find('div.w-8.h-8');
-                    if ($iconContainer.length) {
-                        $iconContainer
-                            .removeClass('bg-blue-100 group-hover:bg-blue-200')
-                            .addClass('bg-blue-200');
-                        
-                        const $icon = $iconContainer.find('i');
-                        if ($icon.length) {
-                            $icon.addClass('text-blue-700');
-                        }
-                    }
+
+                if (href && (currentUrl.includes(href) || currentPath.startsWith(href))) {
+                    $item.addClass('active');
+                    applyActiveStyling($item);
+                    hasActiveChild = true;
+
+                    // Ensure submenu is open
+                    $submenu.addClass('active').show();
+                    $parent.find('.menu-toggle-btn').addClass('active');
+                    $parent.find('.fa-chevron-down').css('transform', 'rotate(180deg)');
                 } else {
-                    $item
-                        .removeClass('bg-blue-50 text-blue-600 border-l-4 border-blue-500')
-                        .addClass('text-gray-700 hover:bg-blue-50 border-transparent');
-                    
-                    const $iconContainer = $item.find('div.w-8.h-8');
-                    if ($iconContainer.length) {
-                        const isFAQ = $item.attr('data-href') === '/admin/faq/list';
-                        
-                        if (isFAQ) {
-                            $iconContainer
-                                .removeClass('bg-blue-200')
-                                .addClass('bg-green-100 group-hover:bg-green-200');
-                            
-                            const $icon = $iconContainer.find('i');
-                            if ($icon.length) {
-                                $icon
-                                    .removeClass('text-blue-700')
-                                    .addClass('text-green-600');
-                            }
-                        } else {
-                            $iconContainer
-                                .removeClass('bg-blue-200')
-                                .addClass('bg-blue-100 group-hover:bg-blue-200');
-                            
-                            const $icon = $iconContainer.find('i');
-                            if ($icon.length) {
-                                $icon
-                                    .removeClass('text-blue-700')
-                                    .addClass('text-blue-600');
-                            }
-                        }
-                    }
+                    removeActiveStyling($item);
                 }
             });
+
+            // Apply active styling to parent button if any child is active
+            if (hasActiveChild) {
+                const $toggleBtn = $parent.find('.menu-toggle-btn');
+                $toggleBtn.addClass('active');
+            }
+        });
+    }
+
+    // Helper function to apply active styling
+    function applyActiveStyling($item) {
+        $item
+            .addClass('bg-orange-500 text-white border-r-2 border-orange-500 hover:bg-orange-500')
+            .removeClass('text-gray-700 hover:bg-blue-50 border-transparent text-white hover:text-gray-900');
+
+        const $iconContainer = $item.find('div.w-8.h-8, div.w-6.h-6');
+        if ($iconContainer.length) {
+            $iconContainer
+                .removeClass('bg-blue-100 bg-green-100 group-hover:bg-blue-200 group-hover:bg-green-200')
+                .addClass('bg-orange-200');
+
+            const $icon = $iconContainer.find('i');
+            if ($icon.length) {
+                $icon
+                    .removeClass('text-blue-600 text-green-600 text-blue-500 text-green-500')
+                    .addClass('text-orange-700');
+            }
         }
-        
-        // Initialize active nav items
-        updateActiveNavItems();
-        
-        // Update active nav items on URL change (for single page applications)
-        if (typeof history !== 'undefined' && history.pushState) {
-            $(window).on('popstate', updateActiveNavItems);
-            
-            const originalPushState = history.pushState;
-            history.pushState = function(state, title, url) {
-                originalPushState.call(history, state, title, url);
-                setTimeout(updateActiveNavItems, 50);
-            };
+    }
+
+    // Helper function to remove active styling
+    function removeActiveStyling($item) {
+        const href = $item.attr('data-href');
+        const isFAQ = href && href.includes('faq');
+
+        if ($item.closest('.submenu').length) {
+            // Submenu items
+            $item
+                .removeClass('bg-orange-500 text-white border-r-2 border-orange-500 hover:bg-orange-500')
+                .addClass('text-white hover:bg-blue-50 border-transparent hover:text-gray-900');
+
+            const $iconContainer = $item.find('div.w-6.h-6');
+            if ($iconContainer.length) {
+                $iconContainer
+                    .removeClass('bg-orange-200')
+                    .addClass('bg-blue-100 group-hover:bg-blue-200');
+
+                const $icon = $iconContainer.find('i');
+                if ($icon.length) {
+                    $icon
+                        .removeClass('text-orange-700')
+                        .addClass('text-blue-500');
+                }
+            }
+        } else {
+            // Main menu items
+            $item
+                .removeClass('bg-orange-500 text-white border-r-2 border-orange-500 hover:bg-orange-500')
+                .addClass('text-white hover:bg-gray-50 hover:text-gray-900 border-transparent');
+
+            const $iconContainer = $item.find('div.w-8.h-8');
+            if ($iconContainer.length) {
+                if (isFAQ) {
+                    $iconContainer
+                        .removeClass('bg-orange-200')
+                        .addClass('bg-green-100 group-hover:bg-green-200');
+
+                    const $icon = $iconContainer.find('i');
+                    if ($icon.length) {
+                        $icon
+                            .removeClass('text-orange-700')
+                            .addClass('text-green-600');
+                    }
+                } else {
+                    $iconContainer
+                        .removeClass('bg-orange-200')
+                        .addClass('bg-blue-100 group-hover:bg-blue-200');
+
+                    const $icon = $iconContainer.find('i');
+                    if ($icon.length) {
+                        $icon
+                            .removeClass('text-orange-700')
+                            .addClass('text-blue-600');
+                    }
+                }
+            }
         }
-        
-        // Update active nav items when clicking on anchor links
-        $(document).on('click', 'a[href^="/"]', function(e) {
-            if (!$(this).attr('target') && this.hostname === window.location.hostname) {
-                setTimeout(updateActiveNavItems, 100);
-            }
-        });
-        
-        // Handle window resize
-        $(window).on('resize', function() {
-            if ($(window).width() >= 1024) {
-                $('.sidebar-mobile').removeClass('active');
-                $('#mobileOverlay').removeClass('active');
-                $('body').css('overflow', 'auto');
-            }
-        });
-        
-        // Close dropdowns on escape key
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Escape') {
-                $('.user-dropdown').hide();
-                $('#mobileUserDropdown').removeClass('active');
-                $('#mobileOverlay').removeClass('active');
-                $('.sidebar-mobile').removeClass('active');
-                $('body').css('overflow', 'auto');
-            }
-        });
-        
-        // Prevent body scroll when sidebar is open
-        $(document).on('touchmove', function(e) {
-            if ($('.sidebar-mobile').hasClass('active')) {
-                e.preventDefault();
-            }
-        });
-        
-        // Handle mobile viewport height
-        function setViewportHeight() {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    // ==================== ADDITIONAL EVENT HANDLERS ====================
+
+    // Update active nav items on URL change (for single page applications)
+    if (typeof history !== 'undefined' && history.pushState) {
+        $(window).on('popstate', updateActiveNavItems);
+
+        const originalPushState = history.pushState;
+        history.pushState = function(state, title, url) {
+            originalPushState.call(history, state, title, url);
+            setTimeout(updateActiveNavItems, 50);
+        };
+    }
+
+    // Close dropdowns on escape key
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('.user-dropdown').hide();
+            $('#mobileUserDropdown').removeClass('active');
+            $('#mobileOverlay').removeClass('active');
+            $('.sidebar-mobile').removeClass('active');
+            $('body').css('overflow', 'auto');
         }
-        
-        setViewportHeight();
-        $(window).on('resize', setViewportHeight);
     });
+
+    // Handle window resize
+    $(window).on('resize', function() {
+        if ($(window).width() >= 1024) {
+            // Close mobile sidebar
+            $('.sidebar-mobile').removeClass('active');
+            $('#mobileOverlay').removeClass('active');
+            $('body').css('overflow', 'auto');
+
+            // Close all submenus in mobile sidebar
+            $('.sidebar-mobile .submenu').removeClass('active').hide();
+            $('.sidebar-mobile .menu-toggle-btn').removeClass('active');
+            $('.sidebar-mobile .fa-chevron-down').css('transform', 'rotate(0deg)');
+        }
+    });
+
+    // Handle mobile viewport height
+    function setViewportHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    setViewportHeight();
+    $(window).on('resize', setViewportHeight);
+
+    // Force update on window load (in case of redirects)
+    $(window).on('load', function() {
+        console.log('Window fully loaded - updating navigation');
+        updateActiveNavItems();
+    });
+
+    console.log('Navigation initialization complete');
+});
 </script>
 </body>
 </html>

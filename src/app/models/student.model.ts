@@ -12,6 +12,8 @@ export interface Student {
   state?: string;
   city?: string;
   zipcode?: string;
+  guardian?: Guardian;              // <- add this
+  student_details?: StudentDetail[]
   password: string;
   created_at?: string;
   updated_at?: string;
