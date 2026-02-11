@@ -30,10 +30,13 @@ export interface Assignment {
 
   course_id: number; // FK
   title: string;
-  assignment_file?: string; // uploaded file name
-  due_date?: string; // assignment due date
-  total_marks?: number; // total marks
-  uploaded_at?: string; // timestamp when uploaded
+  assignment_file?: string;
+  due_date?: string;
+  total_marks?: number;
+  uploaded_at?: string;
+  start_date?: string;
+  active_status?: boolean;
+  description?: string;
 
   created_at?: string;
   updated_at?: string;
@@ -47,6 +50,11 @@ export interface AssignmentPayload {
   assignment_file?: File | string; // file for upload
   due_date?: string;
   total_marks?: number;
+
+  // 👇 New Fields
+  start_date?: string;
+  active_status?: boolean;
+  description?: string;
 }
 
 // ===== API Response =====

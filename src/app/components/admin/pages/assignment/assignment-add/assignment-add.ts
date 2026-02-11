@@ -1,15 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AssignmentService } from '../../../../../services/assignment.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Course } from '../../../../../models/assignment.model';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-assignment-add',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, QuillModule],
   templateUrl: './assignment-add.html',
 })
 export class AssignmentAdd implements OnInit {
@@ -23,23 +24,43 @@ export class AssignmentAdd implements OnInit {
     private fb: FormBuilder,
     private assignmentService: AssignmentService,
     private toastService: ToastService,
-    public router: Router, // <-- make public for template access
+    public router: Router,
     private cdr: ChangeDetectorRef,
   ) {
     this.assignmentForm = this.fb.group({
       course_id: ['', Validators.required],
       title: ['', Validators.required],
-      assignment_file: [''], // UI placeholder for file name
-      due_date: ['', Validators.required],
+      assignment_file: [''],
+      start_date: ['', Validators.required],
+      due_date: [''],
       total_marks: [''],
+      description: [''],
+      active_status: [true], // default true
     });
   }
+
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'], // basic formatting
+      ['blockquote', 'code-block'], // blocks
+      [{ header: 1 }, { header: 2 }], // headers
+      [{ list: 'ordered' }, { list: 'bullet' }], // lists
+      [{ script: 'sub' }, { script: 'super' }], // sub/superscript
+      [{ indent: '-1' }, { indent: '+1' }], // indentation
+      [{ direction: 'rtl' }], // text direction
+      [{ size: ['small', false, 'large', 'huge'] }], // font size
+      [{ color: [] }, { background: [] }], // color pickers
+      [{ font: [] }], // font family
+      [{ align: [] }], // alignment
+      ['clean'], // remove formatting
+      ['link', 'image', 'video'], // media
+    ],
+  };
 
   ngOnInit(): void {
     this.loadCourses();
   }
 
-  /** ---------- LOAD COURSES ---------- */
   loadCourses(): void {
     this.isLoading = true;
     this.assignmentService.getCourses().subscribe({
@@ -56,7 +77,6 @@ export class AssignmentAdd implements OnInit {
     });
   }
 
-  /** ---------- FILE SELECTION ---------- */
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -67,7 +87,6 @@ export class AssignmentAdd implements OnInit {
     }
   }
 
-  /** ---------- SUBMIT ---------- */
   onSubmit(): void {
     if (this.assignmentForm.invalid) {
       this.markFormGroupTouched(this.assignmentForm);
@@ -78,12 +97,16 @@ export class AssignmentAdd implements OnInit {
     this.isSubmitting = true;
 
     const formData = new FormData();
+
     Object.keys(this.assignmentForm.value).forEach((key) => {
-      if (key !== 'assignment_file') {
-        const value = this.assignmentForm.value[key];
-        if (value !== null && value !== undefined) {
-          formData.append(key, value);
-        }
+      let value = this.assignmentForm.value[key];
+
+      if (key === 'active_status') {
+        value = value ? '1' : '0';
+      }
+
+      if (key !== 'assignment_file' && value !== null && value !== undefined) {
+        formData.append(key, value);
       }
     });
 
@@ -110,17 +133,14 @@ export class AssignmentAdd implements OnInit {
     });
   }
 
-  /** ---------- CANCEL ---------- */
   cancel(): void {
     this.router.navigate(['/admin/assignment/list']);
   }
 
-  /** ---------- HELPER TO MARK FORM CONTROLS AS TOUCHED ---------- */
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach((control) => control.markAsTouched());
   }
 
-  /** ---------- GETTER FOR FORM CONTROLS ---------- */
   get f() {
     return this.assignmentForm.controls;
   }
