@@ -14,6 +14,8 @@ import {
 export class InstructorService {
 
   private apiUrl = 'https://dotbitz.com/api/instructors';
+  // private apiUrl = 'http://localhost:8000/api/instructors';
+
 
   constructor(private http: HttpClient) {}
 

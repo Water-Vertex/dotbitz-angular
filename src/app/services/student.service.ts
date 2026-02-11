@@ -101,7 +101,13 @@ import { RegistrationRequest, Student, StudentDetail, Guardian } from '../models
   providedIn: 'root',
 })
 export class StudentService {
+<<<<<<< HEAD
   private apiUrl = 'http://localhost:8000/api/students'; 
+=======
+  // private apiUrl = 'http://localhost:8000/api/students';
+  private apiUrl = 'https://dotbitz.com/api/students';
+
+>>>>>>> 302c5cf78a9b20aaead1f45d40361edadd0ef156
 
   constructor(private http: HttpClient) {}
 

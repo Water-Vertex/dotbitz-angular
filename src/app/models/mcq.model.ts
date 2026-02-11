@@ -27,4 +27,3 @@ export interface Mcq {
   created_at?: string;
   updated_at?: string;
 }
-

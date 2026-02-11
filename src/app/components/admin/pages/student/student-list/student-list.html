@@ -47,7 +47,7 @@
             <td class="px-6 py-4 text-sm text-gray-900">{{ student.id }}</td>
             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ student.first_name }} {{ student.last_name }}</td>
             <td class="px-6 py-4 text-sm text-gray-600">{{ student.email }}</td>
-        
+
             <td class="px-6 py-4 text-sm whitespace-nowrap">
               <div class="flex space-x-2">
                 <a [routerLink]="['/admin/student/edit', student?.id]" class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium">Edit</a>
