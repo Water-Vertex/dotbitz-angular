@@ -1,0 +1,177 @@
+<div class="container mx-auto px-4 py-8">
+    <!-- Header - Same structure as FAQ -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Coupon Management</h1>
+                <p class="text-gray-600 mt-1">Manage discount coupons</p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <button
+                    (click)="refreshData()"
+                    [disabled]="isLoading"
+                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
+                    <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+                </button>
+                <a
+                    routerLink="/admin/coupon/add"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium"
+                >
+                    <i class="fas fa-plus"></i>
+                    <span>Add New Coupon</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State - Same as FAQ -->
+    <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="text-gray-500 mt-2">Loading coupons...</p>
+    </div>
+
+    
+    <!-- Main Content -->
+    <div *ngIf="!isLoading">
+        <!-- No Data -->
+        <div *ngIf="coupons.length === 0" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-tag text-gray-400 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Coupons Found</h3>
+            <p class="text-gray-600 mb-4">Start by adding your first discount coupon</p>
+            <a
+                routerLink="/admin/coupon/add"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors inline-flex items-center space-x-2 text-sm font-medium"
+            >
+                <i class="fas fa-plus"></i>
+                <span>Add New Coupon</span>
+            </a>
+        </div>
+
+        <!-- Data Table -->
+        <div *ngIf="coupons.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <!-- Mobile Card View -->
+            <div class="md:hidden divide-y divide-gray-200">
+                <div *ngFor="let coupon of coupons; trackBy: trackById" class="p-4 hover:bg-gray-50">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="text-sm font-medium text-gray-900">#{{coupon.code}}</span>
+                            <span class="ml-2 px-2 py-1 rounded text-xs font-semibold"
+                                  [ngClass]="coupon.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                                {{ coupon.is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a
+                                routerLink="/admin/coupon/edit/{{coupon.id}}"
+                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium transition-colors"
+                            >
+                                Edit
+                            </a>
+                            <button
+                                (click)="deleteCoupon(coupon.id)"
+                                class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Type</h4>
+                            <p class="text-sm text-gray-900 capitalize">{{coupon.discount_type}}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Value</h4>
+                            <p class="text-sm text-gray-900">
+                                {{coupon.discount_type === 'percentage' ? coupon.discount_value + '%' : '$' + coupon.discount_value}}
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Usage</h4>
+                            <p class="text-sm text-gray-900">{{coupon.used_count}} / {{coupon.usage_limit ?? '∞'}}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Expires</h4>
+                            <p class="text-sm text-gray-900">{{coupon.expires_at | date:'mediumDate'}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr *ngFor="let coupon of coupons; trackBy: trackById" class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{{coupon.code}}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">{{coupon.discount_type}}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{coupon.discount_type === 'percentage' ? coupon.discount_value + '%' : '$' + coupon.discount_value}}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{coupon.used_count}} / {{coupon.usage_limit ?? '∞'}}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 rounded text-xs font-semibold"
+                                      [ngClass]="coupon.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                                    {{ coupon.is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{coupon.expires_at | date:'mediumDate'}}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <div class="flex space-x-2">
+                                    <a
+                                        routerLink="/admin/coupon/edit/{{coupon.id}}"
+                                        class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium transition-colors"
+                                    >
+                                        Edit
+                                    </a>
+                                    <button
+                                        (click)="deleteCoupon(coupon.id)"
+                                        class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination - Same as FAQ -->
+            <div class="border-t border-gray-200 px-6 py-4 bg-gray-50">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+                    <div class="text-sm text-gray-700 text-center sm:text-left">
+                        Showing {{coupons.length}} of {{totalItems}} coupons
+                    </div>
+                    <button
+                        (click)="refreshData()"
+                        [disabled]="isLoading"
+                        class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center sm:justify-start disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <i class="fas fa-sync-alt mr-2" [class.animate-spin]="isLoading"></i>
+                        {{ isLoading ? 'Refreshing...' : 'Refresh List' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

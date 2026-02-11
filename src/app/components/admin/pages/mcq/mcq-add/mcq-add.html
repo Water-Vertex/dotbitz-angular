@@ -1,0 +1,148 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Add New MCQs</h1>
+      <p class="text-gray-600 mt-1">Create multiple questions for a single course</p>
+    </div>
+    <a routerLink="/admin/mcqs"
+   class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium cursor-pointer">
+   <i class="bi bi-arrow-left"></i>
+   <span>Back to List</span>
+</a>
+
+
+    <!-- <a routerLink="/admin/mcqs" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium">
+      <i class="bi bi-arrow-left"></i>
+      <span>Back to List</span>
+    </a> -->
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6">
+    <form [formGroup]="mcqForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+      <!-- Course Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Course <span class="text-red-500">*</span>
+        </label>
+
+        <div *ngIf="coursesLoading" class="flex items-center space-x-2 text-blue-600">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          <span>Loading courses...</span>
+        </div>
+
+        <select formControlName="course_id"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          [disabled]="coursesLoading || courses.length === 0">
+          <option value="">-- Select Course --</option>
+          <option *ngFor="let course of courses" [value]="course.id">
+            {{ course.course_name }} <span *ngIf="course.course_code">({{ course.course_code }})</span>
+          </option>
+        </select>
+      </div>
+
+      <!-- MCQs FormArray -->
+      <div formArrayName="mcqs" class="space-y-6">
+        <div *ngFor="let mcq of mcqs.controls; let i = index" [formGroupName]="i" class="bg-gray-50 p-4 rounded-lg border space-y-4">
+
+          <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-lg">MCQ {{ i + 1 }}</h2>
+            <button type="button" (click)="removeMcq(i)" *ngIf="mcqs.length > 1"
+              class="px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm flex items-center space-x-1">
+              <i class="bi bi-trash"></i>
+              <span>Remove</span>
+            </button>
+          </div>
+
+          <!-- Question -->
+          <div>
+            <textarea formControlName="question" rows="3" placeholder="Enter question..."
+              class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+          </div>
+
+          <!-- Answer Type -->
+          <div class="flex space-x-4">
+            <label class="flex items-center space-x-2">
+              <input type="radio" formControlName="issingle" [value]="true">
+              <span>Single Answer</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="radio" formControlName="issingle" [value]="false">
+              <span>Multiple Answers</span>
+            </label>
+          </div>
+
+          <!-- Options -->
+          <div formArrayName="options" class="space-y-2">
+            <div *ngFor="let opt of optionsAt(i).controls; let j = index" [formGroupName]="j" class="flex items-center space-x-2">
+              <div>{{ j + 1 }}.</div>
+
+              <div *ngIf="isSingleAt(i)">
+<!-- Single answer radio -->
+<input type="radio"
+       [value]="j"
+       formControlName="correctAnswers"
+       [checked]="correctAnswersAt(i).value === j"
+       (change)="onSingleAnswerChange(i, j)">
+              </div>
+              <div *ngIf="!isSingleAt(i)">
+                <input type="checkbox" [checked]="isCorrectAnswer(i,j)" (change)="onCorrectAnswerChange(i,j,$event)">
+              </div>
+
+              <input type="text" formControlName="value" placeholder="Option {{ j + 1 }}"
+                class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+
+              <button type="button" (click)="removeOption(i,j)" [disabled]="optionsAt(i).length <= 2"
+                class="px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+
+            <button type="button" (click)="addOption(i)" [disabled]="optionsAt(i).length >= 10"
+              class="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm flex items-center space-x-1">
+              <i class="bi bi-plus-circle"></i>
+              <span>Add Option</span>
+            </button>
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label>Status</label>
+            <select formControlName="status" class="px-3 py-2 border rounded-lg text-sm">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" (click)="addMcq()"
+        class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex items-center space-x-1">
+        <i class="bi bi-plus-circle"></i>
+        <span>Add Another MCQ</span>
+      </button>
+
+      <!-- Submit -->
+      <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+        <a routerLink="/admin/mcqs"
+   class="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
+   Cancel
+</a>
+
+        <!-- <a routerLink="/admin/mcqs" class="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</a> -->
+        <button type="submit" [disabled]="mcqForm.invalid || loading"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex items-center space-x-2">
+          <span *ngIf="!loading">Create MCQs</span>
+          <span *ngIf="loading" class="flex items-center space-x-2">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <span>Saving...</span>
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
