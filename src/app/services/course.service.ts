@@ -8,9 +8,13 @@ import { Instructor, Course, CourseApiResponse } from '../models/course.model';
   providedIn: 'root',
 })
 export class CourseService {
+
   private apiUrl = 'http://localhost:8000/api/courses';
 
   // private apiUrl = 'https://dotbitz.com/api/courses';
+
+ 
+
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +37,7 @@ export class CourseService {
   }
 
   getInstructors(): Observable<{ data: Instructor[] }> {
-    return this.http.get<{ data: Instructor[] }>('http://localhost:8000/api/instructors', {
+    return this.http.get<{ data: Instructor[] }>('https://dotbitz.com/api/instructors', {
       headers: this.getHeaders(),
     });
   }

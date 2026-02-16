@@ -9,11 +9,14 @@ import { InstructorPayload, InstructorApiResponse } from '../models/instructor.m
   providedIn: 'root',
 })
 export class InstructorService {
-  private apiUrl = 'http://localhost:8000/api/instructors';
   // private apiUrl = 'https://dotbitz.com/api/instructors';
+  private apiUrl = 'http://localhost:8000/api/instructors';
 
   constructor(private http: HttpClient) {}
 
+  /* =========================
+     Headers
+     ========================= */
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
 

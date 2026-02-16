@@ -3,13 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AssignmentPayload, AssignmentApiResponse } from '../models/assignment.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AssignmentService {
-  private apiUrl = 'http://localhost:8000/api/assignments';
-  private coursesUrl = 'http://localhost:8000/api/courses';
+  private apiUrl = environment.AdminApiUrl + '/assignments';
+  private coursesUrl = environment.AdminApiUrl + '/courses'; // For fetching courses for dropdowns
 
   constructor(private http: HttpClient) {}
 

@@ -13,43 +13,62 @@ import { ToastService } from '../../../services/toast.service';
 })
 export class Login {
   loginForm: FormGroup;
-  isLoading = false;
+  isLoadingGeneral = false; // Admin login loader
+  isLoadingGuardian = false; // Guardian login loader
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
-  onSubmit(): void {
+  onSubmit(loginType: 'admin' | 'guardian'): void {
     if (this.loginForm.valid) {
-      this.isLoading = true;
+      if (loginType === 'guardian') {
+        this.isLoadingGuardian = true;
+      } else {
+        this.isLoadingGeneral = true;
+      }
 
-      this.authService.login(this.loginForm.value).subscribe({
-        next: (response) => {
+      const credentials = this.loginForm.value;
+      const loginRequest =
+        loginType === 'guardian'
+          ? this.authService.guardianLogin(credentials)
+          : this.authService.login(credentials);
+
+      loginRequest.subscribe({
+        next: (response: any) => {
           if (response.success) {
             this.toastService.success('Welcome!', 'Logged in successfully');
-            this.router.navigate(['/admin/dashboard']);
+            this.router.navigate([
+              loginType === 'guardian' ? '/guardian/dashboard' : '/admin/dashboard',
+            ]);
+          } else {
+            this.toastService.error('Login Failed', response.message || 'Try again.');
           }
-          this.isLoading = false;
+          this.resetLoaders();
         },
         error: (error) => {
-          const errorMessage = error.error?.message || 'Login failed. Please try again.';
-          this.toastService.error('Login Failed', errorMessage);
-          this.isLoading = false;
-        }
+          this.toastService.error('Login Failed', error.error?.message || 'Try again.');
+          this.resetLoaders();
+        },
       });
     } else {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.loginForm.controls).forEach(key => {
-        this.loginForm.get(key)?.markAsTouched();
-      });
+      Object.keys(this.loginForm.controls).forEach((key) =>
+        this.loginForm.get(key)?.markAsTouched(),
+      );
     }
+  }
+
+  private resetLoaders() {
+    this.isLoadingGeneral = false;
+    this.isLoadingGuardian = false;
   }
 }

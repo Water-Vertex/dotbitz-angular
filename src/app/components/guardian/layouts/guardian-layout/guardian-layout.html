@@ -1,0 +1,191 @@
+<style>
+  /* Same CSS as before */
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+  }
+  .mobile-overlay.active {
+    display: block;
+  }
+
+  .mobile-user-dropdown {
+    position: fixed;
+    top: 70px;
+    right: 1rem;
+    width: 280px;
+    max-width: calc(100vw - 2rem);
+    z-index: 1001;
+    display: none;
+  }
+  .mobile-user-dropdown.active {
+    display: block;
+  }
+</style>
+
+<!-- Mobile Overlay -->
+<div
+  class="mobile-overlay bg-black bg-opacity-40"
+  [class.active]="mobileSidebarActive || mobileUserDropdownActive"
+  (click)="mobileSidebarActive = false; mobileUserDropdownActive = false"
+></div>
+
+<!-- Mobile User Dropdown -->
+<div
+  class="mobile-user-dropdown bg-white rounded-xl shadow-2xl border border-gray-100 py-2"
+  [class.active]="mobileUserDropdownActive"
+>
+  <div class="px-5 py-4 border-b border-gray-100">
+    <p class="text-sm font-semibold text-gray-900">
+      {{ guardian.first_name }} {{ guardian.last_name }}
+    </p>
+    <p class="text-xs text-gray-500 mt-1">{{ guardian.email }}</p>
+  </div>
+
+  <!-- Profile Link -->
+  <a
+    routerLink="/guardian/profile"
+    class="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200"
+    (click)="mobileUserDropdownActive = false"
+  >
+    <i class="fas fa-user-circle mr-3 text-gray-400 w-5"></i>
+    Profile
+  </a>
+
+  <div class="border-t border-gray-100 my-1"></div>
+
+  <button
+    (click)="logout()"
+    class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+  >
+    <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
+    <span>Sign Out</span>
+  </button>
+</div>
+
+<div class="flex h-screen bg-gray-50">
+
+  <!-- Desktop Sidebar -->
+  <div class="desktop-sidebar w-64 bg-gray-900 text-white shadow-lg flex flex-col border-r border-gray-200">
+    <div class="p-6 border-b border-gray-700">
+      <h2 class="text-xl font-bold text-white">Guardian Portal</h2>
+      <p class="text-sm text-gray-500 mt-1">Welcome, {{ guardian.first_name }}</p>
+    </div>
+
+    <nav class="flex-1 mt-4 overflow-y-auto no-scrollbar">
+      <div class="px-4 space-y-1">
+        <a
+          routerLink="/guardian/dashboard"
+          class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900"
+        >
+          <i class="fas fa-home mr-3 w-5 text-center"></i>
+          Dashboard
+        </a>
+        <!-- Removed Profile link from sidebar -->
+      </div>
+    </nav>
+
+    <div class="p-4 border-t border-gray-700 bg-gray-800 flex items-center space-x-3">
+      <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+        <span class="text-white font-semibold text-sm">{{ guardian.first_name?.charAt(0) }}</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-white truncate">
+          {{ guardian.first_name }} {{ guardian.last_name }}
+        </p>
+        <p class="text-xs text-gray-400 truncate">{{ guardian.email }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class="bg-white border-b border-gray-200 shadow-sm">
+      <div class="flex justify-between items-center px-4 lg:px-6 py-4">
+        <div class="flex items-center space-x-4">
+          <button
+            (click)="toggleMobileSidebar()"
+            class="mobile-menu-btn text-gray-600 hover:text-blue-600 p-2 rounded-lg lg:hidden"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+          <span class="font-semibold text-gray-900 header-title">Guardian Dashboard</span>
+        </div>
+
+        <div class="flex items-center space-x-2 lg:space-x-4">
+          <div class="relative hidden lg:block">
+            <button
+              (click)="desktopUserDropdownActive = !desktopUserDropdownActive"
+              class="flex items-center space-x-3 text-sm focus:outline-none bg-white hover:bg-gray-50 rounded-xl px-4 py-2.5 border border-gray-200 hover:border-gray-300 transition-all duration-200 shadow-sm"
+            >
+              <div
+                class="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm"
+              >
+                <span class="text-white font-semibold text-sm">{{
+                  guardian.first_name?.charAt(0)
+                }}</span>
+              </div>
+              <div class="text-left">
+                <p class="font-semibold text-gray-900">
+                  {{ guardian.first_name }} {{ guardian.last_name }}
+                </p>
+                <p class="text-xs text-gray-500">Guardian</p>
+              </div>
+              <i
+                class="fas fa-chevron-down text-gray-400 text-xs transition-transform"
+                [style.transform]="desktopUserDropdownActive ? 'rotate(180deg)' : 'none'"
+              ></i>
+            </button>
+
+            <div
+              *ngIf="desktopUserDropdownActive"
+              class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50"
+            >
+              <div class="px-5 py-4 border-b border-gray-100">
+                <p class="text-sm font-semibold text-gray-900">
+                  {{ guardian.first_name }} {{ guardian.last_name }}
+                </p>
+                <p class="text-xs text-gray-500">{{ guardian.email }}</p>
+              </div>
+
+              <!-- Profile Link Only Here -->
+              <a
+                routerLink="/guardian/profile"
+                class="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200"
+              >
+                <i class="fas fa-user-circle mr-3 text-gray-400 w-5"></i>
+                Profile
+              </a>
+
+              <div class="border-t border-gray-100 my-1"></div>
+
+              <button
+                (click)="logout()"
+                class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+              >
+                <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i> Sign Out
+              </button>
+            </div>
+          </div>
+
+          <button
+            (click)="toggleMobileUserDropdown()"
+            class="mobile-user-btn w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm lg:hidden"
+          >
+            {{ guardian.first_name?.charAt(0) }}
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto bg-gray-50">
+      <div class="p-4 lg:p-6 main-content">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>
