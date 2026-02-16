@@ -111,15 +111,20 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Mcq } from '../models/mcq.model';
 import { Course } from '../models/course.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class McqService {
   // ✅ BASE URLs - properly defined
-  private apiUrl = 'http://localhost:8000/api/mcqs';           // Public MCQ routes
-  private adminApiUrl = 'http://localhost:8000/api/admin/mcqs'; // Admin MCQ routes
-  private courseApiUrl = 'http://localhost:8000/api/courses';   // Course routes
+  // private apiUrl = 'http://localhost:8000/api/mcqs';           
+  // private adminApiUrl = 'http://localhost:8000/api/admin/mcqs'; 
+  // private courseApiUrl = 'http://localhost:8000/api/courses'
+  private adminApiUrl = 'http://localhost:8000/api/mcqs'; 
+  private courseApiUrl = environment.apiUrl+'/courses';
+  private apiUrl = environment.apiUrl+'/mcqs';          
+;   // Course routes
 
   constructor(private http: HttpClient) {}
 

@@ -13,7 +13,10 @@ import { ToastService } from '../../../services/toast.service';
 })
 export class Login {
   loginForm: FormGroup;
-  isLoading = false;
+  isLoadingAdmin = false;
+  isLoadingStudent = false;
+
+
 
   constructor(
     private fb: FormBuilder,
@@ -26,10 +29,31 @@ export class Login {
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
+loginAsStudent() {
+  if (this.loginForm.invalid) return;
+
+  this.isLoadingStudent = true;
+
+
+  this.authService.studentLogin(this.loginForm.value).subscribe({
+    next: (res) => {
+      this.isLoadingStudent = false;
+      if (res.success) {
+        this.toastService.success('Welcome!', 'Student logged in');
+        this.router.navigate(['/student/dashboard']);
+      }
+    },
+    error: (err) => {
+      this.isLoadingStudent = false;
+      this.toastService.error('Login Failed', err.error.message);
+    }
+  });
+}
+
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.isLoading = true;
+      this.isLoadingAdmin = true;
 
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
@@ -37,12 +61,12 @@ export class Login {
             this.toastService.success('Welcome!', 'Logged in successfully');
             this.router.navigate(['/admin/dashboard']);
           }
-          this.isLoading = false;
+          this.isLoadingAdmin = false;
         },
         error: (error) => {
           const errorMessage = error.error?.message || 'Login failed. Please try again.';
           this.toastService.error('Login Failed', errorMessage);
-          this.isLoading = false;
+          this.isLoadingAdmin = false;
         }
       });
     } else {

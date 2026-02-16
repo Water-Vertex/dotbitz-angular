@@ -15,7 +15,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
   private isInitialized = false;
-
+  
   constructor(
     private http: HttpClient,
     private router: Router, // Inject Router
@@ -32,8 +32,10 @@ export class AuthService {
     }
   }
 
+
+
  login(credentials: LoginRequest) {
-  return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+  return this.http.post<LoginResponse>(`${this.apiUrl}/admin/login`, credentials).pipe(
     tap(res => {
       if (res.success) {
         localStorage.setItem('token', res.token);
@@ -43,6 +45,36 @@ export class AuthService {
     })
   );
 }
+studentLogin(credentials: LoginRequest) {
+  return this.http.post<LoginResponse>(`${this.apiUrl}/student/login`, credentials).pipe(
+    tap(res => {
+      if (res.success && res.Student) {
+        const user: User = {
+          id: res.Student.id,
+          name: `${res.Student.first_name} ${res.Student.last_name}`, // combine first & last name
+          email: res.Student.email
+        };
+
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(user));
+        this.currentUserSubject.next(user); // ab currentUser me proper name hai
+      }
+    })
+  );
+}
+
+
+// studentLogin(credentials: LoginRequest) {
+//   return this.http.post<LoginResponse>(`${this.apiUrl}/student/login`, credentials).pipe(
+//     tap(res => {
+//       if (res.success) {
+//         localStorage.setItem('token', res.token);
+//         localStorage.setItem('user', JSON.stringify(res.Student));
+//         this.currentUserSubject.next(res.Student);
+//       }
+//     })
+//   );
+// }
 
   logout(): Observable<any> {
     const token = this.getToken();
@@ -161,4 +193,23 @@ export class AuthService {
       localStorage.removeItem('user');
     }
   }
+//   // AuthService ke andar
+// studentLogin(credentials: { email: string, password: string }) {
+//   return this.http.post<LoginResponse>(`${this.apiUrl}/student/login`, credentials).pipe(
+//     tap(res => {
+//       if (res.success && res.Student) {   // check Student exists
+//         const studentUser: User = {
+//           id: res.Student.id,
+//           name: res.Student.name,
+//           email: res.Student.email,
+//           role: 'student'
+//         };
+//         this.setToken(res.token);
+//         this.setUser(studentUser);
+//         this.currentUserSubject.next(studentUser);
+//       }
+//     })
+//   );
+// }
+
 }

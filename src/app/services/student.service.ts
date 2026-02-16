@@ -94,20 +94,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError,tap } from 'rxjs/operators';
 import { RegistrationRequest, Student, StudentDetail, Guardian } from '../models/student.model';
+import { environment } from '../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class StudentService {
-<<<<<<< HEAD
-  private apiUrl = 'http://localhost:8000/api/students'; 
-=======
-  // private apiUrl = 'http://localhost:8000/api/students';
-  private apiUrl = 'https://dotbitz.com/api/students';
+     private apiUrl = 'http://localhost:8000/api/students'; 
 
->>>>>>> 302c5cf78a9b20aaead1f45d40361edadd0ef156
+    //  private apiUrl = environment.apiUrl+ '/students'; 
+    //private apiUrl = 'https://dotbitz.com/api/students';
+
 
   constructor(private http: HttpClient) {}
 
@@ -146,6 +146,44 @@ export class StudentService {
       catchError(err => throwError(() => err))
     );
   }
+  
+// getProfile(): Observable<any> {
+//   return this.http.get(`${this.apiUrl}/profile`, { 
+//     headers: this.getHeaders() 
+//   }).pipe(
+//     catchError(err => throwError(() => err))
+//   );
+// }
+
+getProfile(): Observable<any> {
+  console.log('🔷 Service: getProfile() called');
+  console.log('🔷 API URL:', `${this.apiUrl}/profile`);
+  console.log('🔷 Token exists:', !!localStorage.getItem('token'));
+  
+  return this.http.get(`${this.apiUrl}/profile`, { 
+    headers: this.getHeaders() 
+  }).pipe(
+    tap(response => {
+      console.log('✅ Service: Response received:', response);
+    }),
+    catchError(err => {
+      console.error('❌ Service: Request failed:', err);
+      console.error('❌ Service: Error status:', err.status);
+      console.error('❌ Service: Error body:', err.error);
+      return throwError(() => err);
+    })
+  );
+}
+
+updateProfile(data: Partial<Student>): Observable<any> {
+  return this.http.put(`${this.apiUrl}/profile`, data, { 
+    headers: this.getHeaders() 
+  }).pipe(
+    catchError(err => throwError(() => err))
+  );
+}
+
+
 
   updateStudent(id: number, data: Partial<Student>): Observable<Student> {
     return this.http.put<Student>(`${this.apiUrl}/${id}`, data, { headers: this.getHeaders() }).pipe(

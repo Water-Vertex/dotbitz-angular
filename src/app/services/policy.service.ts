@@ -7,7 +7,8 @@ import { catchError, map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class PolicyService {
-  private apiUrl = 'https://dotbitz.com/api/policies';
+  // private apiUrl = 'https://dotbitz.com/api/policies';
+  private apiUrl = 'http://localhost:8000/api/policies';
 
   constructor(private http: HttpClient) {}
 

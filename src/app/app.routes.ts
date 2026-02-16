@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { Login } from './components/auth/login/login';
 import { AdminLayout } from './components/admin/layouts/admin-layout/admin-layout';
 import { Dashboard } from './components/admin/pages//dashboard/dashboard';
+// import { StudentLayout } from './components/admin/pages//dashboard/dashboard';
+import { DashboardLayoutComponent } from './components/student/layouts/dashboard-layout/dashboard-layout';
 import { authGuard } from './guards/auth-guard';
 import { FaqList } from './components/admin/pages/faq/faq-list/faq-list';
 import { FaqAdd } from './components/admin/pages/faq/faq-add/faq-add';
@@ -36,9 +38,14 @@ import { McqsEdit } from './components/admin/pages/mcq/mcq-edit/mcq-edit';
 import { AssessmentList } from './components/admin/pages/assessment/assessment-list/assessment-list';
 import { AssessmentAdd } from './components/admin/pages/assessment/assessment-add/assessment-add';
 import { AssessmentEdit } from './components/admin/pages/assessment/assessment-edit/assessment-edit';
+import { StudentDashboardComponent } from './components/student/pages/dashboard/dashboard';
+import { ProfileComponent } from './components/student/pages/profile/profile-show/profile-show'; // ✅ import profile
+import { ProfileEditComponent } from './components/student/pages/profile/profile-edit/profile-edit';
+import { StudentLogin } from './components/auth/student-login/student-login';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
+  { path: 'student/login', component: StudentLogin },
 
 
   {
@@ -77,10 +84,11 @@ export const routes: Routes = [
       { path: 'admin/policy/list', component: PolicyList },
       { path: 'admin/policy/add', component: PolicyAdd },
       { path: 'admin/policy/edit/:id', component: PolicyEdit },
-//Admin Student routes
-      { path: 'admin/student/list', component: StudentList },
-      { path: 'admin/student/add', component: StudentAdd },
-      { path: 'admin/student/edit/:id', component: StudentEdit },
+      
+// //Admin Student routes
+//       { path: 'admin/student/list', component: StudentList },
+//       { path: 'admin/student/add', component: StudentAdd },
+//       { path: 'admin/student/edit/:id', component: StudentEdit },
 
        // Student routes
       { path: 'admin/student/list', component: StudentList },
@@ -112,12 +120,15 @@ export const routes: Routes = [
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
-  {
-    path: '',
-    component: StudentLayout,
-    children: [
-      { path: 'student/registration', component: StudentRegistration },
-    ]
-  },
-  { path: '**', redirectTo: '' }
+ {
+  path: '',
+  component: DashboardLayoutComponent, // layout wrapper
+  children: [
+    { path: 'student/profile', component: ProfileComponent }, 
+    { path: 'student/profile/edit', component: ProfileEditComponent },
+    { path: 'student/registration', component: StudentRegistration },
+    { path: 'student/dashboard', component: StudentDashboardComponent }, 
+  ]
+},
+{ path: '**', redirectTo: '' }
 ];

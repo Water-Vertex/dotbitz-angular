@@ -1,0 +1,88 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Welcome, {{ currentUser?.name }}!</h1>
+      <p class="text-gray-600 mt-1">Here's an overview of your courses, assignments, and exams.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center">
+        <i class="fas fa-plus mr-2"></i>Enroll in Course
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- My Courses Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-blue-50 rounded-lg">
+          <i class="fas fa-book-open text-blue-600 text-lg"></i>
+        </div>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 mb-1">My Courses</h3>
+      <p class="text-gray-600 text-sm mb-4">View and manage your enrolled courses.</p>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Go to Courses
+      </button>
+    </div>
+
+    <!-- Assignments Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-green-50 rounded-lg">
+          <i class="fas fa-tasks text-green-600 text-lg"></i>
+        </div>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 mb-1">Assignments</h3>
+      <p class="text-gray-600 text-sm mb-4">Check upcoming assignments and deadlines.</p>
+      <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+        View Assignments
+      </button>
+    </div>
+
+    <!-- Exams Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow">
+      <div class="flex items-center justify-between mb-4">
+        <div class="p-3 bg-red-50 rounded-lg">
+          <i class="fas fa-file-alt text-red-600 text-lg"></i>
+        </div>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 mb-1">Exams</h3>
+      <p class="text-gray-600 text-sm mb-4">See your exam schedule and results.</p>
+      <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+        View Exams
+      </button>
+    </div>
+  </div>
+
+  <!-- Optional Recent Activity -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+    <div class="space-y-4">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
+          <i class="fas fa-book text-blue-600 text-sm"></i>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-gray-900"><span class="font-medium">Web Development Bootcamp</span> course updated</p>
+          <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-1">
+          <i class="fas fa-tasks text-green-600 text-sm"></i>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm text-gray-900"><span class="font-medium">UI/UX Assignment</span> submitted</p>
+          <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

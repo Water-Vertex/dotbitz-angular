@@ -33,7 +33,7 @@
             <p class="text-sm text-gray-500">Enter your email and password to sign in!</p>
           </div>
           <div>
-            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <form [formGroup]="loginForm" (ngSubmit)="loginAsStudent()">
               <div class="space-y-5">
                 <!-- Email -->
                 <div>
@@ -156,12 +156,11 @@
                 <div>
                   <button
                     type="button"
-                    [disabled]="isLoadingAdmin"
-                    (click)="onSubmit()"
+                    [disabled]="isLoading"
+                    (click)="loginAsStudent()"
                     class="bg-[#161950] shadow-theme-xs hover:bg-[#161950] flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition"
                   >
-                    <span *ngIf="!isLoadingAdmin">Sign In</span>
-                    <span *ngIf="isLoadingAdmin">Authenticating...</span>
+                    <span>Sign In</span>
                   </button>
                 </div>
 
@@ -170,23 +169,22 @@
 
                 <div class="flex gap-3">
   <!-- Guardian Button -->
-  <!-- <button
-    type="button"
+  <a
+
    
     class="bg-[#161950] shadow-theme-xs hover:bg-[#0f123d] flex w-1/2 items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition disabled:opacity-60"
   >
-    <span *ngIf="!isLoading">Guardian Sign In</span>
-    <span *ngIf="isLoading">Authenticating...</span>
-  </button>-->
+    <span >Guardian Sign In</span>
+                </a>
 
-  <button
+  <!-- <button
     type="button"
     (click)="loginAsStudent()"
     class="bg-[#161950] shadow-theme-xs hover:bg-[#0f123d] flex w-1/2 items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition disabled:opacity-60"
   >
     <span *ngIf="!isLoadingStudent">Student Sign In</span>
     <span *ngIf="isLoadingStudent">Authenticating...</span>
-  </button> 
+  </button>  -->
 </div>
               </div>
             </form>

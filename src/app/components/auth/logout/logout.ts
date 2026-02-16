@@ -30,7 +30,7 @@ export class Logout {
       },
       error: () => {
         // Force redirect even if there's an error
-        this.router.navigate(['/login']);
+        this.router.navigate(['student/login']);
       }
     });
   }
