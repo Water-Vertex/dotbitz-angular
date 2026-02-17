@@ -8,8 +8,8 @@ import { Instructor, Course, CourseApiResponse } from '../models/course.model';
   providedIn: 'root',
 })
 export class CourseService {
-  private apiUrl = 'http://localhost:8000/api/courses';
-
+  // private apiUrl = 'http://localhost:8000/api/courses';
+private apiUrl = 'http://localhost:8000/api/admin/courses';
   // private apiUrl = 'https://dotbitz.com/api/courses';
 
   constructor(private http: HttpClient) {}

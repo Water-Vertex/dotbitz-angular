@@ -42,6 +42,7 @@ import { StudentDashboardComponent } from './components/student/pages/dashboard/
 import { ProfileComponent } from './components/student/pages/profile/profile-show/profile-show'; // ✅ import profile
 import { ProfileEditComponent } from './components/student/pages/profile/profile-edit/profile-edit';
 import { StudentLogin } from './components/auth/student-login/student-login';
+import { StudentCourseList } from './components/student/pages/course/course-list/course-list';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -128,6 +129,8 @@ export const routes: Routes = [
     { path: 'student/profile/edit', component: ProfileEditComponent },
     { path: 'student/registration', component: StudentRegistration },
     { path: 'student/dashboard', component: StudentDashboardComponent }, 
+    { path: 'student/course/list', component: StudentCourseList },  
+
   ]
 },
 { path: '**', redirectTo: '' }
