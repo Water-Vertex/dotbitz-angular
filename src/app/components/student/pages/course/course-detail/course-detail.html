@@ -1,0 +1,118 @@
+<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[70vh] space-y-4">
+  <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#073a89]"></div>
+  <p class="text-gray-500 font-medium animate-pulse">Loading Course Details...</p>
+</div>
+
+<div *ngIf="!loading && course">
+  
+  <section class="bg-gradient-to-br from-[#073a89] to-[#0091b9] text-white py-16">
+    <div class="container mx-auto px-6">
+      <h1 class="text-4xl font-bold mb-4">{{ course.course_name }}</h1>
+      <div class="flex gap-4">
+        <span>Level: {{ course.course_level }}</span>
+        <span>Duration: {{ course.course_duration }}</span>
+        <span>Start: {{ course.start_date | date: 'mediumDate' }}</span>
+      </div>
+      <div *ngIf="course.is_featured" class="mt-4 px-3 py-1 bg-red-500 rounded-full text-sm inline-block">
+        ⭐ Featured Course
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-6 grid lg:grid-cols-3 gap-12">
+      
+      <div class="lg:col-span-2 space-y-12 min-w-0">
+        
+        <div class="w-full overflow-hidden">
+          <h2 class="text-3xl font-bold mb-6 text-[#073a89]">Course Description</h2>
+          <div
+            class="prose prose-lg max-w-none text-gray-700 leading-relaxed break-words overflow-wrap-anywhere"
+            [innerHTML]="course.course_description"
+          ></div>
+        </div>
+
+        <div *ngIf="getBenefits().length > 0">
+          <h2 class="text-3xl font-bold mb-6 text-[#073a89]">Parent-Friendly Benefits</h2>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div *ngFor="let benefit of getBenefits()" class="flex gap-3 items-start">
+              <div class="w-6 h-6 bg-blue-100 flex items-center justify-center rounded-full shrink-0 mt-1">
+                <span class="text-blue-600 text-xs">✔</span>
+              </div>
+              <p class="text-gray-700 whitespace-normal break-words">{{ benefit }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="course.instructor">
+          <h2 class="text-3xl font-bold mb-6 text-[#073a89]">Meet Your Instructor</h2>
+          <div class="bg-gray-50 p-8 rounded-xl">
+            <h3 class="text-2xl font-bold">
+              {{ course.instructor.first_name }} {{ course.instructor.last_name }}
+            </h3>
+            <p class="text-blue-600 mt-1 font-medium">{{ course.instructor.title }}</p>
+            <p class="mt-4 text-gray-700 leading-relaxed">{{ course.instructor.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-1">
+        <div class="sticky top-24 space-y-6">
+          <div class="rounded-xl overflow-hidden shadow-lg border border-gray-100">
+            <img 
+              *ngIf="course.thumbnail_image" 
+              [src]="'http://localhost:8000/assets/images/courses/' + course.thumbnail_image" 
+              class="w-full h-56 object-cover" 
+              alt="Course Thumbnail" 
+            />
+          </div>
+
+          <div class="bg-gray-50 p-8 rounded-xl shadow-lg space-y-6">
+            <h3 class="text-2xl font-bold text-center text-[#073a89]">Course Details</h3>
+            
+            <div class="space-y-4">
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Course Fee</span>
+                <span class="font-bold text-orange-600">${{ course.course_fee }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Duration</span>
+                <span class="font-semibold">{{ course.course_duration }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Level</span>
+                <span class="font-semibold">{{ course.course_level }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Age Limit</span>
+                <span class="font-semibold">{{ course.age_limit }}+ Years</span>
+              </div>
+            </div>
+
+            <div class="text-center pt-2">
+              <span *ngIf="course.status === 'active'" class="px-6 py-2 bg-green-100 text-green-800 rounded-full text-sm font-bold">Active</span>
+              <span *ngIf="course.status === 'upcoming'" class="px-6 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">Upcoming</span>
+              <span *ngIf="course.status === 'inactive'" class="px-6 py-2 bg-red-100 text-red-800 rounded-full text-sm font-bold">Inactive</span>
+            </div>
+
+            <button *ngIf="course.status === 'active'" class="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-md">
+              ENROLL NOW
+            </button>
+            <button *ngIf="course.status === 'upcoming'" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-md">
+              JOIN WAITLIST
+            </button>
+            <button *ngIf="course.status === 'inactive'" disabled class="w-full py-4 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
+              NOT AVAILABLE
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<div *ngIf="!loading && !course" class="py-20 text-center">
+  <p class="text-red-500 font-bold text-xl">Course not found!</p>
+  <button routerLink="/student/courses" class="mt-4 text-blue-600 hover:underline">Back to Courses</button>
+</div>

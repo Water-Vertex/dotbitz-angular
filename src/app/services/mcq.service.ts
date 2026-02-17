@@ -6,19 +6,26 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Mcq } from '../models/mcq.model';
 import { Course } from '../models/course.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class McqService {
   // ✅ BASE URLs - properly defined
+
   // private apiUrl = 'https://dotbitz.com/api/mcqs'; // Public MCQ routes
   // private adminApiUrl = 'https://dotbitz.com/api/mcqs'; // Admin MCQ routes
   // private courseApiUrl = 'https://dotbitz.com/api/courses'; // Course routes
 
-  private apiUrl = 'http://localhost:8000/api/mcqs'; // Public MCQ routes
-  private adminApiUrl = 'http://localhost:8000/api/mcqs'
-  private courseApiUrl = 'http://localhost:8000/api/courses'; // Course routes
+  // private apiUrl = 'http://localhost:8000/api/mcqs'; // Public MCQ routes
+  // private adminApiUrl = 'http://localhost:8000/api/mcqs'
+  // private courseApiUrl = 'http://localhost:8000/api/courses'; // Course routes
+
+  private apiUrl = environment.AdminApiUrl + '/mcqs';           // Public MCQ routes
+  private adminApiUrl = environment.AdminApiUrl + '/mcqs'; // Admin MCQ routes
+  private courseApiUrl = environment.AdminApiUrl + '/courses';   // Course routes
+
 
   constructor(private http: HttpClient) {}
 

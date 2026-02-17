@@ -11,7 +11,7 @@ import { GuardianService } from '../../../../services/guardian.service';
   templateUrl: './guardian-layout.html',
   styleUrls: ['./guardian-layout.css'],
 })
-export class GuardianLayoutComponent implements OnInit {
+export class GuardianLayout implements OnInit {
   guardian: any = {}; // store dynamic data
 
   // Mobile/desktop toggles
@@ -54,5 +54,12 @@ export class GuardianLayoutComponent implements OnInit {
 
   toggleMobileUserDropdown() {
     this.mobileUserDropdownActive = !this.mobileUserDropdownActive;
+  }
+
+  navigateToProfile() {
+    this.router.navigate(['/guardian/profile']);
+  }
+  navigateToLogout() {
+    this.router.navigate(['/guardian/logout']);
   }
 }

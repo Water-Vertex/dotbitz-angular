@@ -1,9 +1,12 @@
 export const environment = {
-  production: true,
-  // apiUrl: 'https://dotbitz.com/api',
+  production: false,
+  // local API URLs'
   AdminApiUrl: 'http://localhost:8000/api/admin',
   GuardianApiUrl: 'http://localhost:8000/api/guardian',
   StudentApiUrl: 'http://localhost:8000/api/student',
 
-  // apiUrl: 'http://localhost:8000/api',
+  // live API URLs
+  // AdminApiUrl: 'https://dotbitz.com/api/admin',
+  // GuardianApiUrl: 'https://dotbitz.com/api/guardian',
+  // StudentApiUrl: 'https://dotbitz.com/api/student',
 };

@@ -32,14 +32,11 @@ export class GuardianLogin {
     if (this.loginForm.valid) {
       this.isLoading = true;
 
-     
-           this.authService.guardianLogin(this.loginForm.value).subscribe({
-       next: (response: any) => {
+      this.authService.guardianLogin(this.loginForm.value).subscribe({
+        next: (response: any) => {
           if (response.success) {
             this.toastService.success('Welcome!', 'Logged in successfully');
-            this.router.navigate([
-               '/guardian/dashboard',
-            ]);
+            this.router.navigate(['/guardian/dashboard']);
           } else {
             this.toastService.error('Login Failed', response.message || 'Try again.');
           }
@@ -61,5 +58,9 @@ export class GuardianLogin {
   private resetLoaders() {
     this.isLoading = false;
     this.isLoadingGuardian = false;
+  }
+
+  navigateToStudentLogin() {
+    this.router.navigate(['/student/login']);
   }
 }

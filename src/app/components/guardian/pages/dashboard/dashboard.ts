@@ -8,68 +8,41 @@ import { CommonModule } from '@angular/common';
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })
-export class GuardianDashboardComponent implements OnInit {
-  // Metrics cards data
+export class GuardianDashboard implements OnInit {
   metrics = {
-    children: 2,
-    childrenChange: 15.5,
-    childrenTrend: 'up',
-    courses: 5,
-    coursesChange: 5.0,
-    coursesTrend: 'up',
-    assignments: 3,
-    assignmentsChange: -12,
-    assignmentsTrend: 'down',
-    attendance: 92,
-    attendanceChange: 2,
-    attendanceTrend: 'up',
+    customers: 3782,
+    customersChange: 11.01,
+    customersTrend: 'up',
+    orders: 5359,
+    ordersChange: 9.05,
+    ordersTrend: 'down',
   };
 
-  // Chart data placeholder
   chartData: any;
-
-  // Table for children progress
-  childrenProgress: any[] = [];
+  tableData: any[] = [];
 
   ngOnInit() {
     this.initializeChartData();
-    this.initializeChildrenProgress();
+    this.initializeTableData();
   }
 
   initializeChartData() {
     this.chartData = {
-      // Chart configuration can go here
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-      datasets: [
-        {
-          label: 'Attendance',
-          data: [90, 92, 88, 95, 92],
-          borderColor: '#3b82f6', // blue-500
-          backgroundColor: 'rgba(59, 130, 246, 0.2)',
-          fill: true,
-          tension: 0.4,
-        },
-      ],
+      // Chart data configuration
     };
   }
 
-  initializeChildrenProgress() {
-    this.childrenProgress = [
+  initializeTableData() {
+    this.tableData = [
       {
-        name: 'Ali Khan',
-        course: 'Web Development',
-        progress: 75,
+        product: 'Macbook pro 13”',
+        image: 'src/images/product/product-01.jpg',
+        category: 'Laptop',
+        price: 2399.0,
+        status: 'Delivered',
+        variants: 2,
       },
-      {
-        name: 'Sara Khan',
-        course: 'UI/UX Design',
-        progress: 60,
-      },
-      {
-        name: 'Zara Ahmed',
-        course: 'Data Science',
-        progress: 40,
-      },
+      // ... more table data
     ];
   }
 }

@@ -7,7 +7,7 @@ import {
   Assessment,
   AssessmentFormData,
   AssessmentListResponse,
-  Course
+  Course,
 } from '../models/assessment.model';
 import { environment } from '../../environments/environment';
 
@@ -15,8 +15,8 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class AssessmentService {
-//   private apiUrl = 'https://dotbitz.com/api/assessments';
   private apiUrl = environment.AdminApiUrl + '/assessments';
+
   constructor(private http: HttpClient) {}
 
   // ================= Headers =================
@@ -86,7 +86,7 @@ export class AssessmentService {
   // ================= Get Courses (for Assessment Dropdown) =================
   getCourses(): Observable<Course[]> {
     return this.http
-      .get<any>('https://dotbitz.com/api/courses', {
+      .get<any>(environment.AdminApiUrl + '/courses', {
         headers: this.getHeaders(),
       })
       .pipe(

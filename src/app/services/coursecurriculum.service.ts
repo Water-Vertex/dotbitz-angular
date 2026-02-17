@@ -1,3 +1,151 @@
+// import { Injectable } from '@angular/core';
+// import { HttpClient, HttpHeaders } from '@angular/common/http';
+// import { Observable, throwError } from 'rxjs';
+// import { catchError, map } from 'rxjs/operators';
+
+// import {
+//   CourseCurriculumPayload,
+//   CourseCurriculumApiResponse,
+// } from '../models/coursecurriculum.model';
+
+// @Injectable({
+//   providedIn: 'root',
+// })
+// export class CourseCurriculumService {
+//   private apiUrl = 'http://localhost:8000/api/course-curricula';
+
+//   constructor(private http: HttpClient) {}
+
+//   private getHeaders(isFormData: boolean = false): HttpHeaders {
+//     const token = localStorage.getItem('token');
+
+//     let headers = new HttpHeaders({
+//       Accept: 'application/json',
+//     });
+
+//     // Only add application/json if we are NOT sending a file
+//     if (!isFormData) {
+//       headers = headers.set('Content-Type', 'application/json');
+//     }
+
+//     if (token) {
+//       headers = headers.set('Authorization', `Bearer ${token}`);
+//     }
+
+//     return headers;
+//   }
+
+//   /* =========================
+//       Get All Curriculums
+//      ========================= */
+//   getCurriculums(courseId?: number): Observable<CourseCurriculumApiResponse> {
+//     let url = this.apiUrl;
+//     if (courseId) {
+//       url += `?course_id=${courseId}`;
+//     }
+//     return this.http.get<any>(url, { headers: this.getHeaders() }).pipe(
+//       catchError((error) => {
+//         console.error('Error fetching curriculums:', error);
+//         return throwError(() => error);
+//       }),
+//     );
+//   }
+
+//   /* =========================
+//       Get Single Curriculum
+//      ========================= */
+//   getCurriculum(id: number): Observable<CourseCurriculumApiResponse> {
+//     return this.http
+//       .get<any>(`${this.apiUrl}/${id}`, {
+//         headers: this.getHeaders(),
+//       })
+//       .pipe(
+//         map((response) => {
+//           if (response.success !== undefined) return response;
+//           return { success: true, data: response, message: 'Success' };
+//         }),
+//         catchError((error) => {
+//           console.error(`Error fetching curriculum ${id}:`, error);
+//           return throwError(() => error);
+//         }),
+//       );
+//   }
+
+//   /* =========================
+//       Create Curriculum (Fixed for FormData)
+//      ========================= */
+//   createCurriculum(
+//     payload: CourseCurriculumPayload | FormData,
+//   ): Observable<CourseCurriculumApiResponse> {
+//     const isFormData = payload instanceof FormData;
+
+//     return this.http
+//       .post<any>(this.apiUrl, payload, {
+//         headers: this.getHeaders(isFormData),
+//       })
+//       .pipe(
+//         catchError((error) => {
+//           console.error('Error creating curriculum:', error);
+//           return throwError(() => error);
+//         }),
+//       );
+//   }
+
+//   /* =========================
+//       Update Curriculum (Fixed for FormData)
+//      ========================= */
+//   updateCurriculum(
+//     id: number,
+//     payload: CourseCurriculumPayload | FormData,
+//   ): Observable<CourseCurriculumApiResponse> {
+//     const isFormData = payload instanceof FormData;
+
+//     // NOTE: Some PHP/Laravel backends require POST with '_method: PUT'
+//     // when sending FormData via PUT. If this fails, let me know.
+//     return this.http
+//       .put<any>(`${this.apiUrl}/${id}`, payload, {
+//         headers: this.getHeaders(isFormData),
+//       })
+//       .pipe(
+//         catchError((error) => {
+//           console.error(`Error updating curriculum ${id}:`, error);
+//           return throwError(() => error);
+//         }),
+//       );
+//   }
+
+//   /* =========================
+//       Delete Curriculum
+//      ========================= */
+//   deleteCurriculum(id: number): Observable<any> {
+//     return this.http
+//       .delete<any>(`${this.apiUrl}/${id}`, {
+//         headers: this.getHeaders(),
+//       })
+//       .pipe(
+//         catchError((error) => {
+//           console.error(`Error deleting curriculum ${id}:`, error);
+//           return throwError(() => error);
+//         }),
+//       );
+//   }
+
+//   /* =========================
+//       Get Courses
+//      ========================= */
+//   getCourses(): Observable<any> {
+//     return this.http
+//       .get<any>('http://localhost:8000/api/courses', {
+//         headers: this.getHeaders(),
+//       })
+//       .pipe(
+//         catchError((error) => {
+//           console.error('Error fetching courses:', error);
+//           return throwError(() => error);
+//         }),
+//       );
+//   }
+// }
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -6,13 +154,14 @@ import {
   CourseCurriculumPayload,
   CourseCurriculumApiResponse,
 } from '../models/coursecurriculum.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CourseCurriculumService {
-  private apiUrl = 'http://localhost:8000/api/course-curricula';
-  private coursesUrl = 'http://localhost:8000/api/courses';
+  private apiUrl = environment.AdminApiUrl + '/course-curriculam';
+  private coursesUrl = environment.AdminApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 

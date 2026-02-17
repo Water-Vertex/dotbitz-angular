@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 })
 export class AssignmentService {
   private apiUrl = environment.AdminApiUrl + '/assignments';
-  private coursesUrl = environment.AdminApiUrl + '/courses'; // For fetching courses for dropdowns
+  private coursesUrl = environment.AdminApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
