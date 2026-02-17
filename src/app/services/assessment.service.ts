@@ -9,13 +9,14 @@ import {
   AssessmentListResponse,
   Course
 } from '../models/assessment.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AssessmentService {
 
-  private apiUrl = 'https://dotbitz.com/api/assessments';
+  private apiUrl = environment.AdminApiUrl + '/assessments';
 
   constructor(private http: HttpClient) {}
 
@@ -83,7 +84,7 @@ export class AssessmentService {
 
   // ================= Get Courses (for Assessment Dropdown) =================
   getCourses(): Observable<Course[]> {
-    return this.http.get<any>('https://dotbitz.com/api/courses', {
+    return this.http.get<any>(environment.AdminApiUrl + '/courses', {
       headers: this.getHeaders()
     }).pipe(
       map(res => res.data ?? res),

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Instructor, Course, CourseApiResponse } from '../models/course.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { Instructor, Course, CourseApiResponse } from '../models/course.model';
 export class CourseService {
   // private apiUrl = 'http://localhost:8000/api/courses';
 
-  private apiUrl = 'https://dotbitz.com/api/courses';
+  private apiUrl = environment.AdminApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +34,7 @@ export class CourseService {
   }
 
   getInstructors(): Observable<{ data: Instructor[] }> {
-    return this.http.get<{ data: Instructor[] }>('https://dotbitz.com/api/instructors', {
+    return this.http.get<{ data: Instructor[] }>(`${this.apiUrl}/instructors`, {
       headers: this.getHeaders(),
     });
   }

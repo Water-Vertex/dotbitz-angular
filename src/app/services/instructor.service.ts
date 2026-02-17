@@ -7,13 +7,14 @@ import {
   InstructorPayload,
   InstructorApiResponse
 } from '../models/instructor.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InstructorService {
 
-  private apiUrl = 'https://dotbitz.com/api/instructors';
+  private apiUrl = environment.AdminApiUrl + '/instructors';
   // private apiUrl = 'http://localhost:8000/api/instructors';
 
 

@@ -36,6 +36,18 @@ import { McqsEdit } from './components/admin/pages/mcq/mcq-edit/mcq-edit';
 import { AssessmentList } from './components/admin/pages/assessment/assessment-list/assessment-list';
 import { AssessmentAdd } from './components/admin/pages/assessment/assessment-add/assessment-add';
 import { AssessmentEdit } from './components/admin/pages/assessment/assessment-edit/assessment-edit';
+import { GuardianLayout } from './components/guardian/layouts/guardian-layout/guardian-layout';
+import { ProfileShow } from './components/guardian/pages/profile/profile-show/profile-show';
+import { ProfileEdit } from './components/guardian/pages/profile/profile-edit/profile-edit';
+import { GuardianDashboard } from './components/guardian/pages/dashboard/dashboard';
+import { GuardianLogin } from './components/auth/guardian-login/guardian-login';
+import { StudentDashboardLayout } from './components/student/layouts/student-dashboard-layout/student-dashboard-layout';
+import { StudentProfile } from './components/student/pages/profile/profile-show/profile-show';
+import { StudentProfileEdit } from './components/student/pages/profile/profile-edit/profile-edit';
+import { StudentDashboard } from './components/student/pages/dashboard/dashboard';
+import { StudentLogin } from './components/auth/student-login/student-login';
+import { GuardianLogout } from './components/auth/guardian-logout/guardian-logout';
+import { StudentLogout } from './components/auth/student-logout/student-logout';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -105,6 +117,37 @@ export const routes: Routes = [
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
+
+  // Guardian Routes
+
+  { path: 'guardian/login', component: GuardianLogin },
+  {
+    path: '',
+    component: GuardianLayout,
+    canActivate: [authGuard],
+    children: [
+      { path: 'guardian/logout', component: GuardianLogout },
+      { path: 'guardian/dashboard', component: GuardianDashboard },
+      { path: 'guardian/profile', component: ProfileShow },
+      { path: 'guardian/profile/edit', component: ProfileEdit },
+
+      { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
+    ],
+  },
+
+  // Student Routes
+{ path: 'student/login', component: StudentLogin },
+  {
+  path: '',
+  component: StudentDashboardLayout, // layout wrapper
+  children: [
+    { path: 'student/logout', component: StudentLogout },
+    { path: 'student/profile', component: StudentProfile },
+    { path: 'student/profile/edit', component: StudentProfileEdit },
+    { path: 'student/dashboard', component: StudentDashboard },
+  ]
+},
+
   {
     path: '',
     component: StudentLayout,

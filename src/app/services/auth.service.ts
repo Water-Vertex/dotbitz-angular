@@ -11,7 +11,9 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
+  private AdminApiUrl = environment.AdminApiUrl;
+  private GuardianApiUrl = environment.GuardianApiUrl;
+  private StudentApiUrl = environment.StudentApiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
   private isInitialized = false;
@@ -32,17 +34,44 @@ export class AuthService {
     }
   }
 
- login(credentials: LoginRequest) {
-  return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+  private storeAuth(token: string, userData: any) {
+  if (isPlatformBrowser(this.platformId)) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    this.currentUserSubject.next(userData);
+  }
+}
+
+login(credentials: LoginRequest) {
+  return this.http.post<any>(`${this.AdminApiUrl}/login`, credentials).pipe(
     tap(res => {
-      if (res.success) {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
-        this.currentUserSubject.next(res.user);
+      if (res?.success && res?.token && res?.user) {
+        this.storeAuth(res.token, res.user);
       }
     })
   );
 }
+
+guardianLogin(credentials: LoginRequest) {
+  return this.http.post<any>(`${this.GuardianApiUrl}/login`, credentials).pipe(
+    tap(res => {
+      if (res?.success && res?.token && res?.guardian) {
+        this.storeAuth(res.token, res.guardian);
+      }
+    })
+  );
+}
+
+studentLogin(credentials: LoginRequest) {
+  return this.http.post<any>(`${this.StudentApiUrl}/login`, credentials).pipe(
+    tap(res => {
+      if (res?.success && res?.token && res?.student) {
+        this.storeAuth(res.token, res.student);
+      }
+    })
+  );
+}
+
 
   logout(): Observable<any> {
     const token = this.getToken();
@@ -57,7 +86,7 @@ export class AuthService {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return this.http.post(`${this.apiUrl}/logout`, {}, { headers }).pipe(
+    return this.http.post(`${this.AdminApiUrl}/logout`, {}, { headers }).pipe(
       tap({
         next: (response: any) => {
           console.log('Logout successful:', response);
@@ -69,6 +98,74 @@ export class AuthService {
           // Even if API call fails, clear local data
           this.clearAuthData();
           this.router.navigate(['/login']);
+        },
+        complete: () => {
+          // Fallback - ensure data is cleared
+          this.clearAuthData();
+        }
+      })
+    );
+  }
+
+  GuardianLogout(): Observable<any> {
+    const token = this.getToken();
+
+    // Prepare headers
+    let headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.post(`${this.GuardianApiUrl}/logout`, {}, { headers }).pipe(
+      tap({
+        next: (response: any) => {
+          console.log('Logout successful:', response);
+          this.clearAuthData();
+          this.router.navigate(['/guardian/login']); // Redirect after successful logout
+        },
+        error: (error) => {
+          console.error('Logout error:', error);
+          // Even if API call fails, clear local data
+          this.clearAuthData();
+          this.router.navigate(['/guardian/login']);
+        },
+        complete: () => {
+          // Fallback - ensure data is cleared
+          this.clearAuthData();
+        }
+      })
+    );
+  }
+
+  Studentlogout(): Observable<any> {
+    const token = this.getToken();
+
+    // Prepare headers
+    let headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.post(`${this.StudentApiUrl}/logout`, {}, { headers }).pipe(
+      tap({
+        next: (response: any) => {
+          console.log('Logout successful:', response);
+          this.clearAuthData();
+          this.router.navigate(['/student/login']); // Redirect after successful logout
+        },
+        error: (error) => {
+          console.error('Logout error:', error);
+          // Even if API call fails, clear local data
+          this.clearAuthData();
+          this.router.navigate(['/student/login']);
         },
         complete: () => {
           // Fallback - ensure data is cleared
@@ -138,12 +235,23 @@ export class AuthService {
   }
 
   private getUser(): User | null {
-    if (isPlatformBrowser(this.platformId)) {
-      const userStr = localStorage.getItem('user');
-      return userStr ? JSON.parse(userStr) : null;
-    }
+  if (!isPlatformBrowser(this.platformId)) return null;
+
+  const userStr = localStorage.getItem('user');
+
+  if (!userStr || userStr === 'undefined' || userStr === 'null') {
     return null;
   }
+
+  try {
+    return JSON.parse(userStr);
+  } catch (error) {
+    console.error('Invalid JSON in storage:', error);
+    localStorage.removeItem('user');
+    return null;
+  }
+}
+
 
   private loadUserFromStorage(): void {
     const token = this.getToken();

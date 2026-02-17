@@ -154,13 +154,14 @@ import {
   CourseCurriculumPayload,
   CourseCurriculumApiResponse,
 } from '../models/coursecurriculum.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CourseCurriculumService {
-  private apiUrl = 'https://dotbitz.com/api/course-curriculam';
-  private coursesUrl = 'https://dotbitz.com/api/courses';
+  private apiUrl = environment.AdminApiUrl + '/course-curriculam';
+  private coursesUrl = environment.AdminApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
