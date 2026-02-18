@@ -181,101 +181,19 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Main Menu
                     </h3>
-                    <a routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
+                    <a routerLink="/student/dashboard" data-nav-item data-href="/student/dashboard"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                        Dashboard
                     </a>
-                    <a routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
+                    <a routerLink="/student/courses/list" data-nav-item data-href="/student/courses/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
-                     Instructors
+                        <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
+                       Courses
                     </a>
-                    <a routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-users mr-3 w-5 text-content"></i>
-                      Students
-                    </a>
-                    <!-- Replace the existing Courses menu item with this: -->
-                    <div class="courses-menu-item" data-has-submenu="true">
-                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
-                            <div class="flex items-center">
 
-                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
-                                Courses
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
-                        </button>
 
-                        <!-- Submenu -->
-                        <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/course/add" data-nav-item data-href="/admin/course/add"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                               Add New course
 
-                            </a>
-                            <a routerLink="/admin/course/list" data-nav-item data-href="/admin/course/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-list mr-3 w-5 text-center"></i>
-                                Course List
-                            </a>
-                            <a routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                               <i class="fas fa-book-open mr-3 w-5 text-center"></i>
-                               Course Curriculum
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Content Section -->
-                <div class="mb-6">
-                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                        Content
-                    </h3>
-                    <a routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-quote-left mr-3 w-5 text-content"></i>
-                        MCQs
-
-                    </a>
-                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file mr-3 w-5 text-content"></i>
-                        Policies
-
-                    </a>
-                    <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assessments
-
-                    </a>
-                    <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assignments
-
-                    </a>
-                    <a routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-question-circle mr-3 w-5 text-content"></i>
-                        FAQs
-                    </a>
-                </div>
-
-                <!-- Settings Section -->
-                <div class="mb-6">
-                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                        Configuration
-                    </h3>
-                    <a routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-tags mr-3 w-5 text-content"></i>
-                        Coupons
-                    </a>
                 </div>
             </div>
         </nav>
@@ -323,101 +241,20 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Main Menu
                     </h3>
-                    <a routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
+                    <a routerLink="/student/dashboard" data-nav-item data-href="/student/dashboard"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                        Dashboard
                     </a>
-                    <a routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
+                    <a routerLink="/student/courses/list" data-nav-item data-href="/student/courses/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
-                     Instructors
+                      <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
+                      Courses
                     </a>
-                    <a routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-users mr-3 w-5 text-content"></i>
-                      Students
-                    </a>
-                    <!-- Replace the existing Courses menu item with this: -->
-                    <div class="courses-menu-item" data-has-submenu="true">
-                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
-                            <div class="flex items-center">
 
-                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
-                                Courses
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
-                        </button>
-
-                        <!-- Submenu -->
-                        <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/course/add" data-nav-item data-href="/admin/course/add"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                               Add New course
-
-                            </a>
-                            <a routerLink="/admin/course/list" data-nav-item data-href="/admin/course/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-list mr-3 w-5 text-center"></i>
-                                Course List
-                            </a>
-                            <a routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                               <i class="fas fa-book-open mr-3 w-5 text-center"></i>
-                               Course Curriculum
-                            </a>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Content Section -->
-                <div class="mb-6">
-                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                        Content
-                    </h3>
-                    <a routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-quote-left mr-3 w-5 text-content"></i>
-                        MCQs
 
-                    </a>
-                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file mr-3 w-5 text-content"></i>
-                        Policies
-
-                    </a>
-                    <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assessments
-
-                    </a>
-                    <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assignments
-
-                    </a>
-                    <a routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-question-circle mr-3 w-5 text-content"></i>
-                        FAQs
-                    </a>
-                </div>
-
-                <!-- Settings Section -->
-                <div class="mb-6">
-                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                        Configuration
-                    </h3>
-                    <a routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-tags mr-3 w-5 text-content"></i>
-                        Coupons
-                    </a>
-                </div>
             </div>
         </nav>
 

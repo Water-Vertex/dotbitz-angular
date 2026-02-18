@@ -48,6 +48,10 @@ import { StudentDashboard } from './components/student/pages/dashboard/dashboard
 import { StudentLogin } from './components/auth/student-login/student-login';
 import { GuardianLogout } from './components/auth/guardian-logout/guardian-logout';
 import { StudentLogout } from './components/auth/student-logout/student-logout';
+import { StudentCourseList } from './components/student/pages/courses/course-list/course-list';
+import { GuardianCourseList } from './components/guardian/pages/courses/course-list/course-list';
+import { GuardianCourseDetail } from './components/guardian/pages/courses/course-detail/course-detail';
+import { StudentCourseDetail } from './components/student/pages/courses/course-detail/course-detail';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -130,6 +134,8 @@ export const routes: Routes = [
       { path: 'guardian/dashboard', component: GuardianDashboard },
       { path: 'guardian/profile', component: ProfileShow },
       { path: 'guardian/profile/edit', component: ProfileEdit },
+      { path: 'guardian/courses/list', component: GuardianCourseList },
+      { path: 'guardian/course/detail/:id', component: GuardianCourseDetail},
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
@@ -145,6 +151,8 @@ export const routes: Routes = [
     { path: 'student/profile', component: StudentProfile },
     { path: 'student/profile/edit', component: StudentProfileEdit },
     { path: 'student/dashboard', component: StudentDashboard },
+    { path: 'student/courses/list', component: StudentCourseList },
+    { path: 'student/course/detail/:id', component: StudentCourseDetail}
   ]
 },
 

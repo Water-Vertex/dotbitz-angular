@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   // local API URLs'
   AdminApiUrl: 'http://localhost:8000/api/admin',
   GuardianApiUrl: 'http://localhost:8000/api/guardian',
