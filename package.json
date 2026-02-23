@@ -27,6 +27,7 @@
     "@angular/forms": "^21.1.2",
     "@ckeditor/ckeditor5-angular": "^11.0.0",
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "lightningcss": "^1.31.1",
     "ngx-quill": "^30.0.1",
     "quill": "^2.0.3",
     "rxjs": "~7.8.0",

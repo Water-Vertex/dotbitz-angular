@@ -81,4 +81,51 @@ private apiUrl = 'http://localhost:8000/api/admin/courses';
       .delete<CourseApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
+<<<<<<< Updated upstream
+=======
+
+   getStudentCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+    let url = `${this.StudentApiUrl}?per_page=${perPage}`;
+    if (search) {
+      url += `&search=${search}`;
+    }
+    return this.http
+      .get<CourseApiResponse>(url, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  /**
+   * Fetches a single course detail for the Student.
+   */
+  // getStudentCourseDetail(id: number): Observable<CourseApiResponse> {
+  //   return this.http
+  //     .get<CourseApiResponse>(`${this.guardianApiUrl}/${id}`, { headers: this.getHeaders() })
+  //     .pipe(catchError((err) => throwError(() => err)));
+  // }
+
+  getStudentCourseDetail(id: number): Observable<CourseApiResponse> {
+  return this.http
+    .get<CourseApiResponse>(`${this.StudentApiUrl}/${id}`, { headers: this.getHeaders() })
+    .pipe(catchError((err) => throwError(() => err)));
+}
+
+  getGuardianCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+    let url = `${this.guardianApiUrl}?per_page=${perPage}`;
+    if (search) {
+      url += `&search=${search}`;
+    }
+    return this.http
+      .get<CourseApiResponse>(url, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  /**
+   * Fetches a single course detail for the Guardian.
+   */
+  getGuardianCourseDetail(id: number): Observable<CourseApiResponse> {
+    return this.http
+      .get<CourseApiResponse>(`${this.guardianApiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+>>>>>>> Stashed changes
 }
