@@ -52,17 +52,17 @@ import { StudentCourseList } from './components/student/pages/courses/course-lis
 import { GuardianCourseList } from './components/guardian/pages/courses/course-list/course-list';
 import { GuardianCourseDetail } from './components/guardian/pages/courses/course-detail/course-detail';
 import { StudentCourseDetail } from './components/student/pages/courses/course-detail/course-detail';
+import { GuardianCheckout } from './components/guardian/pages/order/guardian-checkout/guardian-checkout';
+import { MyCoursesGuardian } from './components/guardian/pages/my-courses/my-courses-guardian/my-courses-guardian';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
-
 
   {
     path: '',
     component: AdminLayout,
     canActivate: [authGuard],
     children: [
-
       { path: 'admin/logout', component: Logout },
       { path: 'admin/dashboard', component: Dashboard },
 
@@ -81,17 +81,17 @@ export const routes: Routes = [
       { path: 'admin/course/add', component: CourseAdd },
       { path: 'admin/course/edit/:id', component: CourseEdit },
 
-       //  Course Curriculum routes
+      //  Course Curriculum routes
       { path: 'admin/course/curriculum/list', component: CourseCurriculumList },
       { path: 'admin/course/curriculum/add', component: CourseCurriculumAdd },
       { path: 'admin/course/curriculum/edit/:id', component: CourseCurriculumEdit },
 
-       // Policy routes
+      // Policy routes
       { path: 'admin/policy/list', component: PolicyList },
       { path: 'admin/policy/add', component: PolicyAdd },
       { path: 'admin/policy/edit/:id', component: PolicyEdit },
 
-       // Student routes
+      // Student routes
       { path: 'admin/student/list', component: StudentList },
       { path: 'admin/student/add', component: StudentAdd },
       { path: 'admin/student/edit/:id', component: StudentEdit },
@@ -116,10 +116,8 @@ export const routes: Routes = [
       { path: 'admin/assessments/add', component: AssessmentAdd },
       { path: 'admin/assessments/edit/:id', component: AssessmentEdit },
 
-
-
-      { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
-    ]
+      { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
+    ],
   },
 
   // Guardian Routes
@@ -135,33 +133,33 @@ export const routes: Routes = [
       { path: 'guardian/profile', component: ProfileShow },
       { path: 'guardian/profile/edit', component: ProfileEdit },
       { path: 'guardian/courses/list', component: GuardianCourseList },
-      { path: 'guardian/course/detail/:id', component: GuardianCourseDetail},
+      { path: 'guardian/course/detail/:id', component: GuardianCourseDetail },
+      { path: 'guardian/checkout/:id', component: GuardianCheckout },
+      { path: 'guardian/my-courses', component: MyCoursesGuardian },
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
   },
 
   // Student Routes
-{ path: 'student/login', component: StudentLogin },
+  { path: 'student/login', component: StudentLogin },
   {
-  path: '',
-  component: StudentDashboardLayout, // layout wrapper
-  children: [
-    { path: 'student/logout', component: StudentLogout },
-    { path: 'student/profile', component: StudentProfile },
-    { path: 'student/profile/edit', component: StudentProfileEdit },
-    { path: 'student/dashboard', component: StudentDashboard },
-    { path: 'student/courses/list', component: StudentCourseList },
-    { path: 'student/course/detail/:id', component: StudentCourseDetail}
-  ]
-},
+    path: '',
+    component: StudentDashboardLayout, // layout wrapper
+    children: [
+      { path: 'student/logout', component: StudentLogout },
+      { path: 'student/profile', component: StudentProfile },
+      { path: 'student/profile/edit', component: StudentProfileEdit },
+      { path: 'student/dashboard', component: StudentDashboard },
+      { path: 'student/courses/list', component: StudentCourseList },
+      { path: 'student/course/detail/:id', component: StudentCourseDetail },
+    ],
+  },
 
   {
     path: '',
     component: StudentLayout,
-    children: [
-      { path: 'student/registration', component: StudentRegistration },
-    ]
+    children: [{ path: 'student/registration', component: StudentRegistration }],
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
 ];
