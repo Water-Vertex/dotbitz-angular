@@ -3,7 +3,7 @@ import { Login } from './components/auth/login/login';
 import { AdminLayout } from './components/admin/layouts/admin-layout/admin-layout';
 import { Dashboard } from './components/admin/pages//dashboard/dashboard';
 // import { StudentLayout } from './components/admin/pages//dashboard/dashboard';
-import { DashboardLayoutComponent } from './components/student/layouts/dashboard-layout/dashboard-layout';
+import { StudentDashboardLayout } from './components/student/layouts/student-dashboard-layout/student-dashboard-layout';
 import { authGuard } from './guards/auth-guard';
 import { FaqList } from './components/admin/pages/faq/faq-list/faq-list';
 import { FaqAdd } from './components/admin/pages/faq/faq-add/faq-add';
@@ -42,18 +42,14 @@ import { StudentDashboardComponent } from './components/student/pages/dashboard/
 import { ProfileComponent } from './components/student/pages/profile/profile-show/profile-show'; // ✅ import profile
 import { ProfileEditComponent } from './components/student/pages/profile/profile-edit/profile-edit';
 import { StudentLogin } from './components/auth/student-login/student-login';
-<<<<<<< Updated upstream
-import { StudentCourseList } from './components/student/pages/course/course-list/course-list';
-=======
-import { GuardianLogout } from './components/auth/guardian-logout/guardian-logout';
+// import { GuardianLogout } from './components/auth/guardian-logout/guardian-logout';
 import { StudentLogout } from './components/auth/student-logout/student-logout';
 import { StudentCourseList } from './components/student/pages/courses/course-list/course-list';
-import { GuardianCourseList } from './components/guardian/pages/courses/course-list/course-list';
-import { GuardianCourseDetail } from './components/guardian/pages/courses/course-detail/course-detail';
+// import { GuardianCourseList } from './components/guardian/pages/courses/course-list/course-list';
+// import { GuardianCourseDetail } from './components/guardian/pages/courses/course-detail/course-detail';
 import { StudentCourseDetail } from './components/student/pages/courses/course-detail/course-detail';
 import { StudentCheckout } from './components/student/pages/order/student-checkout/student-checkout';
 import { MyCourses } from './components/student/pages/my-courses/my-courses-student/my-courses-student';
->>>>>>> Stashed changes
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -134,25 +130,19 @@ export const routes: Routes = [
   },
  {
   path: '',
-  component: DashboardLayoutComponent, // layout wrapper
+  component: StudentDashboardLayout, // layout wrapper
+ 
   children: [
-<<<<<<< Updated upstream
-    { path: 'student/profile', component: ProfileComponent }, 
-    { path: 'student/profile/edit', component: ProfileEditComponent },
     { path: 'student/registration', component: StudentRegistration },
-    { path: 'student/dashboard', component: StudentDashboardComponent }, 
-    { path: 'student/course/list', component: StudentCourseList },  
 
-=======
     { path: 'student/logout', component: StudentLogout },
-    { path: 'student/profile', component: StudentProfile },
-    { path: 'student/profile/edit', component: StudentProfileEdit },
-    { path: 'student/dashboard', component: StudentDashboard },
+    { path: 'student/profile', component: ProfileComponent },
+    { path: 'student/profile/edit', component: ProfileEditComponent },
+    { path: 'student/dashboard', component: StudentDashboardComponent },
     { path: 'student/courses/list', component: StudentCourseList },
     { path: 'student/course/detail/:id', component: StudentCourseDetail},
     { path: 'student/my-courses', component: MyCourses },
     { path: 'student/checkout/:courseId', component: StudentCheckout }
->>>>>>> Stashed changes
   ]
 },
 { path: '**', redirectTo: '' }

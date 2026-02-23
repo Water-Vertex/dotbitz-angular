@@ -11,11 +11,13 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
+  private AdminApiUrl = environment.AdminApiUrl;
+  private GuardianApiUrl = environment.GuardianApiUrl;
+  private StudentApiUrl = environment.StudentApiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
   private isInitialized = false;
-  
+
   constructor(
     private http: HttpClient,
     private router: Router, // Inject Router
@@ -32,49 +34,44 @@ export class AuthService {
     }
   }
 
+  private storeAuth(token: string, userData: any) {
+  if (isPlatformBrowser(this.platformId)) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    this.currentUserSubject.next(userData);
+  }
+}
 
-
- login(credentials: LoginRequest) {
-  return this.http.post<LoginResponse>(`${this.apiUrl}/admin/login`, credentials).pipe(
+login(credentials: LoginRequest) {
+  return this.http.post<any>(`${this.AdminApiUrl}/login`, credentials).pipe(
     tap(res => {
-      if (res.success) {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
-        this.currentUserSubject.next(res.user);
+      if (res?.success && res?.token && res?.user) {
+        this.storeAuth(res.token, res.user);
       }
     })
   );
 }
+
+guardianLogin(credentials: LoginRequest) {
+  return this.http.post<any>(`${this.GuardianApiUrl}/login`, credentials).pipe(
+    tap(res => {
+      if (res?.success && res?.token && res?.guardian) {
+        this.storeAuth(res.token, res.guardian);
+      }
+    })
+  );
+}
+
 studentLogin(credentials: LoginRequest) {
-  return this.http.post<LoginResponse>(`${this.apiUrl}/student/login`, credentials).pipe(
+  return this.http.post<any>(`${this.StudentApiUrl}/login`, credentials).pipe(
     tap(res => {
-      if (res.success && res.Student) {
-        const user: User = {
-          id: res.Student.id,
-          name: `${res.Student.first_name} ${res.Student.last_name}`, // combine first & last name
-          email: res.Student.email
-        };
-
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(user));
-        this.currentUserSubject.next(user); // ab currentUser me proper name hai
+      if (res?.success && res?.token && res?.student) {
+        this.storeAuth(res.token, res.student);
       }
     })
   );
 }
 
-
-// studentLogin(credentials: LoginRequest) {
-//   return this.http.post<LoginResponse>(`${this.apiUrl}/student/login`, credentials).pipe(
-//     tap(res => {
-//       if (res.success) {
-//         localStorage.setItem('token', res.token);
-//         localStorage.setItem('user', JSON.stringify(res.Student));
-//         this.currentUserSubject.next(res.Student);
-//       }
-//     })
-//   );
-// }
 
   logout(): Observable<any> {
     const token = this.getToken();
@@ -89,7 +86,7 @@ studentLogin(credentials: LoginRequest) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return this.http.post(`${this.apiUrl}/logout`, {}, { headers }).pipe(
+    return this.http.post(`${this.AdminApiUrl}/logout`, {}, { headers }).pipe(
       tap({
         next: (response: any) => {
           console.log('Logout successful:', response);
@@ -110,15 +107,83 @@ studentLogin(credentials: LoginRequest) {
     );
   }
 
+  GuardianLogout(): Observable<any> {
+    const token = this.getToken();
+
+    // Prepare headers
+    let headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.post(`${this.GuardianApiUrl}/logout`, {}, { headers }).pipe(
+      tap({
+        next: (response: any) => {
+          console.log('Logout successful:', response);
+          this.clearAuthData();
+          this.router.navigate(['/guardian/login']); // Redirect after successful logout
+        },
+        error: (error) => {
+          console.error('Logout error:', error);
+          // Even if API call fails, clear local data
+          this.clearAuthData();
+          this.router.navigate(['/guardian/login']);
+        },
+        complete: () => {
+          // Fallback - ensure data is cleared
+          this.clearAuthData();
+        }
+      })
+    );
+  }
+
+  Studentlogout(): Observable<any> {
+    const token = this.getToken();
+
+    // Prepare headers
+    let headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.post(`${this.StudentApiUrl}/logout`, {}, { headers }).pipe(
+      tap({
+        next: (response: any) => {
+          console.log('Logout successful:', response);
+          this.clearAuthData();
+          this.router.navigate(['/student/login']); // Redirect after successful logout
+        },
+        error: (error) => {
+          console.error('Logout error:', error);
+          // Even if API call fails, clear local data
+          this.clearAuthData();
+          this.router.navigate(['/student/login']);
+        },
+        complete: () => {
+          // Fallback - ensure data is cleared
+          this.clearAuthData();
+        }
+      })
+    );
+  }
+
   // Clear auth data and redirect
   clearAuthData(): void {
     this.clearStorage();
     this.currentUserSubject.next(null);
 
-    // Navigate to login page
-    setTimeout(() => {
-      this.router.navigate(['/login']);
-    }, 100);
+    // // Navigate to login page
+    // setTimeout(() => {
+    //   this.router.navigate(['/login']);
+    // }, 100);
   }
 
   isLoggedIn(): boolean {
@@ -170,12 +235,23 @@ studentLogin(credentials: LoginRequest) {
   }
 
   private getUser(): User | null {
-    if (isPlatformBrowser(this.platformId)) {
-      const userStr = localStorage.getItem('user');
-      return userStr ? JSON.parse(userStr) : null;
-    }
+  if (!isPlatformBrowser(this.platformId)) return null;
+
+  const userStr = localStorage.getItem('user');
+
+  if (!userStr || userStr === 'undefined' || userStr === 'null') {
     return null;
   }
+
+  try {
+    return JSON.parse(userStr);
+  } catch (error) {
+    console.error('Invalid JSON in storage:', error);
+    localStorage.removeItem('user');
+    return null;
+  }
+}
+
 
   private loadUserFromStorage(): void {
     const token = this.getToken();
@@ -193,23 +269,4 @@ studentLogin(credentials: LoginRequest) {
       localStorage.removeItem('user');
     }
   }
-//   // AuthService ke andar
-// studentLogin(credentials: { email: string, password: string }) {
-//   return this.http.post<LoginResponse>(`${this.apiUrl}/student/login`, credentials).pipe(
-//     tap(res => {
-//       if (res.success && res.Student) {   // check Student exists
-//         const studentUser: User = {
-//           id: res.Student.id,
-//           name: res.Student.name,
-//           email: res.Student.email,
-//           role: 'student'
-//         };
-//         this.setToken(res.token);
-//         this.setUser(studentUser);
-//         this.currentUserSubject.next(studentUser);
-//       }
-//     })
-//   );
-// }
-
 }

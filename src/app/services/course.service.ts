@@ -3,14 +3,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Instructor, Course, CourseApiResponse } from '../models/course.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CourseService {
-  // private apiUrl = 'http://localhost:8000/api/courses';
-private apiUrl = 'http://localhost:8000/api/admin/courses';
-  // private apiUrl = 'https://dotbitz.com/api/courses';
+//   //private apiUrl = 'https://dotbitz.com/api/courses';
+  private apiUrl = environment.AdminApiUrl + '/courses';
+private StudentApiUrl = environment.StudentApiUrl + '/courses';
+private GuardianApiUrl = environment.GuardianApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
@@ -81,8 +83,6 @@ private apiUrl = 'http://localhost:8000/api/admin/courses';
       .delete<CourseApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
-<<<<<<< Updated upstream
-=======
 
    getStudentCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
     let url = `${this.StudentApiUrl}?per_page=${perPage}`;
@@ -110,7 +110,7 @@ private apiUrl = 'http://localhost:8000/api/admin/courses';
 }
 
   getGuardianCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
-    let url = `${this.guardianApiUrl}?per_page=${perPage}`;
+    let url = `${this.GuardianApiUrl}?per_page=${perPage}`;
     if (search) {
       url += `&search=${search}`;
     }
@@ -124,8 +124,7 @@ private apiUrl = 'http://localhost:8000/api/admin/courses';
    */
   getGuardianCourseDetail(id: number): Observable<CourseApiResponse> {
     return this.http
-      .get<CourseApiResponse>(`${this.guardianApiUrl}/${id}`, { headers: this.getHeaders() })
+      .get<CourseApiResponse>(`${this.GuardianApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
->>>>>>> Stashed changes
 }
