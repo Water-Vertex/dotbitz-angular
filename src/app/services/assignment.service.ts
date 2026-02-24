@@ -140,4 +140,20 @@ export class AssignmentService {
       }),
     );
   }
+
+  /** =========================
+ *  Student - Get Assignments by Course
+ *  ========================= */
+getAssignmentsByCourse(courseId: number): Observable<any> {
+  return this.http
+    .get<any>(`http://localhost:8000/api/student/assignments/course/${courseId}`, { 
+      headers: this.getHeaders() 
+    })
+    .pipe(
+      catchError((err) => {
+        console.error('Error fetching assignments by course:', err);
+        return throwError(() => err);
+      }),
+    );
+}
 }

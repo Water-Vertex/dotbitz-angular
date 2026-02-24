@@ -50,6 +50,8 @@ import { StudentCourseList } from './components/student/pages/courses/course-lis
 import { StudentCourseDetail } from './components/student/pages/courses/course-detail/course-detail';
 import { StudentCheckout } from './components/student/pages/order/student-checkout/student-checkout';
 import { MyCourses } from './components/student/pages/my-courses/my-courses-student/my-courses-student';
+import { AssignmentStudent } from './components/student/pages/assignment-student/assignment-student';
+import { ViewCourseStudent } from './components/student/pages/view-course-student/view-course-student';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -142,7 +144,10 @@ export const routes: Routes = [
     { path: 'student/courses/list', component: StudentCourseList },
     { path: 'student/course/detail/:id', component: StudentCourseDetail},
     { path: 'student/my-courses', component: MyCourses },
-    { path: 'student/checkout/:courseId', component: StudentCheckout }
+    { path: 'student/checkout/:courseId', component: StudentCheckout },
+    { path: 'student/assignments/:courseId', component: AssignmentStudent },
+    { path: 'student/view-course/:courseId', component: ViewCourseStudent }
+
   ]
 },
 { path: '**', redirectTo: '' }
