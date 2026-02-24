@@ -11,6 +11,7 @@ import { environment } from '../../environments/environment';
 export class AssignmentService {
   private apiUrl = environment.AdminApiUrl + '/assignments';
   private coursesUrl = environment.AdminApiUrl + '/courses';
+  private guardianApiUrl = environment.GuardianApiUrl + '/courses'; // For guardian-specific endpoints
 
   constructor(private http: HttpClient) {}
 
@@ -141,4 +142,35 @@ export class AssignmentService {
       }),
     );
   }
+
+  /** =========================
+   *  Guardian: Get Assignments by Course
+   *  ========================= */
+
+  /** =========================
+   * Guardian: Get Assignments by Course
+   * ========================= */
+  getAssignmentsGuardian(courseId: number): Observable<AssignmentApiResponse> {
+    const token = localStorage.getItem('token');
+
+    // Correct URL: only one 'courses'
+    const url = `${this.guardianApiUrl}/${courseId}/assignments`;
+
+    console.log('Requesting URL:', url); // For debugging
+
+    return this.http
+      .get<AssignmentApiResponse>(url, {
+        headers: new HttpHeaders({
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        }),
+      })
+      .pipe(
+        catchError((err) => {
+          console.error(`Error fetching guardian assignments for course ${courseId}:`, err);
+          return throwError(() => err);
+        }),
+      );
+  }
 }
+

@@ -53,7 +53,9 @@ import { GuardianCourseList } from './components/guardian/pages/courses/course-l
 import { GuardianCourseDetail } from './components/guardian/pages/courses/course-detail/course-detail';
 import { StudentCourseDetail } from './components/student/pages/courses/course-detail/course-detail';
 import { GuardianCheckout } from './components/guardian/pages/order/guardian-checkout/guardian-checkout';
+import { AssignmentGuardian } from './components/guardian/pages/assignment-guardian/assignment-guardian';
 import { MyCoursesGuardian } from './components/guardian/pages/my-courses/my-courses-guardian/my-courses-guardian';
+import { ViewCourseGuardian } from './components/guardian/pages/view-course-guardian/view-course-guardian';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -136,7 +138,10 @@ export const routes: Routes = [
       { path: 'guardian/course/detail/:id', component: GuardianCourseDetail },
       { path: 'guardian/checkout/:id', component: GuardianCheckout },
       { path: 'guardian/my-courses', component: MyCoursesGuardian },
+    { path: 'guardian/assignments/:courseId', component: AssignmentGuardian },
+    { path: 'guardian/course/view/:id', component: ViewCourseGuardian},
 
+    
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
   },
