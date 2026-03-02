@@ -1,0 +1,282 @@
+<!-- Loading -->
+<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[70vh]">
+  <div class="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-[#073a89]"></div>
+  <p class="text-gray-500 mt-4">Loading course...</p>
+</div>
+
+<div *ngIf="!loading && course" class="bg-white">
+  <!-- Simple Breadcrumb -->
+  <div class="border-b border-gray-200">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex items-center text-sm text-gray-500">
+        <a routerLink="/student/my-courses" class="hover:text-[#073a89]">My Courses</a>
+        <span class="mx-2">›</span>
+        <span class="text-gray-900">{{ course.course_name }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left Column - Course Info -->
+      <div class="lg:col-span-2">
+        <!-- Title & Badge -->
+        <div class="mb-6">
+          
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ course.course_name }}</h1>
+
+          <!-- Quick Stats -->
+          <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+            <span class="flex items-center">
+              <i class="fas fa-signal mr-2 text-gray-400"></i>
+              {{ course.course_level }}
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-clock mr-2 text-gray-400"></i>
+              {{ course.course_duration }} weeks
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-calendar mr-2 text-gray-400"></i>
+              Starts {{ course.start_date | date: 'MMM d, yyyy' }}
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-child mr-2 text-gray-400"></i>
+              Age {{ course.age_limit }}+
+            </span>
+          </div>
+        </div>
+
+        <!-- Thumbnail (Mobile) -->
+        <div class="lg:hidden mb-6">
+          <img
+            *ngIf="course.thumbnail_image"
+            [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
+            class="w-full rounded-lg border border-gray-200"
+            [alt]="course.course_name"
+          />
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="border-b border-gray-200 mb-6">
+          <div class="flex gap-6 overflow-x-auto">
+            <button (click)="setTab('instructor')"
+              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'instructor' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+              Instructor
+            </button>
+            <button (click)="setTab('curriculum')"
+              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'curriculum' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+              Curriculum
+            </button>
+            <button (click)="setTab('assignment')"
+              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'assignment' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+              Assignments
+            </button>
+            <button (click)="setTab('quiz')"
+              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'quiz' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+              Quizzes
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="min-h-[200px]">
+          <!-- Instructor Tab -->
+          <div *ngIf="activeTab === 'instructor'">
+            <div *ngIf="course.instructor; else noInstructor">
+              <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center text-[#073a89] font-semibold text-xl shrink-0">
+                  {{ course.instructor.first_name?.charAt(0) }}{{ course.instructor.last_name?.charAt(0) }}
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900">{{ course.instructor.first_name }} {{ course.instructor.last_name }}</h3>
+                  <p class="text-sm text-gray-500 mb-2">{{ course.instructor.title }}</p>
+                  <p class="text-sm text-gray-600">{{ course.instructor.description }}</p>
+                </div>
+              </div>
+            </div>
+            <ng-template #noInstructor>
+              <div class="text-center py-12 text-gray-400">
+                <i class="fas fa-chalkboard-teacher text-4xl mb-3"></i>
+                <p class="text-sm">No instructor assigned yet.</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Curriculum Tab -->
+          <div *ngIf="activeTab === 'curriculum'">
+            <div *ngIf="course.curriculums && course.curriculums.length > 0; else noCurriculum">
+              <div class="space-y-3">
+                <div *ngFor="let item of course.curriculums; let i = index"
+                  class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-start gap-3">
+                  <div class="w-8 h-8 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                    {{ i + 1 }}
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-gray-900">{{ item.title }}</h4>
+                    <p class="text-sm text-gray-500 mt-1" *ngIf="item.description">{{ item.description }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noCurriculum>
+              <div class="text-center py-12 text-gray-400">
+                <i class="fas fa-list-ol text-4xl mb-3"></i>
+                <p class="text-sm">No curriculum added yet.</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Assignment Tab -->
+          <div *ngIf="activeTab === 'assignment'">
+            <div *ngIf="assignmentsLoading" class="flex justify-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+            </div>
+            <div *ngIf="!assignmentsLoading && assignments.length === 0" class="text-center py-12 text-gray-400">
+              <i class="fas fa-tasks text-4xl mb-3"></i>
+              <p class="text-sm">No assignments for this course yet.</p>
+            </div>
+            <div *ngIf="!assignmentsLoading && assignments.length > 0" class="space-y-3">
+              <div *ngFor="let assignment of assignments; let i = index"
+                class="p-5 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                      {{ i + 1 }}
+                    </div>
+                    <div>
+                      <h4 class="font-medium text-gray-900">{{ assignment.title }}</h4>
+                      <div class="flex items-center gap-3 mt-1 text-xs">
+                        <span [class]="isOverdue(assignment.due_date) ? 'text-red-600' : 'text-gray-500'">
+                          <i class="far fa-calendar mr-1"></i>
+                          Due {{ assignment.due_date | date: 'MMM d, yyyy' }}
+                        </span>
+                        <span *ngIf="isOverdue(assignment.due_date)"
+                              class="text-red-600 bg-red-100 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                          Overdue
+                        </span>
+                        <span class="text-gray-500">
+                          <i class="far fa-star mr-1"></i>
+                          {{ assignment.total_marks }} marks
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="shrink-0 ml-13">
+                    <a *ngIf="assignment.assignment_file"
+                      [href]="'http://localhost:8000/assets/assignments/' + assignment.assignment_file"
+                      target="_blank"
+                      download
+                      class="inline-flex items-center gap-1 text-sm font-medium text-[#073a89] hover:text-[#052b63]">
+                      <i class="fas fa-download"></i>
+                      Download
+                    </a>
+                    <span *ngIf="!assignment.assignment_file"
+                      class="text-sm text-gray-400">
+                      <i class="fas fa-file-slash mr-1"></i>
+                      No file
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quiz Tab -->
+          <div *ngIf="activeTab === 'quiz'">
+            <div class="text-center py-12 text-gray-400">
+              <i class="fas fa-question-circle text-4xl mb-3"></i>
+              <p class="text-sm">No quizzes available yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">About this course</h2>
+          <div class="prose prose-sm max-w-none text-gray-600" [innerHTML]="course.course_description">
+          </div>
+        </div>
+
+        <!-- What you'll learn -->
+        <div *ngIf="getBenefits().length > 0" class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">What you'll learn</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div *ngFor="let benefit of getBenefits()" class="flex items-start gap-2">
+              <i class="fas fa-check text-green-500 text-sm mt-1"></i>
+              <span class="text-sm text-gray-600">{{ benefit }}</span>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- Right Column - Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="lg:sticky lg:top-24">
+          <!-- Course Card -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden bg-white">
+            <!-- Thumbnail (Desktop) -->
+            <div class="hidden lg:block bg-gray-50">
+              <img
+                *ngIf="course.thumbnail_image"
+                [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
+                class="w-full aspect-video object-cover"
+                [alt]="course.course_name"
+              />
+              <div *ngIf="!course.thumbnail_image" class="w-full aspect-video bg-gray-100 flex items-center justify-center">
+                <i class="fas fa-image text-3xl text-gray-300"></i>
+              </div>
+            </div>
+
+            <!-- Price & CTA -->
+            <div class="p-6">
+
+              <!-- Course Includes -->
+              <div class="mt-6 pt-6 border-t border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">This course includes:</h3>
+                <ul class="space-y-2">
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-video w-5 text-gray-400"></i>
+                    <span>{{ course.lessons_count || '24' }} lessons</span>
+                  </li>
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-clock w-5 text-gray-400"></i>
+                    <span>{{ course.course_duration }} weeks access</span>
+                  </li>
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-mobile-alt w-5 text-gray-400"></i>
+                    <span>Mobile & TV access</span>
+                  </li>
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-trophy w-5 text-gray-400"></i>
+                    <span>Certificate of completion</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Not Found -->
+<div *ngIf="!loading && !course" class="min-h-[60vh] flex items-center justify-center">
+  <div class="text-center">
+    <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+    <h2 class="text-xl font-semibold text-gray-900 mb-2">Course not found</h2>
+    <p class="text-gray-500 mb-6">The course you're looking for doesn't exist or has been removed.</p>
+    <a routerLink="/student/my-courses"
+            class="px-6 py-2 bg-[#073a89] text-white rounded hover:bg-[#052b63] transition-colors">
+      Back to My Courses
+    </a>
+  </div>
+</div>

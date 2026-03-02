@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, RouterOutlet, Router } from '@angular/router';
 import { AuthService } from '../../../../services/auth.service';
 import { GuardianService } from '../../../../services/guardian.service';
+import { User } from '../../../../models/user.model';
 
 @Component({
   selector: 'app-guardian-layout',
@@ -13,7 +14,8 @@ import { GuardianService } from '../../../../services/guardian.service';
 })
 export class GuardianLayout implements OnInit {
   guardian: any = {}; // store dynamic data
-
+currentUser: User | null = null;
+    userInitials: string = '';
   // Mobile/desktop toggles
   mobileSidebarActive = false;
   mobileUserDropdownActive = false;
@@ -25,20 +27,29 @@ export class GuardianLayout implements OnInit {
     private router: Router,
   ) {}
 
-  ngOnInit(): void {
-    this.loadGuardianProfile();
-  }
-
-  loadGuardianProfile() {
-    this.guardianService.getProfile().subscribe({
-      next: (res) => {
-        this.guardian = res; // store data
-        console.log('Guardian profile:', res); // for debugging
-      },
-      error: (err) => {
-        console.error('Failed to load guardian profile', err);
-      },
+ 
+  ngOnInit() {
+    // Subscribe to current user changes
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      this.setUserInitials();
     });
+
+    // If you need to force load from storage (in case the subscription doesn't fire immediately)
+    if (!this.currentUser) {
+      this.currentUser = this.authService.getCurrentUser();
+      this.setUserInitials();
+    }
+  }
+  setUserInitials() {
+    if (this.currentUser?.first_name && this.currentUser?.last_name) {
+      const name = `${this.currentUser.first_name} ${this.currentUser.last_name}`;
+      this.userInitials = name.charAt(0).toUpperCase();
+    } else if (this.currentUser?.email) {
+      this.userInitials = this.currentUser.email.charAt(0).toUpperCase();
+    } else {
+      this.userInitials = 'A'; // Default fallback
+    }
   }
 
   logout() {
@@ -61,5 +72,24 @@ export class GuardianLayout implements OnInit {
   }
   navigateToLogout() {
     this.router.navigate(['/guardian/logout']);
+  }
+
+   // Helper method to get full name
+  getFullName(): string {
+    if (this.currentUser?.first_name && this.currentUser?.last_name) {
+      return `${this.currentUser.first_name} ${this.currentUser.last_name}`;
+    }
+    return 'Guardian';
+  }
+  getUsername(): string {
+    if (this.currentUser?.first_name) {
+      return `${this.currentUser.first_name}`;
+    }
+    return 'Guardian';
+  }
+
+  // Helper method to get email
+  getEmail(): string {
+    return this.currentUser?.email || 'guardian@example.com';
   }
 }

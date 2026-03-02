@@ -11,6 +11,8 @@ import { environment } from '../../environments/environment';
 export class AssignmentService {
   private apiUrl = environment.AdminApiUrl + '/assignments';
   private coursesUrl = environment.AdminApiUrl + '/courses';
+  private StudentApiUrl = environment.StudentApiUrl + '/assignments';
+  private guardianApiUrl = environment.GuardianApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
@@ -140,5 +142,48 @@ export class AssignmentService {
         return throwError(() => err);
       }),
     );
+  }
+
+
+
+  /** =========================
+ *  Student - Get Assignments by Course
+ *  ========================= */
+getAssignmentsByCourse(courseId: number): Observable<any> {
+  return this.http
+    .get<any>(`${this.StudentApiUrl}/course/${courseId}`, {
+      headers: this.getHeaders()
+    })
+    .pipe(
+      catchError((err) => {
+        console.error('Error fetching assignments by course:', err);
+        return throwError(() => err);
+      }),
+    );
+}
+ /** =========================
+   * Guardian: Get Assignments by Course
+   * ========================= */
+  getAssignmentsGuardian(courseId: number): Observable<AssignmentApiResponse> {
+    const token = localStorage.getItem('token');
+
+    // Correct URL: only one 'courses'
+    const url = `${this.guardianApiUrl}/${courseId}/assignments`;
+
+    console.log('Requesting URL:', url); // For debugging
+
+    return this.http
+      .get<AssignmentApiResponse>(url, {
+        headers: new HttpHeaders({
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        }),
+      })
+      .pipe(
+        catchError((err) => {
+          console.error(`Error fetching guardian assignments for course ${courseId}:`, err);
+          return throwError(() => err);
+        }),
+      );
   }
 }

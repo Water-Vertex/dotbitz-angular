@@ -78,19 +78,19 @@ export class StudentService {
     if (search) params = params.set('search', search);
 
     return this.http
-      .get<{ data: Student[] }>(`${this.apiUrl}/admin/students`, { headers: this.getHeaders(), params })
+      .get<{ data: Student[] }>(`${this.apiUrl}`, { headers: this.getHeaders(), params })
       .pipe(catchError(err => throwError(() => err)));
   }
 
   deleteStudent(id: number): Observable<any> {
     return this.http
-      .delete(`${this.apiUrl}/admin/students/${id}`, { headers: this.getHeaders() })
+      .delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError(err => throwError(() => err)));
   }
 
   adminAddStudent(data: RegistrationRequest): Observable<Student> {
     return this.http
-      .post<Student>(`${this.apiUrl}/admin/students/add`, data, { headers: this.getHeaders() })
+      .post<Student>(`${this.apiUrl}/add`, data, { headers: this.getHeaders() })
       .pipe(catchError(err => throwError(() => err)));
   }
 

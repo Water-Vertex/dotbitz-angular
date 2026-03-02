@@ -52,6 +52,23 @@ import { StudentCourseList } from './components/student/pages/courses/course-lis
 import { GuardianCourseList } from './components/guardian/pages/courses/course-list/course-list';
 import { GuardianCourseDetail } from './components/guardian/pages/courses/course-detail/course-detail';
 import { StudentCourseDetail } from './components/student/pages/courses/course-detail/course-detail';
+import { StudentCheckout } from './components/student/pages/order/checkout/checkout';
+import { MyCourses } from './components/student/pages/profile/my-courses/courses/courses';
+import { GuardianCheckout } from './components/guardian/pages/order/checkout/checkout';
+import { MyCoursesGuardian } from './components/guardian/pages/profile/my-courses/courses/courses';
+import { InstructorLogin } from './components/auth/instructor-login/instructor-login';
+import { InstructorLogout } from './components/auth/instructor-logout/instructor-logout';
+import { InstructorLayout } from './components/instructor/layouts/instructor-layout/instructor-layout';
+import { InstructorDashboard } from './components/instructor/pages/dashboard/dashboard';
+import { InstructorProfile } from './components/instructor/pages/profile/profile-show/profile-show';
+import { InstructorProfileEdit } from './components/instructor/pages/profile/profile-edit/profile-edit';
+import { MyCourseDetail } from './components/student/pages/profile/my-courses/course-details/course-details';
+import { GuardianCourseDetails } from './components/guardian/pages/profile/my-courses/course-details/course-details';
+import { InstructorCourseList } from './components/instructor/pages/courses/course-list/course-list';
+import { InstructorCourseDetail } from './components/instructor/pages/courses/course-detail/course-detail';
+import { ClassScheduleList } from './components/instructor/pages/class-schedule/schedule-list/schedule-list';
+import { ClassScheduleAdd } from './components/instructor/pages/class-schedule/schedule-add/schedule-add';
+import { ClassScheduleEdit } from './components/instructor/pages/class-schedule/schedule-edit/schedule-edit';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -136,31 +153,58 @@ export const routes: Routes = [
       { path: 'guardian/profile/edit', component: ProfileEdit },
       { path: 'guardian/courses/list', component: GuardianCourseList },
       { path: 'guardian/course/detail/:id', component: GuardianCourseDetail},
+      { path: 'guardian/checkout/:id', component: GuardianCheckout },
+      { path: 'guardian/my-courses', component: MyCoursesGuardian },
+      { path: 'guardian/course/:id', component: GuardianCourseDetails},
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
   },
 
   // Student Routes
-{ path: 'student/login', component: StudentLogin },
+  { path: 'student/login', component: StudentLogin },
   {
-  path: '',
-  component: StudentDashboardLayout, // layout wrapper
-  children: [
-    { path: 'student/logout', component: StudentLogout },
-    { path: 'student/profile', component: StudentProfile },
-    { path: 'student/profile/edit', component: StudentProfileEdit },
-    { path: 'student/dashboard', component: StudentDashboard },
-    { path: 'student/courses/list', component: StudentCourseList },
-    { path: 'student/course/detail/:id', component: StudentCourseDetail}
-  ]
-},
+    path: '',
+    canActivate: [authGuard],
+    component: StudentDashboardLayout, // layout wrapper
+    children: [
+      { path: 'student/logout', component: StudentLogout },
+      { path: 'student/profile', component: StudentProfile },
+      { path: 'student/profile/edit', component: StudentProfileEdit },
+      { path: 'student/dashboard', component: StudentDashboard },
+      { path: 'student/courses/list', component: StudentCourseList },
+      { path: 'student/course/detail/:id', component: StudentCourseDetail},
+      { path: 'student/checkout/:courseId', component: StudentCheckout },
+      { path: 'student/my-courses', component: MyCourses },
+      { path: 'student/assignments/:courseId', component: AssignmentList },
+      { path: 'student/course/:courseId', component: MyCourseDetail }
+    ]
+  },
 
   {
     path: '',
     component: StudentLayout,
     children: [
       { path: 'student/registration', component: StudentRegistration },
+    ]
+  },
+
+    // Instructor Routes
+  { path: 'instructor/login', component: InstructorLogin },
+  {
+    path: '',
+    canActivate: [authGuard],
+    component: InstructorLayout, // layout wrapper
+    children: [
+      { path: 'instructor/logout', component: InstructorLogout },
+      { path: 'instructor/dashboard', component: InstructorDashboard },
+      { path: 'instructor/profile', component: InstructorProfile },
+      { path: 'instructor/profile/edit', component: InstructorProfileEdit },
+      { path: 'instructor/courses/list', component: InstructorCourseList },
+      { path: 'instructor/course/detail/:id', component: InstructorCourseDetail},
+      { path: 'instructor/class-schedule/list', component: ClassScheduleList },
+      { path: 'instructor/class-schedule/add', component: ClassScheduleAdd },
+      { path: 'instructor/class-schedule/edit/:id', component: ClassScheduleEdit },
     ]
   },
   { path: '**', redirectTo: '' }

@@ -1,108 +1,187 @@
-<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[70vh] space-y-4">
-  <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#073a89]"></div>
-  <p class="text-gray-500 font-medium animate-pulse">Loading Course Details...</p>
+<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[70vh]">
+  <div class="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-[#073a89]"></div>
+  <p class="text-gray-500 mt-4">Loading course...</p>
 </div>
 
-<div *ngIf="!loading && course">
-  <section class="bg-gradient-to-br from-[#073a89] to-[#0091b9] text-white py-16">
-    <div class="container mx-auto px-6">
-      <h1 class="text-4xl font-bold mb-4">{{ course.course_name }}</h1>
-      <div class="flex flex-wrap gap-4 text-sm md:text-base">
-        <span><i class="fas fa-layer-group mr-2"></i>Level: {{ course.course_level }}</span>
-        <span><i class="fas fa-clock mr-2"></i>Duration: {{ course.course_duration }} Weeks</span>
-        <span><i class="fas fa-calendar-alt mr-2"></i>Start: {{ course.start_date | date: 'mediumDate' }}</span>
-      </div>
-      <div *ngIf="course.is_featured" class="mt-4 px-3 py-1 bg-red-500 rounded-full text-sm inline-block shadow-lg">
-        ⭐ Featured Course
+<div *ngIf="!loading && course" class="bg-white">
+  <!-- Simple Breadcrumb -->
+  <div class="border-b border-gray-200">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex items-center text-sm text-gray-500">
+        <a routerLink="/student/courses" class="hover:text-[#073a89]">Courses</a>
+        <span class="mx-2">›</span>
+        <span class="text-gray-900">{{ course.course_name }}</span>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section class="py-16 bg-white">
-    <div class="container mx-auto px-6 grid lg:grid-cols-3 gap-12">
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-      <div class="lg:col-span-2 space-y-12">
-        <div>
-          <h2 class="text-3xl font-bold mb-6 text-[#073a89]">Course Description</h2>
-          <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed break-words" [innerHTML]="course.course_description"></div>
+      <!-- Left Column - Course Info -->
+      <div class="lg:col-span-2">
+        <!-- Title & Badge -->
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-3">
+            <span *ngIf="course.is_featured" class="text-xs font-medium bg-[#073a89]/10 text-[#073a89] px-2 py-1 rounded">Featured</span>
+            <span *ngIf="course.status === 'active'" class="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded">Open for enrollment</span>
+          </div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ course.course_name }}</h1>
+
+          <!-- Quick Stats -->
+          <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+            <span class="flex items-center">
+              <i class="fas fa-signal mr-2 text-gray-400"></i>
+              {{ course.course_level }}
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-clock mr-2 text-gray-400"></i>
+              {{ course.course_duration }} weeks
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-calendar mr-2 text-gray-400"></i>
+              Starts {{ course.start_date | date: 'MMM d, yyyy' }}
+            </span>
+          </div>
         </div>
 
-        <div *ngIf="getBenefits().length > 0">
-          <h2 class="text-3xl font-bold mb-6 text-[#073a89]">Parent-Friendly Benefits</h2>
-          <div class="grid md:grid-cols-2 gap-6">
-            <div *ngFor="let benefit of getBenefits()" class="flex gap-3 items-start">
-              <div class="w-6 h-6 bg-blue-100 flex items-center justify-center rounded-full shrink-0 mt-1">
-                <span class="text-blue-600 text-xs">✔</span>
-              </div>
-              <p class="text-gray-700">{{ benefit }}</p>
+        <!-- Thumbnail (Mobile) -->
+        <div class="lg:hidden mb-6">
+          <img
+            *ngIf="course.thumbnail_image"
+            [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
+            class="w-full rounded-lg border border-gray-200"
+            [alt]="course.course_name"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="mb-8">
+  <h2 class="text-lg font-semibold text-gray-900 mb-3">
+    About this course
+  </h2>
+
+  <div
+    class="prose prose-sm max-w-none text-gray-600 whitespace-pre-line"
+    [innerHTML]="course.course_description">
+  </div>
+</div>
+
+        <!-- What you'll learn -->
+        <div *ngIf="getBenefits().length > 0" class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">What you'll learn</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div *ngFor="let benefit of getBenefits()" class="flex items-start gap-2">
+              <i class="fas fa-check text-green-500 text-sm mt-1"></i>
+              <span class="text-sm text-gray-600">{{ benefit }}</span>
             </div>
           </div>
         </div>
 
-        <div *ngIf="course.instructor">
-          <h2 class="text-3xl font-bold mb-6 text-[#073a89]">Meet Your Instructor</h2>
-          <div class="bg-gray-50 p-8 rounded-xl border border-gray-100">
-            <h3 class="text-2xl font-bold text-gray-900">
-              {{ course.instructor.first_name }} {{ course.instructor.last_name }}
-            </h3>
-            <p class="text-blue-600 mt-1 font-medium">{{ course.instructor.title }}</p>
-            <p class="mt-4 text-gray-700 leading-relaxed">{{ course.instructor.description }}</p>
+        <!-- Instructor -->
+        <div *ngIf="course.instructor" class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">Instructor</h2>
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-[#073a89]/10 rounded-full flex items-center justify-center text-[#073a89] font-semibold text-lg">
+              {{ course.instructor.first_name?.charAt(0) }}{{ course.instructor.last_name?.charAt(0) }}
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">{{ course.instructor.first_name }} {{ course.instructor.last_name }}</h3>
+              <p class="text-sm text-gray-500 mb-2">{{ course.instructor.title }}</p>
+              <p class="text-sm text-gray-600">{{ course.instructor.description }}</p>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- Right Column - Sidebar -->
       <div class="lg:col-span-1">
-        <div class="sticky top-24 space-y-6">
-          <div class="rounded-xl overflow-hidden shadow-2xl border border-gray-100">
-            <img
-              *ngIf="course.thumbnail_image"
-              [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
-              class="w-full h-64 object-cover"
-              [alt]="course.course_name"
-            />
-          </div>
-
-          <div class="bg-white p-8 rounded-xl shadow-xl border border-gray-50 space-y-6">
-            <h3 class="text-2xl font-bold text-center text-[#073a89]">Enrollment Details</h3>
-
-            <div class="space-y-4">
-              <div class="flex justify-between border-b border-gray-100 pb-2">
-                <span class="text-gray-600">Course Fee</span>
-                <span class="font-bold text-2xl text-orange-600">${{ course.course_fee }}</span>
-              </div>
-              <div class="flex justify-between border-b border-gray-100 pb-2">
-                <span class="text-gray-600">Level</span>
-                <span class="font-semibold">{{ course.course_level }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Age Limit</span>
-                <span class="font-semibold">{{ course.age_limit }}+ Years</span>
+        <div class="lg:sticky lg:top-24">
+          <!-- Course Card -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden bg-white">
+            <!-- Thumbnail (Desktop) -->
+            <div class="hidden lg:block bg-gray-50">
+              <img
+                *ngIf="course.thumbnail_image"
+                [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
+                class="w-full aspect-video object-cover"
+                [alt]="course.course_name"
+              />
+              <div *ngIf="!course.thumbnail_image" class="w-full aspect-video bg-gray-100 flex items-center justify-center">
+                <i class="fas fa-image text-3xl text-gray-300"></i>
               </div>
             </div>
 
-            <div class="pt-4">
-              <button *ngIf="course.status === 'active'" class="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg transform hover:-translate-y-1">
-                ENROLL CHILD NOW
-              </button>
-              <button *ngIf="course.status === 'upcoming'" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg">
-                JOIN WAITLIST
-              </button>
-              <div *ngIf="course.status === 'inactive'" class="w-full py-4 bg-gray-100 text-gray-500 font-bold rounded-xl text-center">
-                REGISTRATION CLOSED
+            <!-- Price & CTA -->
+            <div class="p-6">
+              <div class="mb-4">
+                <span class="text-3xl font-bold text-gray-900">${{ course.course_fee }}</span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="space-y-2">
+                <button *ngIf="course.status === 'active'"
+                        [routerLink]="['/guardian/checkout', course.id]"
+                        class="w-full py-3 bg-[#073a89] hover:bg-[#052b63] text-white font-semibold rounded transition-colors">
+                  Enroll now
+                </button>
+
+                <button *ngIf="course.status === 'upcoming'"
+                        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition-colors">
+                  Join waitlist
+                </button>
+
+                <div *ngIf="course.status === 'inactive'"
+                     class="w-full py-3 bg-gray-100 text-gray-500 font-semibold rounded text-center">
+                  Registration closed
+                </div>
+
+                <button class="w-full py-3 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors text-sm">
+                  <i class="far fa-heart mr-2"></i>
+                  Save for later
+                </button>
+              </div>
+
+              <!-- Course Includes -->
+              <div class="mt-6 pt-6 border-t border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">This course includes:</h3>
+                <ul class="space-y-2">
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-video w-5 text-gray-400"></i>
+                    <span>{{ course.lessons_count || '24' }} lessons</span>
+                  </li>
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-clock w-5 text-gray-400"></i>
+                    <span>{{ course.course_duration }} weeks access</span>
+                  </li>
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-mobile-alt w-5 text-gray-400"></i>
+                    <span>Mobile & TV access</span>
+                  </li>
+                  <li class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-trophy w-5 text-gray-400"></i>
+                    <span>Certificate of completion</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
-  </section>
+  </div>
 </div>
 
-<div *ngIf="!loading && !course" class="py-20 text-center">
-  <div class="mb-4 text-5xl">🔍</div>
-  <p class="text-gray-500 font-bold text-xl">We couldn't find that course.</p>
-  <button routerLink="/guardian/courses/list" class="mt-4 px-6 py-2 bg-[#073a89] text-white rounded-lg hover:bg-blue-800">
-    Return to Course List
-  </button>
+<!-- Not Found -->
+<div *ngIf="!loading && !course" class="min-h-[60vh] flex items-center justify-center">
+  <div class="text-center">
+    <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+    <h2 class="text-xl font-semibold text-gray-900 mb-2">Course not found</h2>
+    <p class="text-gray-500 mb-6">The course you're looking for doesn't exist or has been removed.</p>
+    <button routerLink="/student/courses/list"
+            class="px-6 py-2 bg-[#073a89] text-white rounded hover:bg-[#052b63] transition-colors">
+      Browse courses
+    </button>
+  </div>
 </div>
