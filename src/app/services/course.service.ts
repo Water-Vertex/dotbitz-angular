@@ -14,6 +14,7 @@ export class CourseService {
   private apiUrl = environment.AdminApiUrl + '/courses';
   private StudentApiUrl = environment.StudentApiUrl + '/courses';
   private guardianApiUrl = environment.GuardianApiUrl + '/courses';
+  private instructorApiUrl = environment.InstructorApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
@@ -87,7 +88,7 @@ export class CourseService {
   }
 
    getStudentCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
-    let url = `${this.guardianApiUrl}?per_page=${perPage}`;
+    let url = `${this.StudentApiUrl}?per_page=${perPage}`;
     if (search) {
       url += `&search=${search}`;
     }
@@ -101,7 +102,7 @@ export class CourseService {
    */
   getStudentCourseDetail(id: number): Observable<CourseApiResponse> {
     return this.http
-      .get<CourseApiResponse>(`${this.guardianApiUrl}/${id}`, { headers: this.getHeaders() })
+      .get<CourseApiResponse>(`${this.StudentApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 
@@ -121,6 +122,25 @@ export class CourseService {
   getGuardianCourseDetail(id: number): Observable<CourseApiResponse> {
     return this.http
       .get<CourseApiResponse>(`${this.guardianApiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+   getInstructorCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+    let url = `${this.instructorApiUrl}?per_page=${perPage}`;
+    if (search) {
+      url += `&search=${search}`;
+    }
+    return this.http
+      .get<CourseApiResponse>(url, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  /**
+   * Fetches a single course detail for the Instructor.
+   */
+  getInstructorCourseDetail(id: number): Observable<CourseApiResponse> {
+    return this.http
+      .get<CourseApiResponse>(`${this.instructorApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 }

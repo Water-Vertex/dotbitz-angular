@@ -22,7 +22,6 @@ export class GuardianService {
   updateProfile(data: any): Observable<any> {
     return this.http.put(`${this.GuardianApiUrl}/profile/update`, data);
   }
-
   getGuardianStudents(): Observable<any> {
     const token = localStorage.getItem('token');
     return this.http.get(`${this.GuardianApiUrl}/checkout/guardian`, {

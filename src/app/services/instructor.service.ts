@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 
 import {
   InstructorPayload,
-  InstructorApiResponse
+  InstructorApiResponse,
+  Instructor
 } from '../models/instructor.model';
 import { environment } from '../../environments/environment';
 
@@ -15,6 +16,7 @@ import { environment } from '../../environments/environment';
 export class InstructorService {
 
   private apiUrl = environment.AdminApiUrl + '/instructors';
+  private InstructorApiUrl = environment.InstructorApiUrl;
   // private apiUrl = 'http://localhost:8000/api/instructors';
 
 
@@ -139,5 +141,33 @@ getInstructors(search: string = ''): Observable<any> {
       })
     );
   }
+
+   getProfile(): Observable<any> {
+        console.log('🔷 Service: getProfile() called');
+        console.log('🔷 API URL:', `${this.InstructorApiUrl}/profile`);
+        console.log('🔷 Token exists:', !!localStorage.getItem('token'));
+
+        return this.http.get(`${this.InstructorApiUrl}/profile`, {
+          headers: this.getHeaders()
+        }).pipe(
+          tap(response => {
+            console.log('✅ Service: Response received:', response);
+          }),
+        catchError(err => {
+          console.error('❌ Service: Request failed:', err);
+          console.error('❌ Service: Error status:', err.status);
+          console.error('❌ Service: Error body:', err.error);
+          return throwError(() => err);
+        })
+      );
+    }
+
+    updateProfile(data: Partial<Instructor>): Observable<any> {
+      return this.http.put(`${this.InstructorApiUrl}/profile`, data, {
+        headers: this.getHeaders()
+      }).pipe(
+        catchError(err => throwError(() => err))
+      );
+    }
 
 }

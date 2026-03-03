@@ -11,7 +11,8 @@ import { environment } from '../../environments/environment';
 export class AssignmentService {
   private apiUrl = environment.AdminApiUrl + '/assignments';
   private coursesUrl = environment.AdminApiUrl + '/courses';
-  private guardianApiUrl = environment.GuardianApiUrl + '/courses'; // For guardian-specific endpoints
+  private StudentApiUrl = environment.StudentApiUrl + '/assignments';
+  private guardianApiUrl = environment.GuardianApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
@@ -144,9 +145,20 @@ export class AssignmentService {
   }
 
   /** =========================
-   *  Guardian: Get Assignments by Course
+   *  Student - Get Assignments by Course
    *  ========================= */
-
+  getAssignmentsByCourse(courseId: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.StudentApiUrl}/course/${courseId}`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        catchError((err) => {
+          console.error('Error fetching assignments by course:', err);
+          return throwError(() => err);
+        }),
+      );
+  }
   /** =========================
    * Guardian: Get Assignments by Course
    * ========================= */
@@ -173,4 +185,3 @@ export class AssignmentService {
       );
   }
 }
-

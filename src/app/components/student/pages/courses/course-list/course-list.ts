@@ -79,7 +79,7 @@ export class StudentCourseList implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Failed to load guardian courses', err);
+        console.error('Failed to load student courses', err);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -122,3 +122,5 @@ export class StudentCourseList implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+
