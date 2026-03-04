@@ -5,12 +5,15 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CouponService } from '../../../../../services/coupon.service';
 import { ToastService } from '../../../../../services/toast.service';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-coupon-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './coupon-edit.html'
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CKEditorModule],
+  templateUrl: './coupon-edit.html',
+  styleUrls: ['./coupon-edit.css'], 
 })
 export class CouponEdit implements OnInit, OnDestroy {
   couponForm: FormGroup;
@@ -19,13 +22,38 @@ export class CouponEdit implements OnInit, OnDestroy {
   isSubmitting = false;
   private routeSub?: Subscription;
 
+  // ✅ CKEditor
+  public Editor: any = ClassicEditor;
+  public editorConfig = {
+    toolbar: [
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      '|',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'indent',
+      'outdent',
+      '|',
+      'link',
+      '|',
+      'blockQuote',
+      '|',
+      'undo',
+      'redo',
+    ],
+  };
+
   constructor(
     private fb: FormBuilder,
     private couponService: CouponService,
     private toast: ToastService,
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.couponForm = this.fb.group({
       code: ['', [Validators.required, Validators.minLength(2)]],
@@ -35,14 +63,13 @@ export class CouponEdit implements OnInit, OnDestroy {
       description: ['', [Validators.required, Validators.minLength(2)]],
       is_active: [true],
       valid_from: ['', Validators.required],
-      valid_until: ['', Validators.required]
+      valid_until: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
-    this.routeSub = this.route.params.subscribe(params => {
+    this.routeSub = this.route.params.subscribe((params) => {
       const id = params['id'];
-
       if (id && !isNaN(id)) {
         this.couponId = +id;
         this.loadCoupon(this.couponId);
@@ -58,7 +85,7 @@ export class CouponEdit implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.couponService.getCoupon(id).subscribe({
-      next: res => {
+      next: (res) => {
         const data = res.data ?? res;
 
         if (!data || !data.code) {
@@ -75,18 +102,18 @@ export class CouponEdit implements OnInit, OnDestroy {
           description: data.description,
           is_active: data.is_active,
           valid_from: data.valid_from,
-          valid_until: data.valid_until
+          valid_until: data.valid_until,
         });
 
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: err => {
+      error: () => {
         this.toast.error('Error', 'Failed to load coupon');
         this.router.navigate(['/admin/coupon/list']);
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -105,11 +132,11 @@ export class CouponEdit implements OnInit, OnDestroy {
           this.router.navigate(['/admin/coupon/list']);
         }, 1500);
       },
-      error: err => this.handleError(err),
+      error: (err) => this.handleError(err),
       complete: () => {
         this.isSubmitting = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -129,27 +156,21 @@ export class CouponEdit implements OnInit, OnDestroy {
     this.router.navigate(['/admin/coupon/list']);
   }
 
-  // Form control getters
   get code() {
     return this.couponForm.get('code');
   }
-
   get discount_type() {
     return this.couponForm.get('discount_type');
   }
-
   get discount_amount() {
     return this.couponForm.get('discount_amount');
   }
-
   get description() {
     return this.couponForm.get('description');
   }
-
   get valid_from() {
     return this.couponForm.get('valid_from');
   }
-
   get valid_until() {
     return this.couponForm.get('valid_until');
   }

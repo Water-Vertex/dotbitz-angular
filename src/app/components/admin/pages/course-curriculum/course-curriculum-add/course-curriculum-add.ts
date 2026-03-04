@@ -5,12 +5,15 @@ import { Router, RouterLink } from '@angular/router';
 import { CourseCurriculumService } from '../../../../../services/coursecurriculum.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Course } from '../../../../../models/coursecurriculum.model';
-import { QuillModule } from 'ngx-quill';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 @Component({
   selector: 'app-course-curriculum-add',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, QuillModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CKEditorModule],
   templateUrl: './course-curriculum-add.html',
+  styleUrls: ['./course-curriculum-add.css'], 
 })
 export class CourseCurriculumAdd implements OnInit {
   curriculumForm: FormGroup;
@@ -18,22 +21,47 @@ export class CourseCurriculumAdd implements OnInit {
   isSubmitting = false;
   courses: Course[] = [];
 
-  quillModules = {
+  // ✅ CKEditor
+  public Editor: any = ClassicEditor;
+  public editorConfig = {
     toolbar: [
-      ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-      ['blockquote', 'code-block'], // blocks
-      [{ list: 'ordered' }, { list: 'bullet' }], // lists
-      [{ indent: '-1' }, { indent: '+1' }], // indents
-      [{ header: [1, 2, 3, 4, 5, 6, false] }], // headers
-      [{ color: [] }, { background: [] }], // text color
-      [{ font: [] }],
-      [{ align: [] }],
-      ['link', 'image', 'video'],
-      ['clean'],
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      '|',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'indent',
+      'outdent',
+      '|',
+      'link',
+      '|',
+      'blockQuote',
+      '|',
+      'undo',
+      'redo',
     ],
   };
 
-  // selected file
+  //  Quill (commented out)
+  // quillModules = {
+  //   toolbar: [
+  //     ['bold', 'italic', 'underline', 'strike'],
+  //     ['blockquote', 'code-block'],
+  //     [{ list: 'ordered' }, { list: 'bullet' }],
+  //     [{ indent: '-1' }, { indent: '+1' }],
+  //     [{ header: [1, 2, 3, 4, 5, 6, false] }],
+  //     [{ color: [] }, { background: [] }],
+  //     [{ font: [] }],
+  //     [{ align: [] }],
+  //     ['link', 'image', 'video'],
+  //     ['clean'],
+  //   ],
+  // };
+
   selectedFile: File | null = null;
 
   constructor(
@@ -48,7 +76,7 @@ export class CourseCurriculumAdd implements OnInit {
       title: ['', Validators.required],
       type: ['', Validators.required],
       video_url: [''],
-      documents: [''], // This acts as a UI placeholder for the filename
+      documents: [''],
       description: [''],
       duration: [''],
       status: ['active'],
@@ -59,19 +87,16 @@ export class CourseCurriculumAdd implements OnInit {
     this.loadCourses();
   }
 
-  /** ---------- FILE SELECTION ---------- */
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
-      // Patch the filename to the form so DB gets filename
       this.curriculumForm.patchValue({
         documents: this.selectedFile.name,
       });
     }
   }
 
-  /** ---------- LOAD COURSES ---------- */
   loadCourses(): void {
     this.isLoading = true;
     this.curriculumService.getCourses().subscribe({
@@ -88,7 +113,6 @@ export class CourseCurriculumAdd implements OnInit {
     });
   }
 
-  /** ---------- submit ---------- */
   onSubmit(): void {
     if (this.curriculumForm.invalid) {
       this.markFormGroupTouched(this.curriculumForm);
@@ -99,13 +123,10 @@ export class CourseCurriculumAdd implements OnInit {
     this.isSubmitting = true;
 
     const formData = new FormData();
-
     const type = this.curriculumForm.get('type')?.value;
 
-    // Loop through other fields
     Object.keys(this.curriculumForm.value).forEach((key) => {
       const value = this.curriculumForm.value[key];
-
       if (key !== 'documents') {
         if (value !== null && value !== undefined) {
           formData.append(key, value);
@@ -113,13 +134,11 @@ export class CourseCurriculumAdd implements OnInit {
       }
     });
 
-    // Handle documents field based on type
     if (type === 'reading' || type === 'assignment') {
       if (this.selectedFile) {
         formData.append('documents', this.selectedFile, this.selectedFile.name);
       }
     } else if (type === 'video') {
-      // Save video URL in 'documents' field
       const url = this.curriculumForm.get('video_url')?.value || '';
       formData.append('documents', url);
     }
@@ -142,19 +161,16 @@ export class CourseCurriculumAdd implements OnInit {
     });
   }
 
-  /** ---------- CANCEL ---------- */
   cancel(): void {
     this.router.navigate(['/admin/course-curriculum/list']);
   }
 
-  /** ---------- HELPER TO MARK FORM CONTROLS AS TOUCHED ---------- */
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
     });
   }
 
-  /** ---------- GETTER FOR FORM CONTROLS ---------- */
   get f() {
     return this.curriculumForm.controls;
   }

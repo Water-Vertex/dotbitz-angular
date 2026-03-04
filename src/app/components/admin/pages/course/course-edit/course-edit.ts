@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { QuillModule } from 'ngx-quill';
+// import { QuillModule } from 'ngx-quill';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -12,12 +12,23 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { CourseApiResponse, Instructor } from '../../../../../models/course.model';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-course-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, QuillModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    // QuillModule,
+    CKEditorModule,
+  ],
   templateUrl: './course-edit.html',
+  styleUrls: ['./course-edit.css'],
+  encapsulation: ViewEncapsulation.None, // ✅ Important
 })
 export class CourseEdit implements OnInit {
   courseForm!: FormGroup;
@@ -28,6 +39,30 @@ export class CourseEdit implements OnInit {
   selectedFile: File | null = null;
   isEditMode: boolean = true;
 
+  // ✅ CKEditor
+  public Editor: any = ClassicEditor;
+
+  public editorConfig = {
+    toolbar: [
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      '|',
+      'link',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'blockQuote',
+      '|',
+      'undo',
+      'redo',
+    ],
+  };
+
+  /*
+  // 🔹 Old Quill Config (DO NOT REMOVE)
   quillModules = {
     toolbar: [
       ['bold', 'italic', 'underline', 'strike'],
@@ -45,6 +80,7 @@ export class CourseEdit implements OnInit {
       ['link', 'image', 'video'],
     ],
   };
+  */
 
   constructor(
     private fb: FormBuilder,
@@ -83,7 +119,6 @@ export class CourseEdit implements OnInit {
     });
   }
 
-  // Helper function: Path se ganda naam hatane ke liye
   getFileName(fullPath: any): string {
     if (!fullPath || typeof fullPath !== 'string') return 'No file selected';
     const name = fullPath.split(/[\\/]/).pop();
@@ -134,7 +169,7 @@ export class CourseEdit implements OnInit {
 
     this.isSubmitting = true;
     const formData = new FormData();
-    formData.append('_method', 'PUT'); // Method Spoofing
+    formData.append('_method', 'PUT');
 
     Object.keys(this.courseForm.value).forEach((key) => {
       if (key !== 'thumbnail_image') {

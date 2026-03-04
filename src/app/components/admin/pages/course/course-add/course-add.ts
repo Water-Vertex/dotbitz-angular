@@ -1,8 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { QuillModule } from 'ngx-quill';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { ClassicEditor } from 'ckeditor5';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -18,8 +17,9 @@ import { ToastService } from '../../../../../services/toast.service';
 @Component({
   selector: 'app-course-add',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, QuillModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CKEditorModule],
   templateUrl: './course-add.html',
+  styleUrls: ['./course-add.css'],
 })
 export class CourseAdd implements OnInit {
   courseForm!: FormGroup;
@@ -29,21 +29,26 @@ export class CourseAdd implements OnInit {
 
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
-  quillModules = {
+
+  
+  public Editor: any = ClassicEditor;
+
+  public editorConfig = {
     toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ header: 1 }, { header: 2 }],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      [{ script: 'sub' }, { script: 'super' }],
-      [{ indent: '-1' }, { indent: '+1' }],
-      [{ direction: 'rtl' }],
-      [{ size: ['small', false, 'large', 'huge'] }],
-      [{ color: [] }, { background: [] }],
-      [{ font: [] }],
-      [{ align: [] }],
-      ['clean'],
-      ['link', 'image', 'video'],
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      '|',
+      'link',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'blockQuote',
+      '|',
+      'undo',
+      'redo',
     ],
   };
 
@@ -103,17 +108,14 @@ export class CourseAdd implements OnInit {
   }
 
   onFileSelected(event: any) {
-    const file = event.target.files[0]; // Capture it in a local constant
-
+    const file = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
         this.cdr.detectChanges();
       };
-      // Use the local 'file' constant which TypeScript knows is not null
       reader.readAsDataURL(file);
     }
   }
@@ -127,36 +129,24 @@ export class CourseAdd implements OnInit {
     this.isSubmitting = true;
     const formData = new FormData();
 
-    // Iterate through form controls
     Object.keys(this.courseForm.value).forEach((key) => {
       if (key !== 'thumbnail_image') {
         let value = this.courseForm.value[key];
-
-        // FIX: Convert booleans to '1' or '0'
-        // FormData sends everything as a string; '1'/'0' is the safest format for APIs
-        if (typeof value === 'boolean') {
-          value = value ? '1' : '0';
-        }
-
-        if (value !== null && value !== undefined) {
-          formData.append(key, value);
-        }
+        if (typeof value === 'boolean') value = value ? '1' : '0';
+        if (value !== null && value !== undefined) formData.append(key, value);
       }
     });
 
-    // Append file safely
     if (this.selectedFile) {
       formData.append('thumbnail_image', this.selectedFile, this.selectedFile.name);
     }
 
-    // Submit
     this.courseService.createCourse(formData).subscribe({
       next: (res) => {
         this.toast.success('Success', res.message || 'Course added successfully');
         this.router.navigate(['/admin/course/list']);
       },
       error: (err) => {
-        // Improved error logging to help you see the "1 more error"
         console.error('Upload error:', err);
         this.toast.error('Error', err.error?.message || 'Failed to add course');
         this.isSubmitting = false;

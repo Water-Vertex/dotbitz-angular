@@ -191,28 +191,43 @@
           />
         </div>
 
+         <!-- Short Description -->
         <div class="md:col-span-2">
           <label class="block text-sm font-medium text-gray-700 mb-2">Summary</label>
           <textarea
             formControlName="short_description"
-            rows="2"
+            rows="3"
             placeholder="Enter short description"
             class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           ></textarea>
         </div>
 
         <!-- Course Description -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Course Description</label>
-        \
-          <quill-editor
-            formControlName="course_description"
-            [style]="{ height: '200px' }"
-            [modules]="quillModules"
-            placeholder="Enter course description"
-          >
-          </quill-editor>
-        </div>
+<div class="md:col-span-2">
+  <label class="block text-sm font-medium text-gray-700 mb-2">
+    Course Description
+  </label>
+
+  <div class="w-full">
+    <ckeditor
+      [editor]="Editor"
+      [config]="editorConfig"
+      formControlName="course_description"
+      class="w-full"
+    >
+    </ckeditor>
+  </div>
+
+  <!-- Validation -->
+  <div
+    *ngIf="courseForm.get('course_description')?.invalid && courseForm.get('course_description')?.touched"
+    class="text-red-500 mt-1 text-sm"
+  >
+    <div *ngIf="courseForm.get('course_description')?.errors?.['required']">
+      Course description is required.
+    </div>
+  </div>
+</div>
       </div>
 
       <!-- Course Benefits -->

@@ -6,12 +6,15 @@ import { Subscription } from 'rxjs';
 import { AssignmentService } from '../../../../../services/assignment.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Course, Assignment } from '../../../../../models/assignment.model';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-assignment-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CKEditorModule],
   templateUrl: './assignment-edit.html',
+  styleUrls: ['./assignment-edit.css'],
 })
 export class AssignmentEdit implements OnInit, OnDestroy {
   assignmentForm: FormGroup;
@@ -20,8 +23,13 @@ export class AssignmentEdit implements OnInit, OnDestroy {
   isSubmitting = false;
   courses: Course[] = [];
 
-  existingFile: string | null = null; // Existing uploaded file
-  selectedFile: File | null = null; // New file selected by user
+  existingFile: string | null = null;
+  selectedFile: File | null = null;
+
+  public Editor: any = ClassicEditor;
+  public editorConfig = {
+    toolbar: ['heading', '|', 'bold', 'italic', 'underline', 'link', 'undo', 'redo'],
+  };
 
   private routeSub: Subscription | undefined;
 
@@ -36,8 +44,11 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     this.assignmentForm = this.fb.group({
       course_id: [null, Validators.required],
       title: ['', Validators.required],
+      description: [''], // CKEditor
+      start_date: [''],
       due_date: ['', Validators.required],
       total_marks: [''],
+      active_status: ['active', Validators.required], // default active
       assignment_file: [''], // optional, for display
     });
   }
@@ -57,7 +68,6 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     });
   }
 
-  /** Load all courses */
   loadCourses(): void {
     this.assignmentService.getCourses().subscribe({
       next: (res: any) => {
@@ -68,7 +78,6 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     });
   }
 
-  /** Load assignment details */
   loadAssignment(id: number): void {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -83,13 +92,16 @@ export class AssignmentEdit implements OnInit, OnDestroy {
           return;
         }
 
-        this.existingFile = data.assignment_file || null; // set existing file
+        this.existingFile = data.assignment_file || null;
 
         this.assignmentForm.patchValue({
           course_id: data.course_id,
           title: data.title,
-          due_date: data.due_date,
-          total_marks: data.total_marks,
+          description: data.description || '',
+          start_date: data.start_date || '',
+          due_date: data.due_date || '',
+          total_marks: data.total_marks || '',
+          active_status: data.active_status === 1 ? 'active' : 'inactive',
         });
 
         this.isLoading = false;
@@ -103,18 +115,16 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     });
   }
 
-  /** Handle file selection */
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
       this.assignmentForm.patchValue({
-        assignment_file: this.selectedFile.name, // optional, for display
+        assignment_file: this.selectedFile.name,
       });
     }
   }
 
-  /** Submit updated assignment */
   onSubmit(): void {
     if (this.assignmentForm.invalid || !this.assignmentId) {
       this.markFormGroupTouched(this.assignmentForm);
@@ -129,10 +139,12 @@ export class AssignmentEdit implements OnInit, OnDestroy {
 
     formData.append('course_id', value.course_id);
     formData.append('title', value.title);
+    formData.append('description', value.description || '');
+    formData.append('start_date', value.start_date || '');
     formData.append('due_date', value.due_date);
     formData.append('total_marks', value.total_marks || '');
+    formData.append('active_status', value.active_status); // will be 'active' or 'inactive'
 
-    // Append new file if selected
     if (this.selectedFile) {
       formData.append('assignment_file', this.selectedFile);
     }
@@ -154,23 +166,18 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     });
   }
 
-  /** Cancel edit */
   cancel(): void {
     this.router.navigate(['/admin/assignment/list']);
   }
 
-  /** Mark all controls touched */
   markFormGroupTouched(formGroup: FormGroup) {
-    Object.values(formGroup.controls).forEach((control) => {
-      control.markAsTouched();
-    });
+    Object.values(formGroup.controls).forEach((control) => control.markAsTouched());
   }
 
   ngOnDestroy(): void {
     if (this.routeSub) this.routeSub.unsubscribe();
   }
 
-  /** Getter for form controls */
   get f() {
     return this.assignmentForm.controls;
   }
