@@ -42,9 +42,7 @@ ngOnInit() {
       this.router.navigate(['/login']);
     });
   }
-<<<<<<< HEAD
-}
-=======
+
 
   // Helper method to get full name
   getFullName(): string {
@@ -65,4 +63,3 @@ ngOnInit() {
     return this.currentUser?.email || 'admin@example.com';
   }
 }
->>>>>>> Muneeb

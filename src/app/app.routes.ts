@@ -69,6 +69,9 @@ import { InstructorCourseDetail } from './components/instructor/pages/courses/co
 import { ClassScheduleList } from './components/instructor/pages/class-schedule/schedule-list/schedule-list';
 import { ClassScheduleAdd } from './components/instructor/pages/class-schedule/schedule-add/schedule-add';
 import { ClassScheduleEdit } from './components/instructor/pages/class-schedule/schedule-edit/schedule-edit';
+import { AnnouncementList } from './components/admin/pages/announcement/announcement-list/announcement-list';
+import { AnnouncementAdd }  from './components/admin/pages/announcement/announcement-add/announcement-add';
+import { AnnouncementEdit } from './components/admin/pages/announcement/announcement-edit/announcement-edit';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -132,6 +135,11 @@ export const routes: Routes = [
       { path: 'admin/assessments/list', component: AssessmentList },
       { path: 'admin/assessments/add', component: AssessmentAdd },
       { path: 'admin/assessments/edit/:id', component: AssessmentEdit },
+
+      //Announement routes
+      { path: 'admin/announcement/list', component: AnnouncementList },
+      { path: 'admin/announcement/add',  component: AnnouncementAdd  },
+      { path: 'admin/announcement/edit/:id', component: AnnouncementEdit },
 
 
 

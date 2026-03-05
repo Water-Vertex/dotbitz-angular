@@ -34,8 +34,4 @@ export class StudentLogout {
       }
     });
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> Muneeb

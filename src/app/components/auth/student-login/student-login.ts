@@ -13,11 +13,7 @@ import { ToastService } from '../../../services/toast.service';
 })
 export class StudentLogin {
   loginForm: FormGroup;
-<<<<<<< HEAD
-  isLoading = false;
-=======
   isLoading = false; // Admin login loader
->>>>>>> Muneeb
 
   constructor(
     private fb: FormBuilder,
@@ -32,35 +28,6 @@ export class StudentLogin {
   }
 
   onSubmit(): void {
-<<<<<<< HEAD
-    if (!this.loginForm.valid) {
-      Object.keys(this.loginForm.controls).forEach((key) =>
-        this.loginForm.get(key)?.markAsTouched(),
-      );
-      return;
-    }
-
-    this.isLoading = true;
-
-    this.authService.studentLogin(this.loginForm.value).subscribe({
-      next: (response: any) => {
-        if (response.success && response.token) {
-          // ✅ Store token for future API calls
-          localStorage.setItem('token', response.token);
-
-          this.toastService.success('Welcome!', 'Logged in successfully');
-          this.router.navigate(['/student/dashboard']);
-        } else {
-          this.toastService.error('Login Failed', response.message || 'Try again.');
-        }
-        this.resetLoaders();
-      },
-      error: (error) => {
-        this.toastService.error('Login Failed', error.error?.message || 'Try again.');
-        this.resetLoaders();
-      },
-    });
-=======
     if (this.loginForm.valid) {
       this.isLoading = true;
 
@@ -88,7 +55,6 @@ export class StudentLogin {
         this.loginForm.get(key)?.markAsTouched(),
       );
     }
->>>>>>> Muneeb
   }
 
   private resetLoaders() {
@@ -96,12 +62,6 @@ export class StudentLogin {
   }
 
   navigateToGuardianLogin() {
-<<<<<<< HEAD
-    this.router.navigate(['/guardian/login']);
-  }
-}
-=======
   this.router.navigate(['/guardian/login']);
 }
 }
->>>>>>> Muneeb
