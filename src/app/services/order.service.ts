@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 })
 export class OrderService {
   private apiUrl = environment.StudentApiUrl; // http://localhost:8000/api/student
+  private guardianApiUrl = environment.GuardianApiUrl; // http://localhost:8000/api/guardian
 
   constructor(private http: HttpClient) {}
 
@@ -38,6 +39,10 @@ validateCoupon(couponCode: string): Observable<any> {
     return this.http
       .post(`${this.apiUrl}/orders`, payload, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
+  }
+
+   placeGuardianOrder(payload: any): Observable<any> {
+    return this.http.post(`${this.guardianApiUrl}/orders`, payload, { headers: this.getHeaders() });
   }
 
   getMyOrders(): Observable<any> {

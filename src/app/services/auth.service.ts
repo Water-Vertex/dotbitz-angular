@@ -14,6 +14,7 @@ export class AuthService {
   private AdminApiUrl = environment.AdminApiUrl;
   private GuardianApiUrl = environment.GuardianApiUrl;
   private StudentApiUrl = environment.StudentApiUrl;
+  private InstructorApiUrl = environment.InstructorApiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
   private isInitialized = false;
@@ -72,6 +73,15 @@ studentLogin(credentials: LoginRequest) {
   );
 }
 
+InstructorLogin(credentials: LoginRequest) {
+  return this.http.post<any>(`${this.InstructorApiUrl}/login`, credentials).pipe(
+    tap(res => {
+      if (res?.success && res?.token && res?.instructor) {
+        this.storeAuth(res.token, res.instructor);
+      }
+    })
+  );
+}
 
   logout(): Observable<any> {
     const token = this.getToken();
@@ -175,15 +185,49 @@ studentLogin(credentials: LoginRequest) {
     );
   }
 
+   Instructorlogout(): Observable<any> {
+    const token = this.getToken();
+
+    // Prepare headers
+    let headers = new HttpHeaders({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.post(`${this.InstructorApiUrl}/logout`, {}, { headers }).pipe(
+      tap({
+        next: (response: any) => {
+          console.log('Logout successful:', response);
+          this.clearAuthData();
+          this.router.navigate(['/instructor/login']); // Redirect after successful logout
+        },
+        error: (error) => {
+          console.error('Logout error:', error);
+          // Even if API call fails, clear local data
+          this.clearAuthData();
+          this.router.navigate(['/instructor/login']);
+        },
+        complete: () => {
+          // Fallback - ensure data is cleared
+          this.clearAuthData();
+        }
+      })
+    );
+  }
+
   // Clear auth data and redirect
   clearAuthData(): void {
     this.clearStorage();
     this.currentUserSubject.next(null);
 
-    // // Navigate to login page
-    // setTimeout(() => {
-    //   this.router.navigate(['/login']);
-    // }, 100);
+    // Navigate to login page
+    setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 100);
   }
 
   isLoggedIn(): boolean {

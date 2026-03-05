@@ -9,10 +9,12 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class CourseService {
-//   //private apiUrl = 'https://dotbitz.com/api/courses';
+  // private apiUrl = 'http://localhost:8000/api/courses';
+
   private apiUrl = environment.AdminApiUrl + '/courses';
-private StudentApiUrl = environment.StudentApiUrl + '/courses';
-private GuardianApiUrl = environment.GuardianApiUrl + '/courses';
+  private StudentApiUrl = environment.StudentApiUrl + '/courses';
+  private guardianApiUrl = environment.GuardianApiUrl + '/courses';
+  private instructorApiUrl = environment.InstructorApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
@@ -35,7 +37,7 @@ private GuardianApiUrl = environment.GuardianApiUrl + '/courses';
   }
 
   getInstructors(): Observable<{ data: Instructor[] }> {
-    return this.http.get<{ data: Instructor[] }>('https://dotbitz.com/api/instructors', {
+    return this.http.get<{ data: Instructor[] }>(`${this.apiUrl}/instructors`, {
       headers: this.getHeaders(),
     });
   }
@@ -47,6 +49,7 @@ private GuardianApiUrl = environment.GuardianApiUrl + '/courses';
       .get<CourseApiResponse>(url, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
+
 
   getCourse(id: number): Observable<CourseApiResponse> {
     return this.http
@@ -97,20 +100,14 @@ private GuardianApiUrl = environment.GuardianApiUrl + '/courses';
   /**
    * Fetches a single course detail for the Student.
    */
-  // getStudentCourseDetail(id: number): Observable<CourseApiResponse> {
-  //   return this.http
-  //     .get<CourseApiResponse>(`${this.guardianApiUrl}/${id}`, { headers: this.getHeaders() })
-  //     .pipe(catchError((err) => throwError(() => err)));
-  // }
-
   getStudentCourseDetail(id: number): Observable<CourseApiResponse> {
-  return this.http
-    .get<CourseApiResponse>(`${this.StudentApiUrl}/${id}`, { headers: this.getHeaders() })
-    .pipe(catchError((err) => throwError(() => err)));
-}
+    return this.http
+      .get<CourseApiResponse>(`${this.StudentApiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
 
   getGuardianCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
-    let url = `${this.GuardianApiUrl}?per_page=${perPage}`;
+    let url = `${this.guardianApiUrl}?per_page=${perPage}`;
     if (search) {
       url += `&search=${search}`;
     }
@@ -124,7 +121,26 @@ private GuardianApiUrl = environment.GuardianApiUrl + '/courses';
    */
   getGuardianCourseDetail(id: number): Observable<CourseApiResponse> {
     return this.http
-      .get<CourseApiResponse>(`${this.GuardianApiUrl}/${id}`, { headers: this.getHeaders() })
+      .get<CourseApiResponse>(`${this.guardianApiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+   getInstructorCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+    let url = `${this.instructorApiUrl}?per_page=${perPage}`;
+    if (search) {
+      url += `&search=${search}`;
+    }
+    return this.http
+      .get<CourseApiResponse>(url, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  /**
+   * Fetches a single course detail for the Instructor.
+   */
+  getInstructorCourseDetail(id: number): Observable<CourseApiResponse> {
+    return this.http
+      .get<CourseApiResponse>(`${this.instructorApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 }

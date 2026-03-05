@@ -58,4 +58,5 @@ export class StudentCourseDetail implements OnInit {
       ? this.course.benefits.split(',')
       : this.course.benefits;
   }
+  
 }

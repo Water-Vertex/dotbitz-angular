@@ -139,8 +139,8 @@
 <div class="mobile-user-dropdown bg-white rounded-xl shadow-2xl border border-gray-100 py-2" id="mobileUserDropdown">
     <!-- User Info -->
     <div class="px-5 py-4 border-b border-gray-100">
-        <p class="text-sm font-semibold text-gray-900">Admin User</p>
-        <p class="text-xs text-gray-500 mt-1">admin@example.com</p>
+        <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
+        <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
     </div>
 
     <!-- Menu Items -->
@@ -159,17 +159,11 @@
 
 <div class="flex h-screen bg-gray-50">
     <!-- Desktop Sidebar (Material Design Light Theme) -->
-    <div class="desktop-sidebar w-64 bg-gray-900 text-white shadow-lg flex flex-col border-r border-gray-200">
+    <div class="desktop-sidebar bg-[#063989] text-white shadow-lg flex flex-col border-r border-gray-200">
         <!-- Header -->
-        <div class="p-6 border-b border-gray-700">
+        <div class="p-2">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
-                    <i class="fas fa-cloud text-white text-lg"></i>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-white">Dreamz SaaS</h2>
-                    <p class="text-sm text-gray-500 mt-1">Admin Console</p>
-                </div>
+                 <img src="../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="150">
             </div>
         </div>
 
@@ -191,26 +185,27 @@
                         <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
                        Courses
                     </a>
+                    <a routerLink="/student/my-courses" data-nav-item data-href="/student/my-courses"
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
+                      My Courses
+                    </a>
 
-<a routerLink="/student/my-courses" data-nav-item data-href="/student/my-courses"
-   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-  <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
-  My Courses
-</a>
+
 
                 </div>
             </div>
         </nav>
 
         <!-- User Section at Bottom -->
-        <div class="p-4 border-t border-gray-700 bg-gray-800">
+        <div class="p-4 border-t border-gray-300 bg-[#063989]">
             <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span class="text-white font-semibold text-sm">A</span>
+                    <span class="text-white font-semibold text-sm">{{ userInitials }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-white truncate">Admin User</p>
-                    <p class="text-xs text-gray-400 truncate">admin@example.com</p>
+                    <p class="text-sm font-medium text-white truncate">{{ getFullName() }}</p>
+                    <p class="text-xs text-gray-400 truncate">{{ getEmail() }}</p>
                 </div>
                 <button class="text-gray-400 hover:text-white transition-colors">
                     <i class="fas fa-chevron-down text-sm"></i>
@@ -220,17 +215,11 @@
     </div>
 
     <!-- Mobile Sidebar -->
-    <div class="sidebar-mobile w-64 bg-white text-gray-800 shadow-xl flex flex-col border-r border-gray-200">
+    <div class="sidebar-mobile bg-[#063989] text-gray-800 shadow-xl flex flex-col border-r border-gray-200">
         <!-- Mobile Header with Close Button -->
-        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+        <div class="p-2  flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
-                    <i class="fas fa-cloud text-white text-lg"></i>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900">Dreamz SaaS</h2>
-                    <p class="text-sm text-gray-500 mt-1">Admin Console</p>
-                </div>
+                <img src="../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="150">
             </div>
             <button class="text-gray-400 hover:text-gray-600 text-lg close-sidebar w-10 h-10 rounded-lg hover:bg-gray-100 flex items-center justify-center">
                 <i class="fas fa-times"></i>
@@ -256,10 +245,10 @@
                       Courses
                     </a>
                     <a routerLink="/student/my-courses" data-nav-item data-href="/student/my-courses"
-   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-  <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
-  My Courses
-</a>
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
+                      My Courses
+                    </a>
 
                 </div>
 
@@ -270,12 +259,12 @@
         <!-- User Section at Bottom -->
         <div class="p-4 border-t border-gray-200 bg-gray-50">
             <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-                    <span class="text-white font-semibold text-sm">A</span>
+                <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center shadow-sm">
+                    <span class="text-white font-semibold text-sm">{{ userInitials }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-gray-900 truncate">Admin User</p>
-                    <p class="text-xs text-gray-500 truncate">admin@example.com</p>
+                    <p class="text-sm font-semibold text-gray-900 truncate">{{ getFullName() }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ getEmail() }}</p>
                 </div>
             </div>
         </div>
@@ -295,7 +284,7 @@
 
                     <!-- Breadcrumb and Title -->
                     <div class="flex items-center space-x-2 text-sm text-gray-600 breadcrumb-text">
-                        <span class="desktop-only">Admin Console</span>
+                        <span class="desktop-only">Student Console</span>
                         <i class="fas fa-chevron-right text-xs desktop-only text-gray-300"></i>
                         <span class="font-semibold text-gray-900 header-title truncate">Dashboard</span>
                     </div>
@@ -322,12 +311,12 @@
                     <!-- Desktop User Menu -->
                     <div class="relative desktop-user-menu">
                         <button class="flex items-center space-x-3 text-sm focus:outline-none bg-white hover:bg-gray-50 rounded-xl px-4 py-2.5 border border-gray-200 hover:border-gray-300 transition-all duration-200 user-menu-btn shadow-sm">
-                            <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-                                <span class="text-white font-semibold text-sm">A</span>
+                            <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center shadow-sm">
+                                <span class="text-white font-semibold text-sm">{{ userInitials }}</span>
                             </div>
                             <div class="text-left">
-                                <p class="font-semibold text-gray-900">Admin User</p>
-                                <p class="text-xs text-gray-500">Administrator</p>
+                                <p class="font-semibold text-gray-900">{{ getUsername() }}</p>
+                                <p class="text-xs text-gray-500">Student</p>
                             </div>
                             <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                         </button>
@@ -336,8 +325,8 @@
                         <div class="user-dropdown absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50" style="display: none;">
                             <!-- User Info -->
                             <div class="px-5 py-4 border-b border-gray-100">
-                                <p class="text-sm font-semibold text-gray-900">Admin User</p>
-                                <p class="text-xs text-gray-500 mt-1">admin@example.com</p>
+                                <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
                             </div>
 
                             <!-- Menu Items -->
@@ -356,8 +345,8 @@
                     </div>
 
                     <!-- Mobile User Button -->
-                    <button class="mobile-user-btn hidden w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm" id="mobileUserBtn">
-                        A
+                    <button class="mobile-user-btn hidden w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm" id="mobileUserBtn">
+                        {{ userInitials }}
                     </button>
                 </div>
             </div>

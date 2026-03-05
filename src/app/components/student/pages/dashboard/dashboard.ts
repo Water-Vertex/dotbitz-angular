@@ -1,23 +1,48 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../../services/auth.service'; // path adjust karo
 
 @Component({
   selector: 'app-student-dashboard',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.css']
 })
-export class StudentDashboardComponent implements OnInit {
-  currentUser: any = null;
+export class StudentDashboard implements OnInit {
+  metrics = {
+    customers: 3782,
+    customersChange: 11.01,
+    customersTrend: 'up',
+    orders: 5359,
+    ordersChange: 9.05,
+    ordersTrend: 'down'
+  };
 
-  constructor(private authService: AuthService) {}
+  chartData: any;
+  tableData: any[] = [];
 
   ngOnInit() {
-    this.loadCurrentUser();
+    this.initializeChartData();
+    this.initializeTableData();
   }
 
-  loadCurrentUser() {
-    this.currentUser = this.authService.getCurrentUser();
+  initializeChartData() {
+    this.chartData = {
+      // Chart data configuration
+    };
+  }
+
+  initializeTableData() {
+    this.tableData = [
+      {
+        product: 'Macbook pro 13”',
+        image: 'src/images/product/product-01.jpg',
+        category: 'Laptop',
+        price: 2399.00,
+        status: 'Delivered',
+        variants: 2
+      },
+      // ... more table data
+    ];
   }
 }

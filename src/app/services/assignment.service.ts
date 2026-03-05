@@ -3,13 +3,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AssignmentPayload, AssignmentApiResponse } from '../models/assignment.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AssignmentService {
-  private apiUrl = 'https://dotbitz.com/api/assignments';
-  private coursesUrl = 'https://dotbitz.com/api/courses';
+  private apiUrl = environment.AdminApiUrl + '/assignments';
+  private coursesUrl = environment.AdminApiUrl + '/courses';
+  private StudentApiUrl = environment.StudentApiUrl + '/assignments';
+  private guardianApiUrl = environment.GuardianApiUrl + '/courses';
 
   constructor(private http: HttpClient) {}
 
@@ -141,13 +144,15 @@ export class AssignmentService {
     );
   }
 
+
+
   /** =========================
  *  Student - Get Assignments by Course
  *  ========================= */
 getAssignmentsByCourse(courseId: number): Observable<any> {
   return this.http
-    .get<any>(`http://localhost:8000/api/student/assignments/course/${courseId}`, { 
-      headers: this.getHeaders() 
+    .get<any>(`${this.StudentApiUrl}/course/${courseId}`, {
+      headers: this.getHeaders()
     })
     .pipe(
       catchError((err) => {
@@ -156,4 +161,29 @@ getAssignmentsByCourse(courseId: number): Observable<any> {
       }),
     );
 }
+ /** =========================
+   * Guardian: Get Assignments by Course
+   * ========================= */
+  getAssignmentsGuardian(courseId: number): Observable<AssignmentApiResponse> {
+    const token = localStorage.getItem('token');
+
+    // Correct URL: only one 'courses'
+    const url = `${this.guardianApiUrl}/${courseId}/assignments`;
+
+    console.log('Requesting URL:', url); // For debugging
+
+    return this.http
+      .get<AssignmentApiResponse>(url, {
+        headers: new HttpHeaders({
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        }),
+      })
+      .pipe(
+        catchError((err) => {
+          console.error(`Error fetching guardian assignments for course ${courseId}:`, err);
+          return throwError(() => err);
+        }),
+      );
+  }
 }

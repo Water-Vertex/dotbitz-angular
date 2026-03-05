@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { StudentService } from '../../../../../services/student.service'; 
+import { StudentService } from '../../../../../services/student.service';
 import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
@@ -11,7 +11,7 @@ import { ChangeDetectorRef } from '@angular/core';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule]
 })
-export class ProfileEditComponent implements OnInit {
+export class StudentProfileEdit implements OnInit {
   editForm!: FormGroup;
   loading = false;
   saving = false;
@@ -68,7 +68,7 @@ export class ProfileEditComponent implements OnInit {
         this.loading = false;
         this.cdr.detectChanges();   // 🔥 IMPORTANT
 
-        
+
         if (err.status === 401) {
           this.router.navigate(['/login']);
         }
@@ -116,7 +116,7 @@ export class ProfileEditComponent implements OnInit {
         console.log('Profile updated:', response);
         this.successMessage = 'Profile updated successfully!';
         this.saving = false;
-        
+
         // Redirect to profile view after 2 seconds
         setTimeout(() => {
           this.router.navigate(['/student/profile']);
@@ -125,16 +125,16 @@ export class ProfileEditComponent implements OnInit {
       error: (err) => {
         console.error('Update error:', err);
         this.saving = false;
-        
+
         // Handle validation errors
         if (err.status === 422 && err.error.errors) {
           const errors = err.error.errors;
           let errorMessage = 'Validation errors:\n';
-          
+
           Object.keys(errors).forEach(key => {
             errorMessage += `- ${errors[key][0]}\n`;
           });
-          
+
           this.error = errorMessage;
         } else {
           this.error = err.error.message || 'Failed to update profile. Please try again.';
@@ -175,7 +175,7 @@ export class ProfileEditComponent implements OnInit {
    */
   getErrorMessage(fieldName: string): string {
     const field = this.editForm.get(fieldName);
-    
+
     if (!field || !field.touched || !field.errors) {
       return '';
     }
@@ -183,11 +183,11 @@ export class ProfileEditComponent implements OnInit {
     if (field.hasError('required')) {
       return `${this.getFieldLabel(fieldName)} is required`;
     }
-    
+
     if (field.hasError('email')) {
       return 'Please enter a valid email address';
     }
-    
+
     if (field.hasError('maxlength')) {
       const maxLength = field.errors['maxlength'].requiredLength;
       return `Maximum ${maxLength} characters allowed`;
@@ -211,7 +211,7 @@ export class ProfileEditComponent implements OnInit {
       city: 'City',
       state: 'State'
     };
-    
+
     return labels[fieldName] || fieldName;
   }
 

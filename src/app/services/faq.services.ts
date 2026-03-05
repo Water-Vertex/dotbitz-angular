@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FaqService {
-  private apiUrl = 'https://dotbitz.com/api/faqs';
+  private apiUrl = environment.AdminApiUrl + '/faqs';
 
   constructor(private http: HttpClient) {}
 

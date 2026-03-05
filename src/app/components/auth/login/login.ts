@@ -53,4 +53,7 @@ export class Login {
       });
     }
   }
+   navigateToInstructorLogin() {
+  this.router.navigate(['/instructor/login']);
+}
 }
