@@ -190,8 +190,9 @@ export class StudentEdit implements OnInit {
 //         guardianEmail: data.guardian?.email || '',
 //         guardianPhone: data.guardian?.phone || '',
 //         guardianRelationship: data.guardian?.relationship || '',
-//         password: '',
-//         confirmPassword: '',
+//         password: '',         
+//         confirmPassword: '',  
+
 //         terms: true
 //       });
 

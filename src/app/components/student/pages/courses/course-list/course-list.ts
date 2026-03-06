@@ -122,5 +122,3 @@ export class StudentCourseList implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
-
-

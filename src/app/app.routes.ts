@@ -69,6 +69,12 @@ import { InstructorCourseDetail } from './components/instructor/pages/courses/co
 import { ClassScheduleList } from './components/instructor/pages/class-schedule/schedule-list/schedule-list';
 import { ClassScheduleAdd } from './components/instructor/pages/class-schedule/schedule-add/schedule-add';
 import { ClassScheduleEdit } from './components/instructor/pages/class-schedule/schedule-edit/schedule-edit';
+import { AnnouncementList } from './components/admin/pages/announcement/announcement-list/announcement-list';
+import { AnnouncementAdd } from './components/admin/pages/announcement/announcement-add/announcement-add';
+import { AnnouncementEdit } from './components/admin/pages/announcement/announcement-edit/announcement-edit';
+import { InstructorAnnouncementList } from './components/instructor/pages/announcement/announcement-list/announcement-list';
+import { InstructorAnnouncementAdd } from './components/instructor/pages/announcement/announcement-add/announcement-add';
+import { InstructorAnnouncementEdit } from './components/instructor/pages/announcement/announcement-edit/announcement-edit';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -99,7 +105,10 @@ export const routes: Routes = [
       //  Course Curriculum routes
       { path: 'admin/course/curriculum/list', component: CourseCurriculumList },
       { path: 'admin/course/curriculum/add', component: CourseCurriculumAdd },
-      { path: 'admin/course/curriculum/edit/:id', component: CourseCurriculumEdit },
+      {
+        path: 'admin/course/curriculum/edit/:id',
+        component: CourseCurriculumEdit,
+      },
 
       // Policy routes
       { path: 'admin/policy/list', component: PolicyList },
@@ -130,6 +139,11 @@ export const routes: Routes = [
       { path: 'admin/assessments/list', component: AssessmentList },
       { path: 'admin/assessments/add', component: AssessmentAdd },
       { path: 'admin/assessments/edit/:id', component: AssessmentEdit },
+
+      //Announement routes
+      { path: 'admin/announcement/list', component: AnnouncementList },
+      { path: 'admin/announcement/add', component: AnnouncementAdd },
+      { path: 'admin/announcement/edit/:id', component: AnnouncementEdit },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
     ],
@@ -195,11 +209,24 @@ export const routes: Routes = [
       { path: 'instructor/profile', component: InstructorProfile },
       { path: 'instructor/profile/edit', component: InstructorProfileEdit },
       { path: 'instructor/courses/list', component: InstructorCourseList },
-      { path: 'instructor/course/detail/:id', component: InstructorCourseDetail },
+      {
+        path: 'instructor/course/detail/:id',
+        component: InstructorCourseDetail,
+      },
       { path: 'instructor/class-schedule/list', component: ClassScheduleList },
       { path: 'instructor/class-schedule/add', component: ClassScheduleAdd },
-      { path: 'instructor/class-schedule/edit/:id', component: ClassScheduleEdit },
-    ],
+
+      {
+        path: 'instructor/class-schedule/edit/:id',
+        component: ClassScheduleEdit,
+      },
+
+      // ================= Instructor Announcement Routes =================
+      { path: 'instructor/announcement/list', component: InstructorAnnouncementList },
+      { path: 'instructor/announcement/add', component: InstructorAnnouncementAdd },
+      { path: 'instructor/announcement/edit/:id', component: InstructorAnnouncementEdit },
+    //
+     ],
   },
   { path: '**', redirectTo: '' },
 ];

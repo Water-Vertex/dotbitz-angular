@@ -43,6 +43,7 @@ ngOnInit() {
     });
   }
 
+
   // Helper method to get full name
   getFullName(): string {
     if (this.currentUser?.first_name && this.currentUser?.last_name) {

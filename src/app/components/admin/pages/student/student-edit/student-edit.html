@@ -1,3 +1,4 @@
+
 <p>student-edit works!</p>
   <!-- Decorative blur -->
     <div class="absolute top-0 right-0 w-64 h-64 bg-[#ffd500] opacity-10 blur-3xl rounded-full"></div>
@@ -52,6 +53,7 @@
                     <!-- First Name -->
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
+
                         Student First Name<span class="text-red-500">*</span>
                       </label>
                       <input
@@ -74,6 +76,7 @@
                     <!-- Last Name -->
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
+
                         Student Last Name<span class="text-red-500">*</span>
                       </label>
                       <input
@@ -97,6 +100,7 @@
                   <!-- Username -->
                   <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
+
                       Student Username<span class="text-red-500">*</span>
                     </label>
                     <input
@@ -120,7 +124,9 @@
                     <!-- Email -->
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
+
                         Student Email<span class="text-red-500">*</span>
+
                       </label>
                       <input
                         type="email"
@@ -167,6 +173,7 @@
                     <!-- Date of Birth -->
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
+
                         Student Date of Birth<span class="text-red-500">*</span>
                       </label>
                       <input
@@ -588,7 +595,7 @@
       You will be redirected to login shortly
     </p>
   </div>
-</div>
+
 
 <!-- Submit Button (Same as before) -->
 <button type="submit" *ngIf="currentStep === 3" [disabled]="registrationForm.invalid || isLoading"
