@@ -11,7 +11,19 @@ export interface Announcement {
   created_at?: string;
   updated_at?: string;
   course_id?: number;
+  batch_id?: number;
+  total_students?: number;
+
+  course?: {
+    course_name: string;
+    course_code: string;
+  };
+  batch?: {
+    name: string;
+  };
 }
+
+
 
 export interface AnnouncementApiResponse {
   success: boolean;

@@ -69,12 +69,18 @@ import { InstructorCourseDetail } from './components/instructor/pages/courses/co
 import { ClassScheduleList } from './components/instructor/pages/class-schedule/schedule-list/schedule-list';
 import { ClassScheduleAdd } from './components/instructor/pages/class-schedule/schedule-add/schedule-add';
 import { ClassScheduleEdit } from './components/instructor/pages/class-schedule/schedule-edit/schedule-edit';
+
 import { AnnouncementList } from './components/admin/pages/announcement/announcement-list/announcement-list';
 import { AnnouncementAdd } from './components/admin/pages/announcement/announcement-add/announcement-add';
 import { AnnouncementEdit } from './components/admin/pages/announcement/announcement-edit/announcement-edit';
 import { InstructorAnnouncementList } from './components/instructor/pages/announcement/announcement-list/announcement-list';
 import { InstructorAnnouncementAdd } from './components/instructor/pages/announcement/announcement-add/announcement-add';
 import { InstructorAnnouncementEdit } from './components/instructor/pages/announcement/announcement-edit/announcement-edit';
+
+import { BatchList } from './components/admin/pages/batches/batch-list/batch-list';
+import { BatchAdd } from './components/admin/pages/batches/batch-add/batch-add';
+import { BatchEdit } from './components/admin/pages/batches/batch-edit/batch-edit';
+
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -140,10 +146,18 @@ export const routes: Routes = [
       { path: 'admin/assessments/add', component: AssessmentAdd },
       { path: 'admin/assessments/edit/:id', component: AssessmentEdit },
 
+
       //Announement routes
       { path: 'admin/announcement/list', component: AnnouncementList },
       { path: 'admin/announcement/add', component: AnnouncementAdd },
       { path: 'admin/announcement/edit/:id', component: AnnouncementEdit },
+
+      // Batch routes
+      { path: 'admin/batches/list', component: BatchList },
+      { path: 'admin/batches/add', component: BatchAdd },
+      { path: 'admin/batches/edit/:id', component: BatchEdit },
+
+     
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
     ],

@@ -35,17 +35,22 @@ export class InstructorAnnouncementEdit implements OnInit {
     }
   }
 
+
   loadAnnouncement(): void {
     this.announcementService.getInstructorAnnouncement(this.id).subscribe({
       next: (res: any) => {
         this.form = { ...res.data };
+
+        // Ensure the alreadySent logic stays the same
         this.alreadySent = res.data.status === 'sent' && !!res.data.sent_at;
+
         this.loading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.errorMsg = 'Could not find announcement.';
         this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
