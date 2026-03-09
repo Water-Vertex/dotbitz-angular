@@ -21,17 +21,32 @@ export class ClassScheduleService {
     return this.http.get(`${this.instructorApiUrl}/${id}`);
   }
 
-  createSchedule(data: any): Observable<any> {
-    return this.http.post(this.instructorApiUrl, data);
+
+  // Get schedules by batch
+  getSchedulesByBatch(batchId: number): Observable<any> {
+    return this.http.get(`${this.instructorApiUrl}/batch/${batchId}`);
   }
 
-  updateSchedule(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.instructorApiUrl}/${id}`, data);
+  // Create multiple schedules (for recurring classes)
+  createSchedules(schedules: any[]): Observable<any> {
+    return this.http.post(this.instructorApiUrl, schedules);
   }
 
+  // Update multiple schedules
+  updateSchedules(id: number, schedules: any[]): Observable<any> {
+    return this.http.put(`${this.instructorApiUrl}/multiple/${id}`, schedules);
+  }
+
+  // Delete single schedule
   deleteSchedule(id: number): Observable<any> {
     return this.http.delete(`${this.instructorApiUrl}/${id}`);
   }
+
+  // Delete multiple schedules
+  deleteSchedules(ids: number[]): Observable<any> {
+    return this.http.delete(this.instructorApiUrl, { body: { ids } });
+  }
+
 
   getCourses(): Observable<any> {
     return this.http.get(`${environment.InstructorApiUrl}/courses`);
@@ -40,4 +55,11 @@ export class ClassScheduleService {
   getInstructors(): Observable<any> {
     return this.http.get(`${environment.InstructorApiUrl}/instructors`);
   }
+
+  // Get batches by course (NEW)
+  getBatchesByCourse(courseId: number): Observable<any> {
+    return this.http.get(`${environment.InstructorApiUrl}/courses/${courseId}/batches`);
+  }
+
+
 }

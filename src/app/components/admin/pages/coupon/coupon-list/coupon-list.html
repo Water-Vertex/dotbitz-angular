@@ -17,7 +17,7 @@
                 </button>
                 <a
                     routerLink="/admin/coupon/add"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium"
+                    class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium"
                 >
                     <i class="fas fa-plus"></i>
                     <span>Add New Coupon</span>
@@ -28,7 +28,7 @@
 
     <!-- Loading State - Same as FAQ -->
     <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
         <p class="text-gray-500 mt-2">Loading coupons...</p>
     </div>
 
@@ -44,7 +44,7 @@
             <p class="text-gray-600 mb-4">Start by adding your first discount coupon</p>
             <a
                 routerLink="/admin/coupon/add"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors inline-flex items-center space-x-2 text-sm font-medium"
+                class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors inline-flex items-center space-x-2 text-sm font-medium"
             >
                 <i class="fas fa-plus"></i>
                 <span>Add New Coupon</span>
@@ -67,7 +67,7 @@
                         <div class="flex space-x-2">
                             <a
                                 routerLink="/admin/coupon/edit/{{coupon.id}}"
-                                class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium transition-colors"
+                                class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
                             >
                                 Edit
                             </a>
@@ -139,7 +139,7 @@
                                 <div class="flex space-x-2">
                                     <a
                                         routerLink="/admin/coupon/edit/{{coupon.id}}"
-                                        class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs font-medium transition-colors"
+                                        class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
                                     >
                                         Edit
                                     </a>
@@ -165,7 +165,7 @@
                     <button
                         (click)="refreshData()"
                         [disabled]="isLoading"
-                        class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center sm:justify-start disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="text-sm text-orange-600 hover:text-orange-800 font-medium flex items-center justify-center sm:justify-start disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <i class="fas fa-sync-alt mr-2" [class.animate-spin]="isLoading"></i>
                         {{ isLoading ? 'Refreshing...' : 'Refresh List' }}

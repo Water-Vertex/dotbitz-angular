@@ -11,7 +11,7 @@
 
     <a
       routerLink="/admin/coupon/list"
-      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium"
+      class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium"
     >
       <i class="fas fa-arrow-left"></i>
       <span>Back</span>
@@ -21,7 +21,7 @@
 
 <!-- Loading -->
 <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
-  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
   <p class="text-gray-500 mt-2">Loading coupon details...</p>
 </div>
 
@@ -38,7 +38,7 @@
           type="text"
           formControlName="code"
           placeholder="SUMMER20"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
           [class.border-red-300]="code?.invalid && code?.touched"
         />
         <div *ngIf="code?.invalid && code?.touched" class="mt-1 space-y-1">
@@ -58,7 +58,7 @@
         </label>
         <select
           formControlName="discount_type"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
           [class.border-red-300]="discount_type?.invalid && discount_type?.touched"
         >
           <option value="">Select type</option>
@@ -79,7 +79,7 @@
           type="number"
           formControlName="discount_amount"
           placeholder="e.g. 100"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
           [class.border-red-300]="discount_amount?.invalid && discount_amount?.touched"
         />
         <p *ngIf="discount_amount?.invalid && discount_amount?.touched" class="text-xs text-red-600 mt-1">
@@ -96,7 +96,7 @@
           type="number"
           formControlName="usage_limit"
           placeholder="e.g. 100 (leave empty for unlimited)"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
         />
         <p class="text-xs text-gray-500 mt-1">
           Leave empty for unlimited usage
@@ -112,7 +112,7 @@
           rows="4"
           formControlName="description"
           placeholder="Enter coupon description"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
           [class.border-red-300]="description?.invalid && description?.touched"
         ></textarea>
         <div *ngIf="description?.invalid && description?.touched" class="mt-1 space-y-1">
@@ -134,7 +134,7 @@
           <input
             type="date"
             formControlName="valid_from"
-            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
             [class.border-red-300]="valid_from?.invalid && valid_from?.touched"
           />
           <p *ngIf="valid_from?.invalid && valid_from?.touched" class="text-xs text-red-600 mt-1">
@@ -149,7 +149,7 @@
           <input
             type="date"
             formControlName="valid_until"
-            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
             [class.border-red-300]="valid_until?.invalid && valid_until?.touched"
           />
           <p *ngIf="valid_until?.invalid && valid_until?.touched" class="text-xs text-red-600 mt-1">
@@ -181,7 +181,7 @@
         <button
           type="submit"
           [disabled]="couponForm.invalid || isSubmitting"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium flex items-center space-x-2"
+          class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium flex items-center space-x-2"
         >
           <span *ngIf="!isSubmitting">
             Update Coupon

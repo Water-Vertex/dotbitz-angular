@@ -12,7 +12,7 @@
 
     <a
       routerLink="/admin/assessments/list"
-      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium"
+      class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors flex items-center space-x-2 text-sm font-medium"
     >
       <i class="fas fa-arrow-left"></i>
       <span>Back</span>
@@ -185,7 +185,7 @@
       <button
         type="submit"
         [disabled]="form.invalid || isSubmitting"
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium disabled:opacity-50"
+        class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 text-sm font-medium disabled:opacity-50"
       >
         <span *ngIf="!isSubmitting">Save Assessment</span>
         <span *ngIf="isSubmitting">Saving...</span>
