@@ -75,6 +75,12 @@ import { BatchEdit } from './components/admin/pages/batches/batch-edit/batch-edi
 import { AnnouncementList } from './components/admin/pages/announcement/announcement-list/announcement-list';
 import { AnnouncementAdd } from './components/admin/pages/announcement/announcement-add/announcement-add';
 import { AnnouncementEdit } from './components/admin/pages/announcement/announcement-edit/announcement-edit';
+import { InstructorAnnouncementList } from './components/instructor/pages/announcement/announcement-list/announcement-list';
+import { InstructorAnnouncementAdd } from './components/instructor/pages/announcement/announcement-add/announcement-add';
+import { InstructorAnnouncementEdit } from './components/instructor/pages/announcement/announcement-edit/announcement-edit';
+import { AdminClassScheduleList } from './components/admin/pages/class-schedule/schedule-list/schedule-list';
+import { AdminClassScheduleAdd } from './components/admin/pages/class-schedule/schedule-add/schedule-add';
+import { AdminClassScheduleEdit } from './components/admin/pages/class-schedule/schedule-edit/schedule-edit';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -149,6 +155,11 @@ export const routes: Routes = [
       { path: 'admin/announcement/add', component: AnnouncementAdd },
       { path: 'admin/announcement/edit/:id', component: AnnouncementEdit },
 
+      // Class Schedule routes
+      { path: 'admin/class-schedule/list', component: AdminClassScheduleList },
+      { path: 'admin/class-schedule/add', component: AdminClassScheduleAdd },
+      { path: 'admin/class-schedule/edit/:id', component: AdminClassScheduleEdit },
+
 
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
@@ -221,6 +232,9 @@ export const routes: Routes = [
       { path: 'instructor/class-schedule/list', component: ClassScheduleList },
       { path: 'instructor/class-schedule/add', component: ClassScheduleAdd },
       { path: 'instructor/class-schedule/edit/:id', component: ClassScheduleEdit },
+      { path: 'instructor/announcement/list', component: InstructorAnnouncementList },
+      { path: 'instructor/announcement/add', component: InstructorAnnouncementAdd },
+      { path: 'instructor/announcement/edit/:id', component: InstructorAnnouncementEdit },
     ]
   },
   { path: '**', redirectTo: '' }

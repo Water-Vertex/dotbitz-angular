@@ -1,4 +1,3 @@
-<!-- components/class-schedule/class-schedule-edit/schedule-edit.html -->
 <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
     <div class="flex justify-between items-center">
         <div>
@@ -34,7 +33,7 @@
             </label>
             <input
                 type="text"
-                [value]="'Instructor #' + instructorId"
+                [value]="instructorName"
                 disabled
                 class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600 cursor-not-allowed"
             >
@@ -62,7 +61,7 @@
             </div>
         </div>
 
-        <!-- Batch Selection -->
+        <!-- Batch Selection (depends on course) -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 Batch <span class="text-red-500">*</span>
@@ -86,85 +85,20 @@
             </div>
         </div>
 
-        <!-- Day Selection Mode -->
+       
+
+        <!-- Day Display (Disabled Input) -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-3">
-                Day Selection <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Day <span class="text-red-500">*</span>
             </label>
-            <div class="flex space-x-4 mb-4">
-                <label class="inline-flex items-center">
-                    <input
-                        type="radio"
-                        name="selectionMode"
-                        [checked]="selectionMode === 'single'"
-                        (change)="setSelectionMode('single')"
-                        class="form-radio text-blue-600"
-                    >
-                    <span class="ml-2 text-sm text-gray-700">Single Day</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input
-                        type="radio"
-                        name="selectionMode"
-                        [checked]="selectionMode === 'multiple'"
-                        (change)="setSelectionMode('multiple')"
-                        class="form-radio text-blue-600"
-                    >
-                    <span class="ml-2 text-sm text-gray-700">Multiple Days</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input
-                        type="radio"
-                        name="selectionMode"
-                        [checked]="selectionMode === 'all'"
-                        (change)="setSelectionMode('all')"
-                        class="form-radio text-blue-600"
-                    >
-                    <span class="ml-2 text-sm text-gray-700">All Days</span>
-                </label>
-            </div>
-
-            <!-- Days FormArray -->
-            <div formArrayName="days" class="space-y-3">
-                <div *ngFor="let dayGroup of daysArray.controls; let i = index"
-                     [formGroupName]="i"
-                     class="flex items-center space-x-2">
-
-                    <select
-                        formControlName="day"
-                        class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                        [class.border-red-300]="dayGroup.get('day')?.invalid && dayGroup.get('day')?.touched"
-                    >
-                        <option [ngValue]="null">-- Select Day --</option>
-                        <option *ngFor="let day of daysOfWeek" [ngValue]="day.value">
-                            {{ day.label }}
-                        </option>
-                    </select>
-
-                    <button
-                        *ngIf="selectionMode === 'multiple' && daysArray.length > 1"
-                        type="button"
-                        (click)="removeDay(i)"
-                        class="p-2 text-red-600 hover:text-red-800"
-                    >
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Add More Days button -->
-            <button
-                *ngIf="selectionMode === 'multiple'"
-                type="button"
-                (click)="addDay('')"
-                class="mt-2 text-sm text-blue-600 hover:text-blue-800"
+            <input
+                type="text"
+                [value]="selectedDayLabel"
+                disabled
+                class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600 cursor-not-allowed"
             >
-                <i class="fas fa-plus mr-1"></i> Add Another Day
-            </button>
-
-            <div *ngIf="daysArray.length === 0 && scheduleForm.touched" class="mt-1 text-xs text-red-600">
-                Please select at least one day
-            </div>
+            <p class="mt-1 text-xs text-gray-500">Day is fixed and cannot be changed</p>
         </div>
 
         <!-- Time Section -->
@@ -265,19 +199,13 @@
             >
                 <span *ngIf="!isSubmitting">
                     <i class="fas fa-save mr-2"></i>
-                    Update Schedule(s)
+                    Update Schedule
                 </span>
                 <span *ngIf="isSubmitting">
                     <i class="fas fa-spinner fa-spin mr-2"></i>
                     Updating...
                 </span>
             </button>
-        </div>
-
-        <!-- Info message about multiple schedules -->
-        <div *ngIf="selectionMode !== 'single'" class="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
-            <i class="fas fa-info-circle mr-2"></i>
-            {{ daysArray.length }} schedule(s) will be updated
         </div>
     </form>
 </div>

@@ -6,7 +6,7 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { ClassScheduleService } from '../../../../../services/classschedule.service';
 import { AuthService } from '../../../../../services/auth.service';
 import { ToastService } from '../../../../../services/toast.service';
-import { Course , Batch} from '../../../../../models/classschedule.model';
+import { Course, Batch, Instructor } from '../../../../../models/classschedule.model';
 
 @Component({
   selector: 'app-class-schedule-form',
@@ -14,7 +14,7 @@ import { Course , Batch} from '../../../../../models/classschedule.model';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './schedule-add.html',
 })
-export class ClassScheduleAdd implements OnInit {
+export class AdminClassScheduleAdd implements OnInit {
   scheduleForm: FormGroup;
   isLoading = true;
   isSubmitting = false;
@@ -23,6 +23,7 @@ export class ClassScheduleAdd implements OnInit {
 
   courses: Course[] = [];
   batches: Batch[] = [];
+  instructors: Instructor[] = []; // Add instructors array
   instructorId: number | null = null;
   instructorName: string | null = null;
 
@@ -52,7 +53,9 @@ export class ClassScheduleAdd implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.scheduleForm = this.fb.group({
+      instructor_id: ['', Validators.required], // Add instructor_id to form
       course_id: ['', Validators.required],
+      batch_id: ['', Validators.required],
       start_time: ['', Validators.required],
       end_time: ['', Validators.required],
       meeting_link: ['', [Validators.required, Validators.pattern('https?://.+')]],
@@ -66,19 +69,14 @@ export class ClassScheduleAdd implements OnInit {
   }
 
   ngOnInit(): void {
-    // Get logged in instructor ID from session
-    this.instructorId = this.authService.getCurrentUser()?.id || null;
-    this.instructorName = this.authService.getCurrentUser()?.first_name + ' ' + this.authService.getCurrentUser()?.last_name || null;
-
-    if (!this.instructorId) {
-      this.toastService.error('Error', 'Instructor not found. Please login again.');
-      this.router.navigate(['/login']);
-      return;
-    }
-
+    // Check if user is admin (you might want to add a proper role check)
+    const currentUser = this.authService.getCurrentUser();
+    
     this.scheduleId = this.route.snapshot.params['id'];
     this.isEditMode = !!this.scheduleId;
 
+    // Load instructors for dropdown
+    this.loadInstructors();
     this.loadCourses();
 
     if (this.isEditMode) {
@@ -125,20 +123,37 @@ export class ClassScheduleAdd implements OnInit {
     }
   }
 
+  // Load instructors for dropdown
+  loadInstructors(): void {
+    this.scheduleService.getInstructors().subscribe({
+      next: (res: any) => {
+        console.log('Instructors loaded:', res);
+        this.instructors = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading instructors:', err);
+        this.toastService.error('Error', 'Failed to load instructors');
+      }
+    });
+  }
+
   loadCourses(): void {
     this.scheduleService.getCourses().subscribe({
       next: (res: any) => {
-        this.courses = Array.isArray(res.data) ? res.data : res || [];
+        console.log('Courses loaded:', res);
+        this.courses = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading courses:', err);
         this.toastService.error('Error', 'Failed to load courses');
       }
     });
   }
 
   // Load batches when course is selected
-  onCourseChange(): void {
+   onCourseChange(): void {
     const courseId = this.scheduleForm.get('course_id')?.value;
     if (courseId) {
       this.loadBatches(courseId);
@@ -163,12 +178,14 @@ export class ClassScheduleAdd implements OnInit {
     this.isLoading = true;
     this.scheduleService.getSchedule(this.scheduleId!).subscribe({
       next: (res: any) => {
+        console.log('Schedule loaded:', res);
         const schedule = res.data || res;
 
         // If it's a single schedule (edit mode)
         if (!Array.isArray(schedule)) {
           this.setSelectionMode('single');
           this.scheduleForm.patchValue({
+            instructor_id: schedule.instructor_id,
             course_id: schedule.course_id,
             batch_id: schedule.batch_id,
             start_time: this.formatDateForInput(schedule.start_time),
@@ -179,7 +196,14 @@ export class ClassScheduleAdd implements OnInit {
           });
 
           // Set the day
-          this.daysArray.at(0).patchValue({ day: schedule.day });
+          if (this.daysArray.length > 0) {
+            this.daysArray.at(0).patchValue({ day: schedule.day });
+          }
+
+          // Load batches for the course
+          if (schedule.course_id) {
+            
+          }
         }
         // If it's multiple schedules (for recurring)
         else if (schedule.length > 0) {
@@ -197,6 +221,7 @@ export class ClassScheduleAdd implements OnInit {
           }
 
           this.scheduleForm.patchValue({
+            instructor_id: firstSchedule.instructor_id,
             course_id: firstSchedule.course_id,
             batch_id: firstSchedule.batch_id,
             start_time: this.formatDateForInput(firstSchedule.start_time),
@@ -205,28 +230,60 @@ export class ClassScheduleAdd implements OnInit {
             status: firstSchedule.status,
             note: firstSchedule.note
           });
+
+          // Load batches for the course
+          if (firstSchedule.course_id) {
+            
+          }
         }
 
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
+        console.error('Error loading schedule:', err);
         this.toastService.error('Error', 'Failed to load schedule details');
-        this.router.navigate(['/instructor/class-schedule/list']);
+        this.router.navigate(['/admin/class-schedule/list']);
       }
     });
   }
 
   formatDateForInput(dateString: string): string {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch (e) {
+      console.error('Error formatting date:', e);
+      return '';
+    }
   }
 
   onSubmit(): void {
     if (this.scheduleForm.invalid) {
       this.markFormGroupTouched(this.scheduleForm);
-      this.toastService.error('Validation', 'Please fill all required fields correctly.');
+      
+      const errors = [];
+      if (this.scheduleForm.get('instructor_id')?.invalid) errors.push('Instructor');
+      if (this.scheduleForm.get('course_id')?.invalid) errors.push('Course');
+      if (this.scheduleForm.get('batch_id')?.invalid) errors.push('Batch');
+      if (this.scheduleForm.get('start_time')?.invalid) errors.push('Start time');
+      if (this.scheduleForm.get('end_time')?.invalid) errors.push('End time');
+      if (this.scheduleForm.get('meeting_link')?.invalid) errors.push('Meeting link');
+      
+      const errorMsg = errors.length > 0 
+        ? `Please fill required fields: ${errors.join(', ')}`
+        : 'Please fill all required fields correctly.';
+      
+      this.toastService.error('Validation', errorMsg);
       return;
     }
 
@@ -235,7 +292,15 @@ export class ClassScheduleAdd implements OnInit {
       return;
     }
 
+    // Validate that all days are selected
+    const invalidDays = this.daysArray.controls.some(control => !control.get('day')?.value);
+    if (invalidDays) {
+      this.toastService.error('Validation', 'Please select a day for each entry.');
+      return;
+    }
+
     this.isSubmitting = true;
+    this.cdr.detectChanges();
 
     const baseFormData = { ...this.scheduleForm.value };
 
@@ -245,8 +310,8 @@ export class ClassScheduleAdd implements OnInit {
 
     for (const day of days) {
       schedules.push({
+        instructor_id: baseFormData.instructor_id, // Use selected instructor
         course_id: baseFormData.course_id,
-        instructor_id: this.instructorId, // Use logged in instructor
         batch_id: baseFormData.batch_id,
         start_time: baseFormData.start_time,
         end_time: baseFormData.end_time,
@@ -257,12 +322,14 @@ export class ClassScheduleAdd implements OnInit {
       });
     }
 
+    console.log('Submitting schedules:', schedules);
+
     if (this.isEditMode) {
       // For edit mode, we need to update all schedules for this pattern
       this.scheduleService.updateSchedules(this.scheduleId!, schedules).subscribe({
         next: (res: any) => {
           this.toastService.success('Success', res.message || 'Class schedules updated successfully');
-          this.router.navigate(['/instructor/class-schedule/list']);
+          this.router.navigate(['/admin/class-schedule/list']);
         },
         error: (err: any) => {
           this.handleError(err);
@@ -274,7 +341,7 @@ export class ClassScheduleAdd implements OnInit {
       this.scheduleService.createSchedules(schedules).subscribe({
         next: (res: any) => {
           this.toastService.success('Success', res.message || `${schedules.length} class schedule(s) created successfully`);
-          this.router.navigate(['/instructor/class-schedule/list']);
+          this.router.navigate(['/admin/class-schedule/list']);
         },
         error: (err: any) => {
           this.handleError(err);
@@ -285,6 +352,7 @@ export class ClassScheduleAdd implements OnInit {
   }
 
   private handleError(err: any): void {
+    console.error('Error:', err);
     const errorMsg = err.error?.message || err.message || 'Operation failed';
     this.toastService.error('Error', errorMsg);
     this.isSubmitting = false;
@@ -303,6 +371,9 @@ export class ClassScheduleAdd implements OnInit {
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
     });
   }
 

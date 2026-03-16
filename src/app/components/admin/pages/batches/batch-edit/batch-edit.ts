@@ -25,7 +25,7 @@ export class BatchEdit implements OnInit, OnDestroy {
 
   instructors: any[] = [];
   courses: any[] = [];
-  studentsList: any[] = [];
+  studentsLimit: any[] = [];
 
   isLoadingInstructors = false;
   isLoadingCourses = false;
@@ -54,7 +54,7 @@ export class BatchEdit implements OnInit, OnDestroy {
       end_date: [''],
       description: ['', Validators.maxLength(1000)],
       status: ['active', Validators.required],
-      students: [[]]
+      students: ['']
     });
   }
 
@@ -140,27 +140,27 @@ export class BatchEdit implements OnInit, OnDestroy {
         };
 
         // Process students - ensure it's an array
-        let studentIds: number[] = [];
-        if (batch.students) {
-          if (typeof batch.students === 'string') {
-            // If it's a comma-separated string like "14,17" or just "14"
-            studentIds = batch.students
-              .split(',')
-              .map((id: string) => {
-                const trimmed = id.trim();
-                return trimmed ? parseInt(trimmed, 10) : null;
-              })
-              .filter((id: number | null) => id !== null && !isNaN(id)) as number[];
-          } else if (Array.isArray(batch.students)) {
-            // If it's already an array
-            studentIds = batch.students;
-          } else if (typeof batch.students === 'number') {
-            // If it's a single number
-            studentIds = [batch.students];
-          }
-        }
+        // let studentIds: number[] = [];
+        // if (batch.students) {
+        //   if (typeof batch.students === 'string') {
+        //     // If it's a comma-separated string like "14,17" or just "14"
+        //     studentIds = batch.students
+        //       .split(',')
+        //       .map((id: string) => {
+        //         const trimmed = id.trim();
+        //         return trimmed ? parseInt(trimmed, 10) : null;
+        //       })
+        //       .filter((id: number | null) => id !== null && !isNaN(id)) as number[];
+        //   } else if (Array.isArray(batch.students)) {
+        //     // If it's already an array
+        //     studentIds = batch.students;
+        //   } else if (typeof batch.students === 'number') {
+        //     // If it's a single number
+        //     studentIds = [batch.students];
+        //   }
+        // }
 
-        console.log('Processed student IDs:', studentIds);
+        // console.log('Processed student IDs:', studentIds);
 
         // Patch form values
         this.batchForm.patchValue({
@@ -171,7 +171,7 @@ export class BatchEdit implements OnInit, OnDestroy {
           end_date: formatDateForInput(batch.end_date),
           description: batch.description || '',
           status: batch.status || 'active',
-          students: studentIds
+          students: batch.students || ''
         });
 
         console.log('Form patched with values:', this.batchForm.value);
@@ -233,41 +233,41 @@ export class BatchEdit implements OnInit, OnDestroy {
     this.batchService.getStudentsByCourse(courseId).subscribe({
       next: (res: any) => {
         console.log('Students loaded:', res);
-        this.studentsList = res?.data || [];
+        
 
         // Restore selected students
-        if (this.originalBatchData && this.studentsList.length > 0) {
-          let originalStudentIds: number[] = [];
+        // if (this.originalBatchData && this.studentsList.length > 0) {
+        //   let originalStudentIds: number[] = [];
 
-          if (typeof this.originalBatchData.students === 'string') {
-            originalStudentIds = this.originalBatchData.students
-              .split(',')
-              .map((id: string) => {
-                const trimmed = id.trim();
-                return trimmed ? parseInt(trimmed, 10) : null;
-              })
-              .filter((id: number | null) => id !== null && !isNaN(id)) as number[];
-          } else if (Array.isArray(this.originalBatchData.students)) {
-            originalStudentIds = this.originalBatchData.students;
-          } else if (typeof this.originalBatchData.students === 'number') {
-            originalStudentIds = [this.originalBatchData.students];
-          }
+        //   if (typeof this.originalBatchData.students === 'string') {
+        //     originalStudentIds = this.originalBatchData.students
+        //       .split(',')
+        //       .map((id: string) => {
+        //         const trimmed = id.trim();
+        //         return trimmed ? parseInt(trimmed, 10) : null;
+        //       })
+        //       .filter((id: number | null) => id !== null && !isNaN(id)) as number[];
+        //   } else if (Array.isArray(this.originalBatchData.students)) {
+        //     originalStudentIds = this.originalBatchData.students;
+        //   } else if (typeof this.originalBatchData.students === 'number') {
+        //     originalStudentIds = [this.originalBatchData.students];
+        //   }
 
-          console.log('Original student IDs:', originalStudentIds);
-          console.log('Available students:', this.studentsList.map(s => s.id));
+        //   console.log('Original student IDs:', originalStudentIds);
+        //   console.log('Available students:', this.studentsList.map(s => s.id));
 
-          const validStudentIds = originalStudentIds.filter(id =>
-            this.studentsList.some(student => student.id === id)
-          );
+        //   const validStudentIds = originalStudentIds.filter(id =>
+        //     this.studentsList.some(student => student.id === id)
+        //   );
 
-          console.log('Valid student IDs to restore:', validStudentIds);
+        //   console.log('Valid student IDs to restore:', validStudentIds);
 
-          this.batchForm.patchValue({
-            students: validStudentIds
-          });
+        //   this.batchForm.patchValue({
+        //     students: validStudentIds
+        //   });
 
-          console.log('Students restored, form value:', this.batchForm.get('students')?.value);
-        }
+        //   console.log('Students restored, form value:', this.batchForm.get('students')?.value);
+        // }
 
         this.isLoadingStudents = false;
         this.cdr.detectChanges();
@@ -352,17 +352,17 @@ export class BatchEdit implements OnInit, OnDestroy {
     this.router.navigate(['/admin/batches/list']);
   }
 
-  toggleSelectAllStudents(event: any): void {
-    const checked = event.target.checked;
-    const studentIds = checked ? this.studentsList.map(s => s.id) : [];
-    this.batchForm.patchValue({ students: studentIds });
-    console.log('Toggle all students:', studentIds);
-  }
+  // toggleSelectAllStudents(event: any): void {
+  //   const checked = event.target.checked;
+  //   const studentIds = checked ? this.studentsList.map(s => s.id) : [];
+  //   this.batchForm.patchValue({ students: studentIds });
+  //   console.log('Toggle all students:', studentIds);
+  // }
 
-  isAllStudentsSelected(): boolean {
-    const selected = this.students?.value || [];
-    return selected.length === this.studentsList.length && this.studentsList.length > 0;
-  }
+  // isAllStudentsSelected(): boolean {
+  //   const selected = this.students?.value || [];
+  //   return selected.length === this.studentsList.length && this.studentsList.length > 0;
+  // }
 
   // Getters
   get instructor_id() { return this.batchForm.get('instructor_id'); }

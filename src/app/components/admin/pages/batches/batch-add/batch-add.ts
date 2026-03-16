@@ -24,7 +24,7 @@ export class BatchAdd implements OnInit {
 
   instructors: any[] = [];
   courses: any[] = [];
-  studentsList: any[] = [];
+  studentsLimit: any[] = [];
 
   isLoadingInstructors = false;
   isLoadingCourses = false;
@@ -47,7 +47,7 @@ export class BatchAdd implements OnInit {
       end_date: [''],
       description: ['', Validators.maxLength(1000)],
       status: ['active', Validators.required],
-      students: [[]] // ✅ array for multiselect
+      students: [''] // ✅ array for multiselect
     });
   }
 
@@ -58,7 +58,7 @@ export class BatchAdd implements OnInit {
     // 👇 When instructor changes
     this.instructor_id?.valueChanges.subscribe((instructorId) => {
       this.courses = [];
-      this.studentsList = [];
+      
       this.batchForm.patchValue({ course_id: '', students: [] });
 
       if (instructorId) {
@@ -68,12 +68,10 @@ export class BatchAdd implements OnInit {
 
     // 👇 When course changes
     this.course_id?.valueChanges.subscribe((courseId) => {
-      this.studentsList = [];
+      
       this.batchForm.patchValue({ students: [] });
 
-      if (courseId) {
-        this.loadStudentsByCourse(courseId);
-      }
+     
     });
 
     // Edit Mode
@@ -125,20 +123,20 @@ export class BatchAdd implements OnInit {
   /* ================================
         LOAD STUDENTS BY COURSE
   ================================= */
-  loadStudentsByCourse(courseId: number): void {
-    this.isLoadingStudents = true;
+  // loadStudentsByCourse(courseId: number): void {
+  //   this.isLoadingStudents = true;
 
-    this.batchService.getStudentsByCourse(courseId).subscribe({
-      next: (res: any) => {
-        this.studentsList = res?.data || [];
-        this.isLoadingStudents = false;
-      },
-      error: () => {
-        this.toastService.error('Error', 'Failed to load students');
-        this.isLoadingStudents = false;
-      }
-    });
-  }
+  //   this.batchService.getStudentsByCourse(courseId).subscribe({
+  //     next: (res: any) => {
+  //       this.studentsList = res?.data || [];
+  //       this.isLoadingStudents = false;
+  //     },
+  //     error: () => {
+  //       this.toastService.error('Error', 'Failed to load students');
+  //       this.isLoadingStudents = false;
+  //     }
+  //   });
+  // }
 
   /* ================================
         LOAD BATCH (EDIT MODE)
@@ -160,12 +158,12 @@ export class BatchAdd implements OnInit {
           end_date: batch.end_date,
           description: batch.description,
           status: batch.status || 'active',
-          students: batch.students ? batch.students.split(',').map((s: string) => +s) : []
+          students: batch.students || ''
         });
 
         // Load dependent dropdowns in edit mode
         this.loadCoursesByInstructor(batch.instructor_id);
-        this.loadStudentsByCourse(batch.course_id);
+        // this.loadStudentsByCourse(batch.course_id);
 
         this.isLoading = false;
       },
@@ -227,11 +225,11 @@ export class BatchAdd implements OnInit {
   /* ================================
         TOGGLE SELECT ALL STUDENTS
   ================================= */
-  toggleSelectAllStudents(event: any): void {
-    const checked = event.target.checked;
-    const studentIds = checked ? this.studentsList.map(s => s.id) : [];
-    this.batchForm.patchValue({ students: studentIds });
-  }
+  // toggleSelectAllStudents(event: any): void {
+  //   const checked = event.target.checked;
+  //   const studentIds = checked ? this.studentsList.map(s => s.id) : [];
+  //   this.batchForm.patchValue({ students: studentIds });
+  // }
 
   /* ================================
         GETTERS

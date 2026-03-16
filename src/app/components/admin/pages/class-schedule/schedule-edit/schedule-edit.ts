@@ -12,7 +12,7 @@ import { ToastService } from '../../../../../services/toast.service';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './schedule-edit.html',
 })
-export class ClassScheduleEdit implements OnInit {
+export class AdminClassScheduleEdit implements OnInit {
   scheduleForm: FormGroup;
   isLoading = true;
   isSubmitting = false;
@@ -22,7 +22,7 @@ export class ClassScheduleEdit implements OnInit {
   batches: any[] = [];
   instructorId: number | null = null;
   instructorName: string | null = null;
-
+  
   selectedDay: string = '';
   selectedDayLabel: string = '';
 
@@ -48,7 +48,7 @@ export class ClassScheduleEdit implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.scheduleId = Number(this.route.snapshot.params['id']);
-
+    
     this.scheduleForm = this.fb.group({
       course_id: ['', Validators.required],
       start_time: ['', Validators.required],
@@ -96,7 +96,7 @@ export class ClassScheduleEdit implements OnInit {
     });
   }
 
-  onCourseChange(): void {
+   onCourseChange(): void {
     const courseId = this.scheduleForm.get('course_id')?.value;
     if (courseId) {
       this.loadBatches(courseId);
@@ -117,15 +117,15 @@ export class ClassScheduleEdit implements OnInit {
     });
   }
 
-
+ 
 
   loadSchedule(): void {
     console.log('Loading schedule with ID:', this.scheduleId);
-
+    
     this.scheduleService.getSchedule(this.scheduleId).subscribe({
       next: (res: any) => {
         console.log('Schedule loaded:', res);
-
+        
         const schedule = res.data || res;
 
         if (!schedule) {
@@ -151,7 +151,7 @@ export class ClassScheduleEdit implements OnInit {
   private initializeFormWithSchedule(schedule: any): void {
     // Handle single schedule (not array)
     const scheduleData = Array.isArray(schedule) ? schedule[0] : schedule;
-
+    
     if (!scheduleData) {
       this.toastService.error('Error', 'No schedule data found');
       this.router.navigate(['/instructor/class-schedule/list']);
@@ -175,7 +175,7 @@ export class ClassScheduleEdit implements OnInit {
 
     // Load batches for the course
     if (scheduleData.course_id) {
-
+      
     }
   }
 
@@ -190,13 +190,13 @@ export class ClassScheduleEdit implements OnInit {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return '';
-
+      
       const year = date.getFullYear();
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const day = date.getDate().toString().padStart(2, '0');
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-
+      
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     } catch (e) {
       console.error('Error formatting date:', e);
@@ -207,18 +207,18 @@ export class ClassScheduleEdit implements OnInit {
   onSubmit(): void {
     if (this.scheduleForm.invalid) {
       this.markFormGroupTouched(this.scheduleForm);
-
+      
       const errors = [];
       if (this.scheduleForm.get('course_id')?.invalid) errors.push('Course');
       if (this.scheduleForm.get('batch_id')?.invalid) errors.push('Batch');
       if (this.scheduleForm.get('start_time')?.invalid) errors.push('Start time');
       if (this.scheduleForm.get('end_time')?.invalid) errors.push('End time');
       if (this.scheduleForm.get('meeting_link')?.invalid) errors.push('Meeting link');
-
-      const errorMsg = errors.length > 0
+      
+      const errorMsg = errors.length > 0 
         ? `Please fill required fields: ${errors.join(', ')}`
         : 'Please fill all required fields correctly.';
-
+      
       this.toastService.error('Validation', errorMsg);
       return;
     }

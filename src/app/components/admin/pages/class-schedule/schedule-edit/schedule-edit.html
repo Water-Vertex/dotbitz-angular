@@ -2,10 +2,10 @@
     <div class="flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">
-                {{ isEditMode ? 'Edit' : 'Add New' }} Class Schedule
+                Edit Class Schedule
             </h1>
             <p class="text-gray-600 mt-1">
-                {{ isEditMode ? 'Update class schedule details' : 'Create a new class schedule' }}
+                Update class schedule details
             </p>
         </div>
         <a routerLink="/instructor/class-schedule/list"
@@ -26,7 +26,7 @@
 <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-6">
     <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="space-y-6">
 
-       <!-- Instructor (Auto-filled, read-only) -->
+        <!-- Instructor (Auto-filled, read-only) -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 Instructor
@@ -53,7 +53,7 @@
             >
                 <option [ngValue]="null">-- Select Course --</option>
                 <option *ngFor="let course of courses" [ngValue]="course.id">
-                    {{ course.course_name  || 'Course #' + course.id }}
+                    {{ course.course_name || 'Course #' + course.id }}
                 </option>
             </select>
             <div *ngIf="f['course_id'].invalid && f['course_id'].touched" class="mt-1 text-xs text-red-600">
@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <!-- Batch Selection (depends on course) -->
+       <!-- Batch Selection (depends on course) -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 Batch <span class="text-red-500">*</span>
@@ -85,86 +85,18 @@
             </div>
         </div>
 
-        <!-- Day Selection Mode -->
+        <!-- Day Display (Disabled Input) -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-3">
-                Day Selection <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Day <span class="text-red-500">*</span>
             </label>
-            <div class="flex space-x-4 mb-4">
-                <label class="inline-flex items-center">
-                    <input
-                        type="radio"
-                        name="selectionMode"
-                        [checked]="selectionMode === 'single'"
-                        (change)="setSelectionMode('single')"
-                        class="form-radio text-blue-600"
-                    >
-                    <span class="ml-2 text-sm text-gray-700">Single Day</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input
-                        type="radio"
-                        name="selectionMode"
-                        [checked]="selectionMode === 'multiple'"
-                        (change)="setSelectionMode('multiple')"
-                        class="form-radio text-blue-600"
-                    >
-                    <span class="ml-2 text-sm text-gray-700">Multiple Days</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input
-                        type="radio"
-                        name="selectionMode"
-                        [checked]="selectionMode === 'all'"
-                        (change)="setSelectionMode('all')"
-                        class="form-radio text-blue-600"
-                    >
-                    <span class="ml-2 text-sm text-gray-700">All Days</span>
-                </label>
-            </div>
-
-            <!-- Days FormArray -->
-            <div formArrayName="days" class="space-y-3">
-                <div *ngFor="let dayGroup of daysArray.controls; let i = index"
-                     [formGroupName]="i"
-                     class="flex items-center space-x-2">
-
-                    <select
-                        formControlName="day"
-                        class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                        [class.border-red-300]="dayGroup.get('day')?.invalid && dayGroup.get('day')?.touched"
-                    >
-                        <option [ngValue]="null">-- Select Day --</option>
-                        <option *ngFor="let day of daysOfWeek" [ngValue]="day.value">
-                            {{ day.label }}
-                        </option>
-                    </select>
-
-                    <button
-                        *ngIf="selectionMode === 'multiple' && daysArray.length > 1"
-                        type="button"
-                        (click)="removeDay(i)"
-                        class="p-2 text-red-600 hover:text-red-800"
-                    >
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Add More Days button (for multiple mode) -->
-            <button
-                *ngIf="selectionMode === 'multiple'"
-                type="button"
-                (click)="addDay('')"
-                class="mt-2 text-sm text-blue-600 hover:text-blue-800"
+            <input
+                type="text"
+                [value]="selectedDayLabel"
+                disabled
+                class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-600 cursor-not-allowed"
             >
-                <i class="fas fa-plus mr-1"></i> Add Another Day
-            </button>
-
-            <!-- Day selection validation -->
-            <div *ngIf="daysArray.length === 0 && scheduleForm.touched" class="mt-1 text-xs text-red-600">
-                Please select at least one day
-            </div>
+            <p class="mt-1 text-xs text-gray-500">Day is fixed and cannot be changed</p>
         </div>
 
         <!-- Time Section -->
@@ -218,23 +150,21 @@
         </div>
 
         <!-- Note -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Note
-                </label>
-
-                <textarea
-                    formControlName="note"
-                    rows="4"
-                    maxlength="1000"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                    placeholder="Enter batch note"
-                ></textarea>
-
-                <div class="text-xs text-gray-500 text-right mt-1">
-                    {{ scheduleForm.get('note')?.value?.length || 0 }}/1000
-                </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Note
+            </label>
+            <textarea
+                formControlName="note"
+                rows="4"
+                maxlength="1000"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                placeholder="Enter schedule note"
+            ></textarea>
+            <div class="text-xs text-gray-500 text-right mt-1">
+                {{ scheduleForm.get('note')?.value?.length || 0 }}/1000
             </div>
+        </div>
 
         <!-- Status -->
         <div>
@@ -267,19 +197,13 @@
             >
                 <span *ngIf="!isSubmitting">
                     <i class="fas fa-save mr-2"></i>
-                    {{ isEditMode ? 'Update' : 'Create' }} Schedule(s)
+                    Update Schedule
                 </span>
                 <span *ngIf="isSubmitting">
                     <i class="fas fa-spinner fa-spin mr-2"></i>
-                    {{ isEditMode ? 'Updating...' : 'Creating...' }}
+                    Updating...
                 </span>
             </button>
-        </div>
-
-        <!-- Info message about multiple schedules -->
-        <div *ngIf="selectionMode !== 'single'" class="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
-            <i class="fas fa-info-circle mr-2"></i>
-            {{ daysArray.length }} schedule(s) will be created (one for each selected day)
         </div>
     </form>
 </div>
