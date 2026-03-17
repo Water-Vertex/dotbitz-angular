@@ -122,19 +122,11 @@ export class InstructorAnnouncementAdd implements OnInit {
       return;
     }
 
-    const payload = { ...this.form };
-
-    // Convert IDs to numbers
-    payload.course_id = Number(payload.course_id);
-    payload.batch_id = Number(payload.batch_id);
-
-    // Remove undefined fields safely
-    Object.keys(payload).forEach((key) => {
-      const k = key as keyof typeof payload;
-      if (payload[k] === undefined) {
-        delete payload[k];
-      }
-    });
+    const payload: Announcement & { course_id?: number; batch_id?: number } = {
+      ...this.form,
+      course_id: this.form.course_id ? Number(this.form.course_id) : undefined,
+      batch_id: this.form.batch_id ? Number(this.form.batch_id) : undefined,
+    };
 
     console.log('Payload sending to backend:', payload);
 

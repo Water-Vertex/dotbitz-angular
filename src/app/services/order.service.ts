@@ -60,4 +60,22 @@ export class OrderService {
       .get(`${this.apiUrl}/orders/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
+
+  // Guardian - Get Batches by Course
+  getGuardianBatchesByCourse(courseId: number): Observable<any> {
+    return this.http
+      .get(`${this.guardianApiUrl}/courses/${courseId}/batches`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  // Guardian - Get Schedule by Batch
+  getGuardianScheduleByBatch(batchId: number): Observable<any> {
+    return this.http
+      .get(`${this.guardianApiUrl}/batches/${batchId}/schedule`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
 }

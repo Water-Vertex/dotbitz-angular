@@ -28,15 +28,24 @@ export class GuardianCheckout implements OnInit {
   couponApplied: boolean = false;
   couponError: string = '';
   discount: number = 0;
-  discountType: string = ''; // 'fixed' or 'percentage'
+  discountType: string = '';
   couponChecking: boolean = false;
 
-  // ✅ New Property
+  // Enrolled check
   isAlreadyEnrolled: boolean = false;
 
+  // Message
   showMessage: boolean = false;
   messageText: string = '';
   messageType: 'success' | 'error' = 'success';
+
+  // Batch & Schedule
+  batches: any[] = [];
+  selectedBatchId: number | null = null;
+  selectedBatch: any = null;
+  schedule: any[] = [];
+  loadingBatches: boolean = false;
+  loadingSchedule: boolean = false;
 
   // Order form fields
   order: any = {
@@ -65,6 +74,7 @@ export class GuardianCheckout implements OnInit {
     coupon_code: '',
     payment_method: '',
     note: '',
+    batch_id: null,
   };
 
   constructor(
@@ -86,6 +96,7 @@ export class GuardianCheckout implements OnInit {
 
     this.generateOrderNumber();
     this.loadData();
+    this.loadBatches();
   }
 
   generateOrderNumber(): void {
@@ -138,15 +149,67 @@ export class GuardianCheckout implements OnInit {
     }
   }
 
-  // -----------------------------------------------
-  // Student Selection Logic
-  // -----------------------------------------------
+  loadBatches(): void {
+    this.loadingBatches = true;
+    this.orderService.getGuardianBatchesByCourse(this.courseId).subscribe({
+      next: (res: any) => {
+        this.batches = res;
+        this.loadingBatches = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load batches', err);
+        this.loadingBatches = false;
+      },
+    });
+  }
+
+
+  onBatchChange(): void {
+    const batch = this.batches.find((b) => b.id == this.selectedBatchId);
+
+    if (!batch) {
+      this.selectedBatch = null;
+      this.schedule = [];
+      this.order.batch_id = null;
+      return;
+    }
+
+    // Full check
+    if (batch.students !== null && batch.enrolled_count >= batch.students) {
+      this.messageText = 'This batch is full. Please select another batch.';
+      this.messageType = 'error';
+      this.showMessage = true;
+      setTimeout(() => (this.showMessage = false), 3000);
+
+      this.selectedBatchId = null;
+      this.selectedBatch = null;
+      return;
+    }
+
+    this.selectedBatch = batch;
+    this.order.batch_id = batch.id;
+
+    this.loadingSchedule = true;
+    this.schedule = [];
+
+    this.orderService.getGuardianScheduleByBatch(batch.id).subscribe({
+      next: (res: any) => {
+        this.schedule = res.data;
+        this.loadingSchedule = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingSchedule = false;
+      },
+    });
+  }
+
   onStudentChange(): void {
     const selectedStudent = this.students.find((s) => s.id == this.order.student_id);
     this.isAlreadyEnrolled = false;
 
     if (selectedStudent) {
-      // Check if student is already enrolled
       if (selectedStudent.enrollments && Array.isArray(selectedStudent.enrollments)) {
         this.isAlreadyEnrolled = selectedStudent.enrollments.some(
           (e: any) => e.course_id == this.courseId || e.course?.id == this.courseId,
@@ -176,9 +239,6 @@ export class GuardianCheckout implements OnInit {
     this.calculateTotal();
   }
 
-  // -----------------------------------------------
-  // Amounts
-  // -----------------------------------------------
   get subAmount(): number {
     return parseFloat(this.order.sub_amount || 0);
   }
@@ -215,9 +275,6 @@ export class GuardianCheckout implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // -----------------------------------------------
-  // Coupon Logic
-  // -----------------------------------------------
   applyCoupon(): void {
     this.couponError = '';
     this.couponApplied = false;
@@ -249,7 +306,7 @@ export class GuardianCheckout implements OnInit {
         this.couponChecking = false;
         this.couponError = 'Invalid or expired coupon code.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -263,14 +320,19 @@ export class GuardianCheckout implements OnInit {
     this.calculateTotal();
   }
 
-  // -----------------------------------------------
-  // Submit Order
-  // -----------------------------------------------
   proceedToCheckout(): void {
     if (this.isAlreadyEnrolled) return;
 
     if (!this.order.student_id) {
       this.messageText = 'Please select a student.';
+      this.messageType = 'error';
+      this.showMessage = true;
+      setTimeout(() => (this.showMessage = false), 3000);
+      return;
+    }
+
+    if (!this.order.batch_id) {
+      this.messageText = 'Please select a batch.';
       this.messageType = 'error';
       this.showMessage = true;
       setTimeout(() => (this.showMessage = false), 3000);
@@ -285,7 +347,10 @@ export class GuardianCheckout implements OnInit {
       return;
     }
 
-    if (this.order.is_financed && (!this.order.finance_id?.trim() || !this.order.finance_provider?.trim())) {
+    if (
+      this.order.is_financed &&
+      (!this.order.finance_id?.trim() || !this.order.finance_provider?.trim())
+    ) {
       this.messageText = 'Please fill in Finance ID and Finance Provider.';
       this.messageType = 'error';
       this.showMessage = true;
@@ -297,6 +362,7 @@ export class GuardianCheckout implements OnInit {
       guardian_id: this.order.guardian_id,
       student_id: Number(this.order.student_id),
       course_id: Number(this.course?.id),
+      batch_id: this.order.batch_id,
       first_name: this.order.first_name,
       last_name: this.order.last_name,
       email: this.order.email,

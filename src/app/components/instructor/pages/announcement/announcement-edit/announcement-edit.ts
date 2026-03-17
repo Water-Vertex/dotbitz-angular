@@ -35,7 +35,6 @@ export class InstructorAnnouncementEdit implements OnInit {
     }
   }
 
-
   loadAnnouncement(): void {
     this.announcementService.getInstructorAnnouncement(this.id).subscribe({
       next: (res: any) => {

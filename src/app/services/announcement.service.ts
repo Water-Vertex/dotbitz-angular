@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class AnnouncementService {
-  private apiUrl = environment.AdminApiUrl + '/announcements';
+  private adminApiUrl = environment.AdminApiUrl + '/announcements';
   private instructorApiUrl = environment.InstructorApiUrl + '/announcements';
 
   constructor(private http: HttpClient) {}
@@ -23,22 +23,25 @@ export class AnnouncementService {
     });
   }
 
-  // ===================== ADMIN METHODS =====================
+  // ============================================================
+  // ADMIN METHODS
+  // ============================================================
+
   getAnnouncements(): Observable<AnnouncementApiResponse> {
     return this.http
-      .get<AnnouncementApiResponse>(this.apiUrl, { headers: this.getHeaders() })
+      .get<AnnouncementApiResponse>(this.adminApiUrl, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 
   getAnnouncement(id: number): Observable<AnnouncementApiResponse> {
     return this.http
-      .get<AnnouncementApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .get<AnnouncementApiResponse>(`${this.adminApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 
   createAnnouncement(payload: Announcement): Observable<AnnouncementApiResponse> {
     return this.http
-      .post<AnnouncementApiResponse>(this.apiUrl, payload, { headers: this.getHeaders() })
+      .post<AnnouncementApiResponse>(this.adminApiUrl, payload, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 
@@ -47,82 +50,87 @@ export class AnnouncementService {
     payload: Partial<Announcement>,
   ): Observable<AnnouncementApiResponse> {
     return this.http
-      .put<AnnouncementApiResponse>(`${this.apiUrl}/${id}`, payload, { headers: this.getHeaders() })
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-
-  deleteAnnouncement(id: number): Observable<AnnouncementApiResponse> {
-    return this.http
-      .delete<AnnouncementApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-
-  // ===================== INSTRUCTOR METHODS =====================
-
-  getInstructorAnnouncements(): Observable<AnnouncementApiResponse> {
-    return this.http
-      .get<AnnouncementApiResponse>(`${this.instructorApiUrl}`, { headers: this.getHeaders() })
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-
-  getInstructorAnnouncement(id: number): Observable<AnnouncementApiResponse> {
-    return this.http
-      .get<AnnouncementApiResponse>(`${this.instructorApiUrl}/${id}`, {
+      .put<AnnouncementApiResponse>(`${this.adminApiUrl}/${id}`, payload, {
         headers: this.getHeaders(),
       })
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  // GET courses for instructor
+  deleteAnnouncement(id: number): Observable<AnnouncementApiResponse> {
+    return this.http
+      .delete<AnnouncementApiResponse>(`${this.adminApiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  // Admin dropdown helpers
+  getInstructors(): Observable<any> {
+    return this.http
+      .get<any>(`${this.adminApiUrl}/instructors`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  getCourses(): Observable<any> {
+    return this.http
+      .get<any>(`${this.adminApiUrl}/courses`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  getBatches(courseId: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.adminApiUrl}/batches/${courseId}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  // ============================================================
+  // INSTRUCTOR METHODS
+  // ============================================================
+
+  getInstructorAnnouncements(): Observable<any> {
+    return this.http
+      .get<any>(`${this.instructorApiUrl}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  getInstructorAnnouncement(id: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.instructorApiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  createInstructorAnnouncement(payload: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.instructorApiUrl}`, payload, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  updateInstructorAnnouncement(id: number, payload: any): Observable<any> {
+    return this.http
+      .put<any>(`${this.instructorApiUrl}/${id}`, payload, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  deleteInstructorAnnouncement(id: number): Observable<any> {
+    return this.http
+      .delete<any>(`${this.instructorApiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  // Instructor dropdown helpers
   getInstructorCourses(): Observable<any> {
     return this.http
       .get<any>(`${this.instructorApiUrl}/courses`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  // GET batches for a selected course
   getBatchesByCourse(courseId: number): Observable<any> {
     return this.http
-      .get<any>(`${this.instructorApiUrl}/courses/${courseId}/batches`, {
-        headers: this.getHeaders(),
-      })
+      .get<any>(`${this.instructorApiUrl}/batches/${courseId}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
-  // GET count of students for a selected course and batch
+
   getCourseStudentsCount(courseId: number, batchId: number): Observable<any> {
     return this.http
       .get<any>(`${this.instructorApiUrl}/courses/${courseId}/students-count?batchId=${batchId}`, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-  // CREATE instructor announcement
-  createInstructorAnnouncement(
-    payload: Announcement & { course_id?: number; batch_id?: number },
-  ): Observable<AnnouncementApiResponse> {
-    return this.http
-      .post<AnnouncementApiResponse>(`${this.instructorApiUrl}`, payload, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-
-  // UPDATE instructor announcement
-  updateInstructorAnnouncement(
-    id: number,
-    payload: Partial<Announcement>,
-  ): Observable<AnnouncementApiResponse> {
-    return this.http
-      .put<AnnouncementApiResponse>(`${this.instructorApiUrl}/${id}`, payload, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-
-  // DELETE instructor announcement
-  deleteInstructorAnnouncement(id: number): Observable<AnnouncementApiResponse> {
-    return this.http
-      .delete<AnnouncementApiResponse>(`${this.instructorApiUrl}/${id}`, {
         headers: this.getHeaders(),
       })
       .pipe(catchError((err) => throwError(() => err)));
