@@ -42,18 +42,10 @@ export class GuardianCourseList implements OnInit, OnDestroy {
 
     this.courseService.getGuardianCourses('', 50).subscribe({
       next: (res: any) => {
-        let rawData: Course[] = [];
+        console.log('Raw API response:', res); // debug
 
-        // Normalize backend response
-        if (res?.data) {
-          rawData = Array.isArray(res.data.data)
-            ? res.data.data
-            : Array.isArray(res.data)
-              ? res.data
-              : [];
-        } else if (Array.isArray(res)) {
-          rawData = res;
-        }
+        // handle Laravel paginated response
+        const rawData: Course[] = res?.data || [];
 
         this.courses = rawData;
 
@@ -63,15 +55,13 @@ export class GuardianCourseList implements OnInit, OnDestroy {
         );
 
         // Fix thumbnail paths
-    this.courses.forEach((c) => {
-      if (c.thumbnail_image && !c.thumbnail_image.startsWith('http')) {
-        console.log('Original thumbnail:', c.thumbnail_image); // Debug original value
-        // Path fixed to match your working URL
-        c.thumbnail_image = `https://dotbitz.com/public/assets/images/courses/${c.thumbnail_image}`;
-      } else if (!c.thumbnail_image) {
-        c.thumbnail_image = 'https://placehold.co/600x400?text=No+Image+Available';
-      }
-    });
+        this.courses.forEach((c) => {
+          if (c.thumbnail_image && !c.thumbnail_image.startsWith('http')) {
+            c.thumbnail_image = `https://dotbitz.com/public/assets/images/courses/${c.thumbnail_image}`;
+          } else if (!c.thumbnail_image) {
+            c.thumbnail_image = 'https://placehold.co/600x400?text=No+Image+Available';
+          }
+        });
 
         this.applyFilters();
         this.isLoading = false;
@@ -105,7 +95,8 @@ export class GuardianCourseList implements OnInit, OnDestroy {
   }
 
   onSearch(): void {
-    this.searchSubject.next(this.searchTerm);
+    this.applyFilters();
+    // this.searchSubject.next(this.searchTerm);
   }
 
   onLevelChange(): void {
