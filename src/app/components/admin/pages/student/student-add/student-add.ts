@@ -293,7 +293,7 @@ export class StudentAdd implements OnInit {
     };
 
     // Call API
-    this.studentService.registerStudent(formData).subscribe({
+    this.studentService.adminAddStudent(formData).subscribe({
       next: (response) => {
         this.isLoading = false;
         // Show success message and redirect
@@ -301,7 +301,7 @@ export class StudentAdd implements OnInit {
         this.toastService.success('Registration Successful', 'Your account has been created successfully! Please login with your credentials.');
          // Redirect to login after a short delay
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/admin/student/list']);
         }, 2000);
       },
       error: (error) => {

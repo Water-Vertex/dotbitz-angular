@@ -56,4 +56,34 @@ validateCoupon(couponCode: string): Observable<any> {
       .get(`${this.apiUrl}/orders/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
+
+   getBatchesByCourse(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/courses/${courseId}/batches`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getSchedulesByBatch(batchId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/class-schedules/batch/${batchId}`,
+    { headers: this.getHeaders() }
+  );
+}
+ getGuardianBatchesByCourse(courseId: number): Observable<any> {
+    return this.http
+      .get(`${this.guardianApiUrl}/courses/${courseId}/batches`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  // Guardian - Get Schedule by Batch
+  getGuardianScheduleByBatch(batchId: number): Observable<any> {
+    return this.http
+      .get(`${this.guardianApiUrl}/batches/${batchId}/schedule`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
 }

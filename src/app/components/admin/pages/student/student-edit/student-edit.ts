@@ -330,7 +330,7 @@ formatDateForInput(dateStr: string): string {
       next: () => {
         this.isLoading = false;
         this.toastService.success('Update Successful', 'Student details updated successfully');
-        setTimeout(() => this.router.navigate(['/students']), 1500);
+        setTimeout(() => this.router.navigate(['/admin/student/list']), 1500);
       },
       error: (err) => {
         this.isLoading = false;

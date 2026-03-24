@@ -12,7 +12,7 @@ import { environment } from '../../environments/environment';
 })
 export class StudentService {
 
- private apiUrl = environment.AdminApiUrl + '/students';
+ private AdminApiUrl = environment.AdminApiUrl + '/students';
  private StudentApiUrl = environment.StudentApiUrl;
 
 
@@ -30,45 +30,45 @@ export class StudentService {
 
   // ---------------- Public ----------------
   registerStudent(data: RegistrationRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, data).pipe(
+    return this.http.post(`${this.StudentApiUrl}/register`, data).pipe(
       catchError(err => throwError(() => err))
     );
   }
 
   checkEmailExists(email: string): Observable<{ exists: boolean }> {
-    return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-email/${email}`).pipe(
+    return this.http.get<{ exists: boolean }>(`${this.StudentApiUrl}/check-email/${email}`).pipe(
       catchError(err => throwError(() => err))
     );
   }
 
   checkUsernameExists(username: string): Observable<{ exists: boolean }> {
-    return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-username/${username}`).pipe(
+    return this.http.get<{ exists: boolean }>(`${this.StudentApiUrl}/check-username/${username}`).pipe(
       catchError(err => throwError(() => err))
     );
   }
 
   // ---------------- Authenticated ----------------
   getStudentById(id: number): Observable<Student> {
-    return this.http.get<Student>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
+    return this.http.get<Student>(`${this.StudentApiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
       catchError(err => throwError(() => err))
     );
   }
 
   updateStudent(id: number, data: Partial<Student>): Observable<Student> {
-    return this.http.put<Student>(`${this.apiUrl}/${id}`, data, { headers: this.getHeaders() }).pipe(
+    return this.http.put<Student>(`${this.AdminApiUrl}/${id}`, data, { headers: this.getHeaders() }).pipe(
       catchError(err => throwError(() => err))
     );
   }
 
   getStudentDetails(studentId: number): Observable<StudentDetail[]> {
     return this.http
-      .get<StudentDetail[]>(`${this.apiUrl}/${studentId}/education`, { headers: this.getHeaders() })
+      .get<StudentDetail[]>(`${this.AdminApiUrl}/${studentId}/education`, { headers: this.getHeaders() })
       .pipe(catchError(err => throwError(() => err)));
   }
 
   getGuardian(studentId: number): Observable<Guardian> {
     return this.http
-      .get<Guardian>(`${this.apiUrl}/${studentId}/guardian`, { headers: this.getHeaders() })
+      .get<Guardian>(`${this.AdminApiUrl}/${studentId}/guardian`, { headers: this.getHeaders() })
       .pipe(catchError(err => throwError(() => err)));
   }
 
@@ -78,19 +78,19 @@ export class StudentService {
     if (search) params = params.set('search', search);
 
     return this.http
-      .get<{ data: Student[] }>(`${this.apiUrl}`, { headers: this.getHeaders(), params })
+      .get<{ data: Student[] }>(`${this.AdminApiUrl}`, { headers: this.getHeaders(), params })
       .pipe(catchError(err => throwError(() => err)));
   }
 
   deleteStudent(id: number): Observable<any> {
     return this.http
-      .delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .delete(`${this.AdminApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError(err => throwError(() => err)));
   }
 
   adminAddStudent(data: RegistrationRequest): Observable<Student> {
     return this.http
-      .post<Student>(`${this.apiUrl}/add`, data, { headers: this.getHeaders() })
+      .post<Student>(`${this.AdminApiUrl}/register`, data, { headers: this.getHeaders() })
       .pipe(catchError(err => throwError(() => err)));
   }
 

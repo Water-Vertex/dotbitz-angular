@@ -143,4 +143,5 @@ export class CourseService {
       .get<CourseApiResponse>(`${this.instructorApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
+
 }
