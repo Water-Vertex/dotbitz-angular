@@ -19,12 +19,20 @@ export class StudentCheckout implements OnInit {
   loading = true;
   submitting = false;
 
+  // Batch
+  batches: any[] = [];
+  selectedBatch: any = null;
+  batchSchedules: any[] = [];
+  batchId: number | null = null;
+  loadingBatches = false;
+  loadingSchedules = false;
+
   // Coupon
   couponCode: string = '';
   couponApplied: boolean = false;
   couponError: string = '';
   discount: number = 0;
-  discountType: string = ''; // 'fixed' or 'percentage'
+  discountType: string = '';
   couponChecking: boolean = false;
 
   // Order form fields
@@ -34,6 +42,7 @@ export class StudentCheckout implements OnInit {
   isFinanced: boolean = false;
   financeId: string = '';
   financeProvider: string = '';
+  batchFull: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -41,7 +50,7 @@ export class StudentCheckout implements OnInit {
     private courseService: CourseService,
     private studentService: StudentService,
     private orderService: OrderService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -55,22 +64,100 @@ export class StudentCheckout implements OnInit {
     this.loading = true;
     forkJoin({
       student: this.studentService.getProfile(),
-      course: this.courseService.getStudentCourseDetail(courseId)
+      course: this.courseService.getStudentCourseDetail(courseId),
     }).subscribe({
       next: ({ student, course }) => {
         this.student = student;
         this.course = course.data;
         this.loading = false;
+        this.loadBatches(courseId);
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Fetch error:', err);
         this.loading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
+  // -----------------------------------------------
+  // Batch Logic
+  // -----------------------------------------------
+  loadBatches(courseId: number): void {
+    this.loadingBatches = true;
+    this.orderService.getBatchesByCourse(courseId).subscribe({
+      next: (res: any) => {
+        this.batches = res;
+        this.loadingBatches = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingBatches = false;
+      },
+    });
+  }
+
+  //   onBatchChange(): void {
+  //   this.batchFull = false;
+  //   if (!this.batchId) {
+  //     this.batchSchedules = [];
+  //     this.selectedBatch = null;
+  //     return;
+  //   }
+  //   this.selectedBatch = this.batches.find(b => b.id == this.batchId);
+
+  //   // Batch full check
+  //   if (this.selectedBatch?.students !== null) {
+  //     this.orderService.getBatchEnrolledCount(this.batchId!).subscribe({
+  //       next: (res: any) => {
+  //         if (res.enrolled_count >= this.selectedBatch.students) {
+  //           this.batchFull = true;
+  //         }
+  //       }
+  //     });
+  //   }
+
+  //   this.loadingSchedules = true;
+  //   this.orderService.getSchedulesByBatch(this.batchId!).subscribe({
+  //     next: (res: any) => {
+  //       this.batchSchedules = res.data;
+  //       this.loadingSchedules = false;
+  //       this.cdr.detectChanges();
+  //     },
+  //     error: () => {
+  //       this.loadingSchedules = false;
+  //     }
+  //   });
+  // }
+
+  onBatchChange(): void {
+    this.batchFull = false;
+    this.batchSchedules = [];
+
+    if (!this.batchId) {
+      this.selectedBatch = null;
+      return;
+    }
+
+    this.selectedBatch = this.batches.find((b) => b.id == this.batchId);
+
+    this.batchFull = this.selectedBatch?.is_full ?? false;
+
+    this.loadingSchedules = true;
+    this.orderService.getSchedulesByBatch(this.batchId!).subscribe({
+      next: (res: any) => {
+        this.batchSchedules = res.data;
+        this.loadingSchedules = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingSchedules = false;
+      },
+    });
+
+    this.cdr.detectChanges();
+  }
   // -----------------------------------------------
   // Amounts
   // -----------------------------------------------
@@ -78,21 +165,13 @@ export class StudentCheckout implements OnInit {
     return parseFloat(this.course?.course_fee ?? 0);
   }
 
-  // get discountAmount(): number {
-  //   if (!this.couponApplied) return 0;
-  //   if (this.discountType === 'percentage') {
-  //     return parseFloat(((this.subAmount * this.discount) / 100).toFixed(2));
-  //   }
-  //   // 'fixed'
-  //   return parseFloat(this.discount.toFixed(2));
-  // }
   get discountAmount(): number {
-  if (!this.couponApplied) return 0;
-  if (this.discountType === 'percentage') {
-    return parseFloat(((this.subAmount * this.discount) / 100).toFixed(2));
+    if (!this.couponApplied) return 0;
+    if (this.discountType === 'percentage') {
+      return parseFloat(((this.subAmount * this.discount) / 100).toFixed(2));
+    }
+    return parseFloat(Number(this.discount).toFixed(2));
   }
-  return parseFloat(Number(this.discount).toFixed(2)); // ✅ Number() wrap karo
-}
 
   get totalAmount(): number {
     const total = this.subAmount - this.discountAmount;
@@ -115,17 +194,14 @@ export class StudentCheckout implements OnInit {
     this.couponChecking = true;
 
     this.orderService.validateCoupon(this.couponCode.trim()).subscribe({
- next: (res: any) => {
-  console.log('Coupon response:', res.data); // yeh paste karo
-  this.couponChecking = false;
-  if (res.success) {
-    this.couponApplied = true;
-    this.discount = parseFloat(res.data.discount_value);
-    this.discountType = res.data.discount_type;
-    console.log('Discount type:', this.discountType); // exact value dekhni hai
-    this.cdr.detectChanges();
-  }
- else {
+      next: (res: any) => {
+        this.couponChecking = false;
+        if (res.success) {
+          this.couponApplied = true;
+          this.discount = parseFloat(res.data.discount_value);
+          this.discountType = res.data.discount_type;
+          this.cdr.detectChanges();
+        } else {
           this.couponError = res.message || 'Invalid coupon code.';
           this.cdr.detectChanges();
         }
@@ -134,7 +210,7 @@ export class StudentCheckout implements OnInit {
         this.couponChecking = false;
         this.couponError = 'Invalid or expired coupon code.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -150,6 +226,10 @@ export class StudentCheckout implements OnInit {
   // Submit Order
   // -----------------------------------------------
   proceedToPay(): void {
+    if (!this.batchId) {
+      alert('Please select a batch.');
+      return;
+    }
     if (!this.paymentMethod) {
       alert('Please select a payment method.');
       return;
@@ -158,20 +238,25 @@ export class StudentCheckout implements OnInit {
       alert('Please fill in Finance ID and Finance Provider.');
       return;
     }
+    if (this.batchFull) {
+      alert('This batch is full. Please select another batch.');
+      return;
+    }
 
     this.submitting = true;
 
     const payload = {
-      course_id:        this.course.id,
-      sub_amount:       this.subAmount,
-      total_amount:     this.totalAmount,
-      discount:         this.discountAmount,
-      coupon_code:      this.couponApplied ? this.couponCode : null,
-      payment_method:   this.paymentMethod,
-      note:             this.note,
-      status:           this.status,
-      is_financed:      this.isFinanced,
-      finance_id:       this.isFinanced ? this.financeId : null,
+      course_id: this.course.id,
+      batch_id: this.batchId,
+      sub_amount: this.subAmount,
+      total_amount: this.totalAmount,
+      discount: this.discountAmount,
+      coupon_code: this.couponApplied ? this.couponCode : null,
+      payment_method: this.paymentMethod,
+      note: this.note,
+      status: this.status,
+      is_financed: this.isFinanced,
+      finance_id: this.isFinanced ? this.financeId : null,
       finance_provider: this.isFinanced ? this.financeProvider : null,
     };
 
@@ -183,14 +268,14 @@ export class StudentCheckout implements OnInit {
           this.router.navigate(['/student/courses/list']);
         }
       },
-     error: (err) => {
-  this.submitting = false;
-  if (err.status === 409) {
-    alert('You are already enrolled in this course!');
-  } else {
-    alert('Failed to place order. Please try again.');
-  }
-}
+      error: (err) => {
+        this.submitting = false;
+        if (err.status === 409) {
+          alert('You are already enrolled in this course!');
+        } else {
+          alert('Failed to place order. Please try again.');
+        }
+      },
     });
   }
 }

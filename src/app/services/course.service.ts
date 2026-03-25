@@ -50,7 +50,6 @@ export class CourseService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-
   getCourse(id: number): Observable<CourseApiResponse> {
     return this.http
       .get<CourseApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
@@ -87,7 +86,7 @@ export class CourseService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-   getStudentCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+  getStudentCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
     let url = `${this.StudentApiUrl}?per_page=${perPage}`;
     if (search) {
       url += `&search=${search}`;
@@ -125,7 +124,7 @@ export class CourseService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-   getInstructorCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+  getInstructorCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
     let url = `${this.instructorApiUrl}?per_page=${perPage}`;
     if (search) {
       url += `&search=${search}`;

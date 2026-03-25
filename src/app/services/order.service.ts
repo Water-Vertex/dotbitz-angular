@@ -61,7 +61,17 @@ export class OrderService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  // Guardian - Get Batches by Course
+  getBatchesByCourse(courseId: number): Observable<any> {
+    return this.http.get(`${environment.StudentApiUrl}/courses/${courseId}/batches`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  getSchedulesByBatch(batchId: number): Observable<any> {
+    return this.http.get(`${environment.StudentApiUrl}/class-schedules/batch/${batchId}`, {
+      headers: this.getHeaders(),
+    });
+  }
   getGuardianBatchesByCourse(courseId: number): Observable<any> {
     return this.http
       .get(`${this.guardianApiUrl}/courses/${courseId}/batches`, {
