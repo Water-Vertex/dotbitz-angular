@@ -80,6 +80,7 @@ import { InstructorAnnouncementEdit } from './components/instructor/pages/announ
 import { BatchList } from './components/admin/pages/batches/batch-list/batch-list';
 import { BatchAdd } from './components/admin/pages/batches/batch-add/batch-add';
 import { BatchEdit } from './components/admin/pages/batches/batch-edit/batch-edit';
+import { AppointmentList } from './components/admin/pages/appointment/appointment-list/appointment-list';
 
 
 export const routes: Routes = [
@@ -116,6 +117,10 @@ export const routes: Routes = [
         component: CourseCurriculumEdit,
       },
 
+      // Appointment routes
+      { path: 'admin/appointment/list', component: AppointmentList },
+     
+
       // Policy routes
       { path: 'admin/policy/list', component: PolicyList },
       { path: 'admin/policy/add', component: PolicyAdd },
@@ -146,7 +151,6 @@ export const routes: Routes = [
       { path: 'admin/assessments/add', component: AssessmentAdd },
       { path: 'admin/assessments/edit/:id', component: AssessmentEdit },
 
-
       //Announement routes
       { path: 'admin/announcement/list', component: AnnouncementList },
       { path: 'admin/announcement/add', component: AnnouncementAdd },
@@ -156,8 +160,6 @@ export const routes: Routes = [
       { path: 'admin/batches/list', component: BatchList },
       { path: 'admin/batches/add', component: BatchAdd },
       { path: 'admin/batches/edit/:id', component: BatchEdit },
-
-     
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
     ],
@@ -239,8 +241,8 @@ export const routes: Routes = [
       { path: 'instructor/announcement/list', component: InstructorAnnouncementList },
       { path: 'instructor/announcement/add', component: InstructorAnnouncementAdd },
       { path: 'instructor/announcement/edit/:id', component: InstructorAnnouncementEdit },
-    //
-     ],
+      //
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

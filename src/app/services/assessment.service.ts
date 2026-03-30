@@ -97,4 +97,15 @@ export class AssessmentService {
     console.error('Assessment API Error:', error);
     return throwError(() => error);
   }
+
+
+  // ================= Get Assessments By Course =================
+getAssessmentsByCourse(courseId: number): Observable<Assessment[]> {
+  return this.http.get<any>(`${this.apiUrl}/course/${courseId}`, {
+    headers: this.getHeaders()
+  }).pipe(
+    map(res => res.data ?? res),  // in case API returns { data: [...] } or [...]
+    catchError(this.handleError)
+  );
+}
 }

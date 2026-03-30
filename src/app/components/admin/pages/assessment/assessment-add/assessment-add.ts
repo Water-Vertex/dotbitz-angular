@@ -1,12 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AssessmentService } from '../../../../../services/assessment.service';
 import { ToastService } from '../../../../../services/toast.service';
@@ -16,10 +10,9 @@ import { Course } from '../../../../../models/assessment.model';
   selector: 'app-assessment-add',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './assessment-add.html'
+  templateUrl: './assessment-add.html',
 })
 export class AssessmentAdd implements OnInit {
-
   form!: FormGroup;
   courses: Course[] = [];
   isSubmitting = false;
@@ -28,7 +21,7 @@ export class AssessmentAdd implements OnInit {
     private fb: FormBuilder,
     private assessmentService: AssessmentService,
     private toast: ToastService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +34,11 @@ export class AssessmentAdd implements OnInit {
   buildForm() {
     this.form = this.fb.group({
       course_id: [null, Validators.required],
-      questions: this.fb.array([])
+
+      // ✅ ADDED FIELD
+      assessment_title: ['', Validators.required],
+
+      questions: this.fb.array([]),
     });
   }
 
@@ -59,9 +56,9 @@ export class AssessmentAdd implements OnInit {
         is_single: [true],
         options: this.fb.array([
           this.fb.control('', Validators.required),
-          this.fb.control('', Validators.required)
-        ])
-      })
+          this.fb.control('', Validators.required),
+        ]),
+      }),
     );
   }
 
@@ -75,9 +72,7 @@ export class AssessmentAdd implements OnInit {
   }
 
   addOption(qIndex: number) {
-    this.getOptions(qIndex).push(
-      this.fb.control('', Validators.required)
-    );
+    this.getOptions(qIndex).push(this.fb.control('', Validators.required));
   }
 
   removeOption(qIndex: number, optIndex: number) {
@@ -88,16 +83,29 @@ export class AssessmentAdd implements OnInit {
   onTypeChange(qIndex: number) {
     const question = this.questions.at(qIndex);
     const type = question.get('assessment_type')?.value;
+    const options = question.get('options') as FormArray;
 
     if (type === 'q-a') {
-      question.get('options')?.reset();
-      question.get('options')?.clearValidators();
+      while (options.length !== 0) {
+        options.removeAt(0);
+      }
+
+      options.clearValidators();
+      options.updateValueAndValidity();
+    } else {
+      if (options.length === 0) {
+        options.push(this.fb.control('', Validators.required));
+        options.push(this.fb.control('', Validators.required));
+      }
+
+      options.setValidators(Validators.required);
+      options.updateValueAndValidity();
     }
   }
 
   // ================= COURSES =================
   loadCourses() {
-    this.assessmentService.getCourses().subscribe(courses => {
+    this.assessmentService.getCourses().subscribe((courses) => {
       this.courses = courses;
     });
   }
@@ -122,7 +130,7 @@ export class AssessmentAdd implements OnInit {
       error: () => {
         this.toast.error('Error', 'Failed to save assessment');
         this.isSubmitting = false;
-      }
+      },
     });
   }
 

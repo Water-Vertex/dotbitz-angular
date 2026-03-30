@@ -1,6 +1,8 @@
 <!-- Loading -->
 <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[70vh]">
-  <div class="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-[#073a89]"></div>
+  <div
+    class="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-[#073a89]"
+  ></div>
   <p class="text-gray-500 mt-4">Loading course...</p>
 </div>
 
@@ -9,7 +11,7 @@
   <div class="border-b border-gray-200">
     <div class="container mx-auto px-4 py-3">
       <div class="flex items-center text-sm text-gray-500">
-      <a routerLink="/guardian/my-courses" class="hover:text-[#073a89]">My Courses</a>
+        <a routerLink="/guardian/my-courses" class="hover:text-[#073a89]">My Courses</a>
         <span class="mx-2">›</span>
         <span class="text-gray-900">{{ course.course_name }}</span>
       </div>
@@ -19,12 +21,10 @@
   <!-- Main Content -->
   <div claass="container mx-auto px-4 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
       <!-- Left Column - Course Info -->
       <div class="lg:col-span-2">
         <!-- Title & Badge -->
         <div class="mb-6">
-          
           <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ course.course_name }}</h1>
 
           <!-- Quick Stats -->
@@ -61,24 +61,48 @@
         <!-- Tabs Navigation -->
         <div class="border-b border-gray-200 mb-6">
           <div class="flex gap-6 overflow-x-auto">
-            <button (click)="setTab('instructor')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'instructor' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+            <button
+              (click)="setTab('instructor')"
+              [class]="
+                'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'instructor'
+                  ? 'text-[#073a89] border-b-2 border-[#073a89]'
+                  : 'text-gray-500 hover:text-gray-900')
+              "
+            >
               Instructor
             </button>
-            <button (click)="setTab('curriculum')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'curriculum' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+            <button
+              (click)="setTab('curriculum')"
+              [class]="
+                'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'curriculum'
+                  ? 'text-[#073a89] border-b-2 border-[#073a89]'
+                  : 'text-gray-500 hover:text-gray-900')
+              "
+            >
               Curriculum
             </button>
-            <button (click)="setTab('assignment')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'assignment' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+            <button
+              (click)="setTab('assignment')"
+              [class]="
+                'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'assignment'
+                  ? 'text-[#073a89] border-b-2 border-[#073a89]'
+                  : 'text-gray-500 hover:text-gray-900')
+              "
+            >
               Assignments
             </button>
-            <button (click)="setTab('quiz')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'quiz' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
+            <button
+              (click)="setTab('quiz')"
+              [class]="
+                'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
+                (activeTab === 'quiz'
+                  ? 'text-[#073a89] border-b-2 border-[#073a89]'
+                  : 'text-gray-500 hover:text-gray-900')
+              "
+            >
               Quizzes
             </button>
           </div>
@@ -90,11 +114,16 @@
           <div *ngIf="activeTab === 'instructor'">
             <div *ngIf="course.instructor; else noInstructor">
               <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
-                <div class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center text-[#073a89] font-semibold text-xl shrink-0">
-                  {{ course.instructor.first_name?.charAt(0) }}{{ course.instructor.last_name?.charAt(0) }}
+                <div
+                  class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center text-[#073a89] font-semibold text-xl shrink-0"
+                >
+                  {{ course.instructor.first_name?.charAt(0)
+                  }}{{ course.instructor.last_name?.charAt(0) }}
                 </div>
                 <div>
-                  <h3 class="font-semibold text-gray-900">{{ course.instructor.first_name }} {{ course.instructor.last_name }}</h3>
+                  <h3 class="font-semibold text-gray-900">
+                    {{ course.instructor.first_name }} {{ course.instructor.last_name }}
+                  </h3>
                   <p class="text-sm text-gray-500 mb-2">{{ course.instructor.title }}</p>
                   <p class="text-sm text-gray-600">{{ course.instructor.description }}</p>
                 </div>
@@ -112,14 +141,20 @@
           <div *ngIf="activeTab === 'curriculum'">
             <div *ngIf="course.curriculums && course.curriculums.length > 0; else noCurriculum">
               <div class="space-y-3">
-                <div *ngFor="let item of course.curriculums; let i = index"
-                  class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                <div
+                  *ngFor="let item of course.curriculums; let i = index"
+                  class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-start gap-3"
+                >
+                  <div
+                    class="w-8 h-8 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0"
+                  >
                     {{ i + 1 }}
                   </div>
                   <div>
                     <h4 class="font-medium text-gray-900">{{ item.title }}</h4>
-                    <p class="text-sm text-gray-500 mt-1" *ngIf="item.description">{{ item.description }}</p>
+                    <p class="text-sm text-gray-500 mt-1" *ngIf="item.description">
+                      {{ item.description }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -135,29 +170,44 @@
           <!-- Assignment Tab -->
           <div *ngIf="activeTab === 'assignment'">
             <div *ngIf="assignmentsLoading" class="flex justify-center py-12">
-              <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+              <div
+                class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"
+              ></div>
             </div>
-            <div *ngIf="!assignmentsLoading && assignments.length === 0" class="text-center py-12 text-gray-400">
+            <div
+              *ngIf="!assignmentsLoading && assignments.length === 0"
+              class="text-center py-12 text-gray-400"
+            >
               <i class="fas fa-tasks text-4xl mb-3"></i>
               <p class="text-sm">No assignments for this course yet.</p>
             </div>
             <div *ngIf="!assignmentsLoading && assignments.length > 0" class="space-y-3">
-              <div *ngFor="let assignment of assignments; let i = index"
-                class="p-5 bg-gray-50 rounded-lg border border-gray-200">
+              <div
+                *ngFor="let assignment of assignments; let i = index"
+                class="p-5 bg-gray-50 rounded-lg border border-gray-200"
+              >
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                    <div
+                      class="w-10 h-10 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0"
+                    >
                       {{ i + 1 }}
                     </div>
                     <div>
                       <h4 class="font-medium text-gray-900">{{ assignment.title }}</h4>
                       <div class="flex items-center gap-3 mt-1 text-xs">
-                        <span [class]="isOverdue(assignment.due_date) ? 'text-red-600' : 'text-gray-500'">
+                        <span
+                          [class]="
+                            isOverdue(assignment.due_date) ? 'text-red-600' : 'text-gray-500'
+                          "
+                        >
                           <i class="far fa-calendar mr-1"></i>
                           Due {{ assignment.due_date | date: 'MMM d, yyyy' }}
                         </span>
-                        <span *ngIf="isOverdue(assignment.due_date)"
-                              class="text-red-600 bg-red-100 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                        <span
+                          *ngIf="isOverdue(assignment.due_date)"
+                          class="text-red-600 bg-red-100 px-1.5 py-0.5 rounded text-[10px] font-medium"
+                        >
                           Overdue
                         </span>
                         <span class="text-gray-500">
@@ -168,16 +218,19 @@
                     </div>
                   </div>
                   <div class="shrink-0 ml-13">
-                    <a *ngIf="assignment.assignment_file"
-                      [href]="'http://localhost:8000/assets/assignments/' + assignment.assignment_file"
+                    <a
+                      *ngIf="assignment.assignment_file"
+                      [href]="
+                        'http://localhost:8000/assets/assignments/' + assignment.assignment_file
+                      "
                       target="_blank"
                       download
-                      class="inline-flex items-center gap-1 text-sm font-medium text-[#073a89] hover:text-[#052b63]">
+                      class="inline-flex items-center gap-1 text-sm font-medium text-[#073a89] hover:text-[#052b63]"
+                    >
                       <i class="fas fa-download"></i>
                       Download
                     </a>
-                    <span *ngIf="!assignment.assignment_file"
-                      class="text-sm text-gray-400">
+                    <span *ngIf="!assignment.assignment_file" class="text-sm text-gray-400">
                       <i class="fas fa-file-slash mr-1"></i>
                       No file
                     </span>
@@ -199,8 +252,10 @@
         <!-- Description -->
         <div class="mb-8">
           <h2 class="text-lg font-semibold text-gray-900 mb-3">About this course</h2>
-          <div class="prose prose-sm max-w-none text-gray-600" [innerHTML]="course.course_description">
-          </div>
+          <div
+            class="prose prose-sm max-w-none text-gray-600"
+            [innerHTML]="course.course_description"
+          ></div>
         </div>
 
         <!-- What you'll learn -->
@@ -213,8 +268,6 @@
             </div>
           </div>
         </div>
-
-
       </div>
 
       <!-- Right Column - Sidebar -->
@@ -230,14 +283,16 @@
                 class="w-full aspect-video object-cover"
                 [alt]="course.course_name"
               />
-              <div *ngIf="!course.thumbnail_image" class="w-full aspect-video bg-gray-100 flex items-center justify-center">
+              <div
+                *ngIf="!course.thumbnail_image"
+                class="w-full aspect-video bg-gray-100 flex items-center justify-center"
+              >
                 <i class="fas fa-image text-3xl text-gray-300"></i>
               </div>
             </div>
 
             <!-- Price & CTA -->
             <div class="p-6">
-
               <!-- Course Includes -->
               <div class="mt-6 pt-6 border-t border-gray-200">
                 <h3 class="text-sm font-semibold text-gray-900 mb-3">This course includes:</h3>
@@ -273,9 +328,13 @@
   <div class="text-center">
     <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
     <h2 class="text-xl font-semibold text-gray-900 mb-2">Course not found</h2>
-    <p class="text-gray-500 mb-6">The course you're looking for doesn't exist or has been removed.</p>
-    <a routerLink="/student/my-courses"
-            class="px-6 py-2 bg-[#073a89] text-white rounded hover:bg-[#052b63] transition-colors">
+    <p class="text-gray-500 mb-6">
+      The course you're looking for doesn't exist or has been removed.
+    </p>
+    <a
+      routerLink="/student/my-courses"
+      class="px-6 py-2 bg-[#073a89] text-white rounded hover:bg-[#052b63] transition-colors"
+    >
       Back to My Courses
     </a>
   </div>
