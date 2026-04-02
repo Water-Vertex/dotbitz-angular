@@ -1,279 +1,370 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DotBitz</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
- <style>
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid #e5e7eb;
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <style>
+      .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.95);
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .nav-link {
+        position: relative;
+      }
+
+      .nav-link:hover::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #ff6500;
+      }
+
+      /* Mobile Menu Styles */
+      .mobile-menu {
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 100%;
+        max-width: 300px;
+        z-index: 100;
+        background: white;
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .mobile-menu.active {
+        transform: translateX(0);
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+      }
+
+      .overlay.active {
+        display: block;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .header-buttons {
+          display: flex;
+          align-items: center;
         }
 
-        .nav-link {
-            position: relative;
+        .logo-container img {
+          max-width: 120px;
         }
+      }
 
-        .nav-link:hover::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #ff6500;
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
         }
-
-
-
-        /* Mobile Menu Styles */
-        .mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100vh;
-            width: 100%;
-            max-width: 300px;
-            z-index: 100;
-            background: white;
-            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+        50% {
+          transform: translateY(-20px);
         }
+      }
 
-        .mobile-menu.active {
-            transform: translateX(0);
-        }
+      .cta-button {
+        background: #ff6500;
+        transition: all 0.3s ease;
+        color: white;
+        box-shadow: 0 10px 30px rgba(255, 101, 0, 0.3);
+      }
 
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-        }
+      .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255, 101, 0, 0.4);
+      }
 
-        .overlay.active {
-            display: block;
-        }
+      .stats-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .header-buttons {
-                display: flex;
-                align-items: center;
-            }
+      .stats-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.15);
+      }
+      /* ===== Custom Scrollbar (WebKit Browsers) ===== */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
 
-            .logo-container img {
-                max-width: 120px;
-            }
-        }
+      ::-webkit-scrollbar-track {
+        background: #f3f4f6; /* light gray */
+        border-radius: 10px;
+      }
 
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #ff6500, #ff8a3d);
+        border-radius: 10px;
+        border: 2px solid #f3f4f6;
+      }
 
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-
-        .cta-button {
-            background: #FF6500;
-            transition: all 0.3s ease;
-            color:white;
-            box-shadow: 0 10px 30px rgba(255, 101, 0, 0.3);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255, 101, 0, 0.4);
-        }
-
-        .stats-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15);
-        }
-        /* ===== Custom Scrollbar (WebKit Browsers) ===== */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f3f4f6; /* light gray */
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff6500, #ff8a3d);
-    border-radius: 10px;
-    border: 2px solid #f3f4f6;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #e65c00, #ff6500);
-}
-
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #e65c00, #ff6500);
+      }
     </style>
-
-</head>
-<body class="bg-gray-50">
+  </head>
+  <body class="bg-gray-50">
     <!-- Mobile Menu Overlay -->
 
     <!-- Sticky Header -->
 
     <header class="sticky-header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
-                <div class="flex items-center logo-container">
-                    <div class="flex items-center space-x-2">
-                        <img src="../../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="150">
-                    </div>
-                </div>
-
-                <!-- Desktop Navigation (Center) -->
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="https://dotbitz.com/" class="nav-link font-medium" style="color: #1d1d1d;">Home</a>
-                    <a href="https://dotbitz.com/courses" class="nav-link font-medium" style="color: #1d1d1d;">Courses</a>
-                    <a href="https://dotbitz.com/about" class="nav-link font-medium" style="color: #1d1d1d;">About</a>
-                    <a href="https://dotbitz.com/faq" class="nav-link font-medium" style="color: #1d1d1d;">FAQ</a>
-                    <a href="https://dotbitz.com/contact" class="nav-link font-medium" style="color: #1d1d1d;">Contact</a>
-                </nav>
-
-                <!-- Right Side Buttons -->
-                <div class="flex items-center space-x-4 header-buttons">
-                    <a href="https://portal.dotbitz.com" class="hidden md:block font-medium px-4 py-2" style="color: #073a89;">
-                        Login
-                    </a>
-
-
-                    <!-- Mobile Menu Button -->
-                    <button class="md:hidden p-2" id="mobileMenuButton">
-                        <svg class="w-6 h-6" style="color: #073a89;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo -->
+          <div class="flex items-center logo-container">
+            <div class="flex items-center space-x-2">
+              <img
+                src="../../../../../../assets/images/logo/dotbitz-logo.png"
+                alt="DotBitz Logo"
+                width="150"
+              />
             </div>
+          </div>
+
+          <!-- Desktop Navigation (Center) -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a href="https://dotbitz.com/" class="nav-link font-medium" style="color: #1d1d1d"
+              >Home</a
+            >
+            <a
+              href="https://dotbitz.com/courses"
+              class="nav-link font-medium"
+              style="color: #1d1d1d"
+              >Courses</a
+            >
+            <a href="https://dotbitz.com/about" class="nav-link font-medium" style="color: #1d1d1d"
+              >About</a
+            >
+            <a href="https://dotbitz.com/faq" class="nav-link font-medium" style="color: #1d1d1d"
+              >FAQ</a
+            >
+            <a
+              href="https://dotbitz.com/contact"
+              class="nav-link font-medium"
+              style="color: #1d1d1d"
+              >Contact</a
+            >
+          </nav>
+
+          <!-- Right Side Buttons -->
+          <div class="flex items-center space-x-4 header-buttons">
+            <a
+              href="https://portal.dotbitz.com"
+              class="hidden md:block font-medium px-4 py-2"
+              style="color: #073a89"
+            >
+              Login
+            </a>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden p-2" id="mobileMenuButton">
+              <svg
+                class="w-6 h-6"
+                style="color: #073a89"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </button>
+          </div>
         </div>
+      </div>
     </header>
     <div class="mobile-menu" id="mobileMenu">
-        <div class="p-6 h-full flex flex-col">
-            <!-- Mobile Menu Header -->
-            <div class="flex justify-between items-center mb-8">
-                <img src="../../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="120">
-                <button class="p-2" id="closeMobileMenu">
-                    <svg class="w-6 h-6" style="color: #073a89;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Mobile Navigation -->
-            <nav class="flex-1">
-                <div class="space-y-4">
-                    <a href="https://dotbitz.com" class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors" style="color: #1d1d1d;">
-                        <i class="fas fa-home mr-3" style="color: #0091B9;"></i>
-                        Home
-                    </a>
-                    <a href="https://dotbitz.com/courses" class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors" style="color: #1d1d1d;">
-                        <i class="fas fa-book-open mr-3" style="color: #0091B9;"></i>
-                        Courses
-                    </a>
-                    <a href="https://dotbitz.com/about" class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors" style="color: #1d1d1d;">
-                        <i class="fas fa-info-circle mr-3" style="color: #0091B9;"></i>
-                        About
-                    </a>
-                    <a href="https://dotbitz.com/faq" class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors" style="color: #1d1d1d;">
-                        <i class="fas fa-info-circle mr-3" style="color: #0091B9;"></i>
-                        FAQ
-                    </a>
-                    <a href="https://dotbitz.com/contact" class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors" style="color: #1d1d1d;">
-                        <i class="fas fa-envelope mr-3" style="color: #0091B9;"></i>
-                        Contact
-                    </a>
-                </div>
-
-                <!-- Mobile Buttons -->
-                <div class="mt-8 space-y-4">
-                    <a href="https://portal.dotbitz.com" class="w-full block py-3 px-4 rounded-lg font-medium text-center" style="color: #073a89; border: 2px solid #073a89;">
-                        Login
-                    </a>
-
-                </div>
-            </nav>
-
-            <!-- Mobile Footer -->
-            <div class="pt-6 mt-auto border-t" style="border-color: #e5e7eb;">
-                <div class="flex justify-center space-x-4 mb-4">
-                    <a href="#" class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
-                       style="background-color: #bae4f0; color: #073a89;">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
-                       style="background-color: #bae4f0; color: #073a89;">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
-                       style="background-color: #bae4f0; color: #073a89;">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a href="#" class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
-                       style="background-color: #bae4f0; color: #073a89;">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                </div>
-                <p class="text-center text-sm" style="color: #1d1d1d;">
-                    © 2024 DotBitz
-                </p>
-            </div>
+      <div class="p-6 h-full flex flex-col">
+        <!-- Mobile Menu Header -->
+        <div class="flex justify-between items-center mb-8">
+          <img
+            src="../../../../../../assets/images/logo/dotbitz-logo.png"
+            alt="DotBitz Logo"
+            width="120"
+          />
+          <button class="p-2" id="closeMobileMenu">
+            <svg
+              class="w-6 h-6"
+              style="color: #073a89"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
         </div>
+
+        <!-- Mobile Navigation -->
+        <nav class="flex-1">
+          <div class="space-y-4">
+            <a
+              href="https://dotbitz.com"
+              class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors"
+              style="color: #1d1d1d"
+            >
+              <i class="fas fa-home mr-3" style="color: #0091b9"></i>
+              Home
+            </a>
+            <a
+              href="https://dotbitz.com/courses"
+              class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors"
+              style="color: #1d1d1d"
+            >
+              <i class="fas fa-book-open mr-3" style="color: #0091b9"></i>
+              Courses
+            </a>
+
+            <a routerLink="/student/my-assessments" class="nav-link font-medium" style="color: #1d1d1d;">
+                My Assessments</a>
+            <a
+              routerLink="/student/my-assessments"
+              class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors"
+              style="color: #1d1d1d"
+            >
+              <i class="fas fa-file-alt mr-3" style="color: #0091b9"></i>
+              My Assessments
+            </a>
+            <a
+              href="https://dotbitz.com/about"
+              class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors"
+              style="color: #1d1d1d"
+            >
+              <i class="fas fa-info-circle mr-3" style="color: #0091b9"></i>
+              About
+            </a>
+            <a
+              href="https://dotbitz.com/faq"
+              class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors"
+              style="color: #1d1d1d"
+            >
+              <i class="fas fa-info-circle mr-3" style="color: #0091b9"></i>
+              FAQ
+            </a>
+            <a
+              href="https://dotbitz.com/contact"
+              class="block py-3 px-4 rounded-lg font-medium text-lg hover:bg-gray-100 transition-colors"
+              style="color: #1d1d1d"
+            >
+              <i class="fas fa-envelope mr-3" style="color: #0091b9"></i>
+              Contact
+            </a>
+          </div>
+
+          <!-- Mobile Buttons -->
+          <div class="mt-8 space-y-4">
+            <a
+              href="https://portal.dotbitz.com"
+              class="w-full block py-3 px-4 rounded-lg font-medium text-center"
+              style="color: #073a89; border: 2px solid #073a89"
+            >
+              Login
+            </a>
+          </div>
+        </nav>
+
+        <!-- Mobile Footer -->
+        <div class="pt-6 mt-auto border-t" style="border-color: #e5e7eb">
+          <div class="flex justify-center space-x-4 mb-4">
+            <a
+              href="#"
+              class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
+              style="background-color: #bae4f0; color: #073a89"
+            >
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a
+              href="#"
+              class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
+              style="background-color: #bae4f0; color: #073a89"
+            >
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a
+              href="#"
+              class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
+              style="background-color: #bae4f0; color: #073a89"
+            >
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a
+              href="#"
+              class="social-icon w-10 h-10 rounded-full flex items-center justify-center"
+              style="background-color: #bae4f0; color: #073a89"
+            >
+              <i class="fab fa-youtube"></i>
+            </a>
+          </div>
+          <p class="text-center text-sm" style="color: #1d1d1d">© 2024 DotBitz</p>
+        </div>
+      </div>
     </div>
     <router-outlet></router-outlet>
     <!-- Mobile Menu Drawer -->
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<script>
-    $(document).ready(function () {
-
+    <script>
+      $(document).ready(function () {
         // Mobile menu functionality
         const $mobileMenuButton = $('#mobileMenuButton');
-        const $closeMobileMenu  = $('#closeMobileMenu');
-        const $mobileMenu       = $('#mobileMenu');
-        const $overlay          = $('#overlay');
+        const $closeMobileMenu = $('#closeMobileMenu');
+        const $mobileMenu = $('#mobileMenu');
+        const $overlay = $('#overlay');
 
         // Open mobile menu
         $mobileMenuButton.on('click', function () {
-            $mobileMenu.addClass('active');
-            $overlay.addClass('active');
-            $('body').css('overflow', 'hidden'); // Prevent scrolling
+          $mobileMenu.addClass('active');
+          $overlay.addClass('active');
+          $('body').css('overflow', 'hidden'); // Prevent scrolling
         });
 
         // Close mobile menu
         function closeMenu() {
-            $mobileMenu.removeClass('active');
-            $overlay.removeClass('active');
-            $('body').css('overflow', 'auto'); // Re-enable scrolling
+          $mobileMenu.removeClass('active');
+          $overlay.removeClass('active');
+          $('body').css('overflow', 'auto'); // Re-enable scrolling
         }
 
         $closeMobileMenu.on('click', closeMenu);
@@ -285,21 +376,20 @@
         // Simple scroll effect for header
         const $header = $('.sticky-header');
         $(window).on('scroll', function () {
-            if ($(window).scrollTop() > 10) {
-                $header.css('box-shadow', '0 2px 10px rgba(0,0,0,0.1)');
-            } else {
-                $header.css('box-shadow', 'none');
-            }
+          if ($(window).scrollTop() > 10) {
+            $header.css('box-shadow', '0 2px 10px rgba(0,0,0,0.1)');
+          } else {
+            $header.css('box-shadow', 'none');
+          }
         });
 
         // Close menu on escape key
         $(document).on('keydown', function (e) {
-            if (e.key === 'Escape') {
-                closeMenu();
-            }
+          if (e.key === 'Escape') {
+            closeMenu();
+          }
         });
-
-    });
-</script>
-</body>
+      });
+    </script>
+  </body>
 </html>

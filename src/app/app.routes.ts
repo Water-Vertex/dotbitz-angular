@@ -81,6 +81,9 @@ import { BatchList } from './components/admin/pages/batches/batch-list/batch-lis
 import { BatchAdd } from './components/admin/pages/batches/batch-add/batch-add';
 import { BatchEdit } from './components/admin/pages/batches/batch-edit/batch-edit';
 import { AppointmentList } from './components/admin/pages/appointment/appointment-list/appointment-list';
+import { AssignAssessmentList } from './components/admin/pages/assign_assessments/assign-assessment-list/assign-assessment-list';
+import { StudentAssessmentList } from './components/student/pages/assign_assessments/assign-assessment-list/assign-assessment-list';
+import { GuardianAssessmentList } from './components/guardian/pages/assign_assessments/assign-assessment-list/assign-assessment-list';
 
 
 export const routes: Routes = [
@@ -119,7 +122,6 @@ export const routes: Routes = [
 
       // Appointment routes
       { path: 'admin/appointment/list', component: AppointmentList },
-     
 
       // Policy routes
       { path: 'admin/policy/list', component: PolicyList },
@@ -161,6 +163,9 @@ export const routes: Routes = [
       { path: 'admin/batches/add', component: BatchAdd },
       { path: 'admin/batches/edit/:id', component: BatchEdit },
 
+      { path: 'admin/assign-assessments/list', component: AssignAssessmentList },
+      // { path: 'admin/assign-assessments/edit/:id', component: AssignAssessmentEdit },
+
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
     ],
   },
@@ -182,6 +187,7 @@ export const routes: Routes = [
       { path: 'guardian/checkout/:id', component: GuardianCheckout },
       { path: 'guardian/my-courses', component: MyCoursesGuardian },
       { path: 'guardian/course/:id', component: GuardianCourseDetails },
+      { path: 'guardian/student-assessments', component: GuardianAssessmentList },
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
@@ -204,6 +210,7 @@ export const routes: Routes = [
       { path: 'student/my-courses', component: MyCourses },
       { path: 'student/assignments/:courseId', component: AssignmentList },
       { path: 'student/course/:courseId', component: MyCourseDetail },
+      { path: 'student/my-assessments', component: StudentAssessmentList },
     ],
   },
 
