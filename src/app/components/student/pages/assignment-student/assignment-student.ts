@@ -14,7 +14,7 @@ export class AssignmentStudent implements OnInit {
   courseId!: number;
   loading = true;
 
-// constructor mein:
+// constructor 
 constructor(
   private route: ActivatedRoute,
   private assignmentService: AssignmentService,

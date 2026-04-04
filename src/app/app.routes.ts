@@ -82,9 +82,9 @@ import { BatchAdd } from './components/admin/pages/batches/batch-add/batch-add';
 import { BatchEdit } from './components/admin/pages/batches/batch-edit/batch-edit';
 import { AppointmentList } from './components/admin/pages/appointment/appointment-list/appointment-list';
 import { AssignAssessmentList } from './components/admin/pages/assign_assessments/assign-assessment-list/assign-assessment-list';
-import { StudentAssessmentList } from './components/student/pages/assign_assessments/assign-assessment-list/assign-assessment-list';
+import { StudentAssessmentList } from './components/student/pages/assessment/assign_assessments/assign-assessment-list/assign-assessment-list';
 import { GuardianAssessmentList } from './components/guardian/pages/assign_assessments/assign-assessment-list/assign-assessment-list';
-
+import { AttemptAssessment } from './components/student/pages/assessment/attempt-assessment/attempt-assessment';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -211,6 +211,7 @@ export const routes: Routes = [
       { path: 'student/assignments/:courseId', component: AssignmentList },
       { path: 'student/course/:courseId', component: MyCourseDetail },
       { path: 'student/my-assessments', component: StudentAssessmentList },
+      { path: 'student/assessment/attempt/:assignAssessmentId', component: AttemptAssessment },
     ],
   },
 

@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil, filter } from 'rxjs';
-import { AssignAssessmentService } from '../../../../../services/assign-assessment.service';
-import { ToastService } from '../../../../../services/toast.service';
+import { AssignAssessmentService } from '../../../../../../services/assign-assessment.service';
+import { ToastService } from '../../../../../../services/toast.service';
 
 @Component({
   selector: 'app-student-assessment-list',
@@ -20,6 +20,9 @@ export class StudentAssessmentList implements OnInit, OnDestroy {
   isLoading: boolean = false;
   studentEmail: string | null = '';
 
+  showStartConfirm = false;
+  selectedAssessmentItem: any = null;
+
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
@@ -29,7 +32,6 @@ export class StudentAssessmentList implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
-    // Watch for route returns to refresh the list automatically
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -43,7 +45,7 @@ export class StudentAssessmentList implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.studentEmail = localStorage.getItem('student_email'); // Optional: For header display
+    this.studentEmail = localStorage.getItem('student_email');
     this.loadMyAssessments();
 
     this.searchSubject
@@ -57,7 +59,6 @@ export class StudentAssessmentList implements OnInit, OnDestroy {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    // Calling the Student-Specific Service Method
     this.assignService
       .getStudentAssessments()
       .pipe(takeUntil(this.destroy$))
@@ -82,8 +83,6 @@ export class StudentAssessmentList implements OnInit, OnDestroy {
       this.filteredAssessments = [...this.assessments];
     } else {
       const lowerTerm = term.toLowerCase();
-
-      // Filtered for student context: Search by Course or Assessment Title
       this.filteredAssessments = this.assessments.filter(
         (item) =>
           item.appointment?.course?.course_name?.toLowerCase().includes(lowerTerm) ||
@@ -100,17 +99,28 @@ export class StudentAssessmentList implements OnInit, OnDestroy {
     this.loadMyAssessments();
   }
 
-  /**
-   * For Student: Navigate to start the test or view results
-   * Adjusted routes to match student side prefix
-   */
+  onStartTest(item: any): void {
+    this.selectedAssessmentItem = item;
+    this.showStartConfirm = true;
+  }
+
+  cancelStart(): void {
+    this.showStartConfirm = false;
+    this.selectedAssessmentItem = null;
+  }
+
+  confirmStart(): void {
+    this.showStartConfirm = false;
+    this.router.navigate(['/student/assessment/attempt', this.selectedAssessmentItem.id]);
+    this.selectedAssessmentItem = null;
+  }
+
   openAssessment(item: any): void {
-    if (item.status === 'Completed' || item.status === 'marked') {
-      // Redirect to results view
+    const attemptStatus = item.attempt?.status;
+    if (attemptStatus === 'completed' || attemptStatus === 'time_up') {
       this.router.navigate(['/student/my-assessments/result', item.id]);
     } else {
-      // Redirect to the actual test taking page
-      this.router.navigate(['/student/my-assessments/start', item.id]);
+      this.router.navigate(['/student/assessment/attempt', item.id]);
     }
   }
 

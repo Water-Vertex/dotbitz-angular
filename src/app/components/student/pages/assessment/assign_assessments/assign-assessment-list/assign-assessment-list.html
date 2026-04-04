@@ -1,0 +1,205 @@
+<div class="max-w-6xl mx-auto px-2 py-8">
+
+  <!-- Start Assessment Confirm Modal -->
+  <div *ngIf="showStartConfirm"
+    class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-exclamation-triangle text-2xl text-[#073a89]"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900">Before You Start</h3>
+      </div>
+      <div class="text-sm text-gray-600 space-y-2 mb-6">
+        <p>⏱️ Once you start, the <strong>timer will begin</strong> and cannot be paused.</p>
+        <p>🚫 You <strong>cannot go back</strong> or attempt this assessment again after submission.</p>
+        <p>⚡ If time runs out, your assessment will be <strong>auto-submitted</strong>.</p>
+        <p class="text-[#073a89] font-medium mt-3">Are you sure you want to start now?</p>
+      </div>
+      <div class="flex gap-3">
+        <button (click)="cancelStart()"
+          class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">
+          Cancel
+        </button>
+        <button (click)="confirmStart()"
+          class="flex-1 px-4 py-3 bg-[#073a89] text-white rounded-xl text-sm font-medium hover:bg-[#052b63]">
+          Yes, Start Test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="bg-white rounded-lg p-5 mb-4 shadow-sm">
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-xl font-bold text-gray-900">My Assessments</h1>
+        <p class="text-gray-600 text-xs mt-0.5">Track your assigned evaluations and results</p>
+      </div>
+      <button
+        (click)="refreshData()"
+        [disabled]="isLoading"
+        class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center space-x-2 text-xs transition-colors font-bold"
+      >
+        <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
+        <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="bg-white rounded-lg p-4 mb-4 shadow-sm">
+    <div class="flex items-center bg-gray-100 rounded-md px-3 py-2">
+      <i class="fas fa-search text-gray-400 mr-2 text-xs"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()"
+        placeholder="Search by course or assessment title..."
+        class="bg-transparent outline-none w-full text-xs text-black font-medium"
+      />
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!isLoading && filteredAssessments.length === 0"
+    class="bg-white rounded-lg p-12 text-center text-black border border-dashed border-gray-200"
+  >
+    <p class="font-bold text-sm">No assessments assigned to you.</p>
+    <p class="text-gray-500 text-xs mt-1">
+      If you were expecting a test, please contact your coordinator.
+    </p>
+  </div>
+
+  <!-- Table -->
+  <div
+    *ngIf="!isLoading && filteredAssessments.length > 0"
+    class="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100"
+  >
+    <div class="overflow-x-auto">
+      <table class="w-full" style="table-layout: fixed;">
+        <colgroup>
+          <col style="width: 22%;" />
+          <col style="width: 24%;" />
+          <col style="width: 11%;" />
+          <col style="width: 9%;" />
+          <col style="width: 12%;" />
+          <col style="width: 13%;" />
+          <col style="width: 9%;" />
+          <col style="width: 12%;" />
+        </colgroup>
+
+        <thead class="bg-gray-100 border-b border-gray-300">
+          <tr>
+            <th class="px-4 py-4 text-left text-[11px] font-bold text-black uppercase tracking-wider">Course</th>
+            <th class="px-4 py-4 text-left text-[11px] font-bold text-black uppercase tracking-wider">Assessment Title</th>
+            <th class="px-4 py-4 text-center text-[11px] font-bold text-black uppercase tracking-wider">Duration (min)</th>
+            <th class="px-4 py-4 text-center text-[11px] font-bold text-black uppercase tracking-wider">Total</th>
+            <th class="px-4 py-4 text-center text-[11px] font-bold text-black uppercase tracking-wider">Obtained Marks</th>
+            <th class="px-4 py-4 text-left text-[11px] font-bold text-black uppercase tracking-wider">Remarks</th>
+            <th class="px-4 py-4 text-center text-[11px] font-bold text-black uppercase tracking-wider">Status</th>
+            <th class="px-4 py-4 text-center text-[11px] font-bold text-black uppercase tracking-wider">Action</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200">
+          <tr
+            *ngFor="let item of filteredAssessments; trackBy: trackById"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            <td class="px-4 py-4 text-[13px] text-black font-bold break-words leading-snug">
+              {{ item.appointment?.course?.course_name }}
+            </td>
+
+            <td class="px-4 py-4 text-[13px] text-black break-words leading-snug">
+              {{ item.assessment?.assessment_title }}
+            </td>
+
+            <td class="px-4 py-4 text-[13px] text-black text-center font-medium">
+              {{ item.time_to_complete }}
+            </td>
+
+            <td class="px-4 py-4 text-[13px] text-black text-center font-medium">
+              {{ item.total_marks }}
+            </td>
+
+            <td class="px-4 py-4 text-[13px] font-bold text-black text-center">
+              {{ item.obtain_marks ?? '---' }}
+            </td>
+
+            <td class="px-4 py-4 text-[13px] text-black break-words leading-snug">
+              {{ item.remarks || '---' }}
+            </td>
+
+            <!-- Status Column -->
+            <td class="px-4 py-4 text-center">
+              <span
+                *ngIf="!item.attempt"
+                class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500"
+              >
+                Not Started
+              </span>
+              <span
+                *ngIf="item.attempt?.status === 'pending'"
+                class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-700"
+              >
+                Pending
+              </span>
+              <span
+                *ngIf="item.attempt?.status === 'completed'"
+                class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700"
+              >
+                Completed
+              </span>
+              <span
+                *ngIf="item.attempt?.status === 'time_up'"
+                class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600"
+              >
+                Time Up
+              </span>
+            </td>
+
+            <!-- Action Column -->
+            <td class="px-4 py-4 text-center">
+
+              <!-- Start Test — Modal trigger -->
+              <button
+                *ngIf="!item.attempt"
+                (click)="onStartTest(item)"
+                class="w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold transition-all shadow-sm"
+              >
+                Start Test
+              </button>
+
+              <!-- Pending -->
+              <button
+                *ngIf="item.attempt?.status === 'pending'"
+                disabled
+                class="w-full py-1.5 bg-gray-200 text-gray-400 rounded text-[11px] font-bold cursor-not-allowed"
+              >
+                Start Test
+              </button>
+
+              <!-- Attempted / Time Up -->
+              <button
+                *ngIf="item.attempt?.status === 'completed' || item.attempt?.status === 'time_up'"
+                disabled
+                class="w-full py-1.5 bg-gray-200 text-gray-400 rounded text-[11px] font-bold cursor-not-allowed"
+              >
+                Attempted
+              </button>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="p-4 bg-gray-50 text-[13px] text-black border-t border-gray-200 font-medium">
+      Total Assigned Assessments:
+      <span class="font-bold text-blue-700">{{ filteredAssessments.length }}</span>
+    </div>
+  </div>
+
+</div>

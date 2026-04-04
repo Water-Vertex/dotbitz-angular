@@ -81,19 +81,15 @@ export class AssignAssessmentService {
     );
   }
 
-  // guardian side
+ // --- GUARDIAN SIDE METHOD ---
   getGuardianStudentAssessments(studentId?: number): Observable<any> {
-    // Agar studentId hai to query parameter add karega
+    
     const url = studentId ? `${this.guardianApiUrl}?student_id=${studentId}` : this.guardianApiUrl;
 
     return this.http
       .get<any>(url, { headers: this.getHeaders() })
       .pipe(catchError(this.handleError('fetching guardian student assessments')));
   }
-
-  /*/**
-   * Common Error Handler to keep code clean
-   */
   private handleError(action: string) {
     return (error: any) => {
       console.error(`Error ${action}:`, error);
