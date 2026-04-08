@@ -48,7 +48,7 @@ export class AppointmentList implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe((e: any) => {
-        if (e.url.includes('/admin/appointments')) this.loadAppointments();
+        if (e.url.includes('/admin/assessment/queries')) this.loadAppointments();
       });
   }
 
@@ -72,14 +72,17 @@ export class AppointmentList implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.appointmentService
-      .getAppointments()
+      .getAssessmentQueries()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: any) => {
+          // Data extraction
           const data = res.data || res.appointments || res || [];
-          // !! ensures truthy/falsy values from API are converted to boolean
+
           this.appointments = data.map((a: any) => ({
             ...a,
+            // AGAR a.name khali hai, to a.user.name check karega
+            name: a.name || a.user?.name || 'Unknown Student',
             isAssessmentAssigned: !!a.already_assigned,
           }));
 
@@ -94,7 +97,6 @@ export class AppointmentList implements OnInit, OnDestroy {
         },
       });
   }
-
   checkAndOpenModal(appointment: any): void {
     if (appointment.isAssessmentAssigned) {
       this.toast.error('Warning', 'Assessment already assigned for this appointment');
@@ -117,6 +119,7 @@ export class AppointmentList implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: any) => {
+          // API se milne wale array ko store karna
           this.assessmentTitles = data.map((a: any) => ({
             ...a,
             disabled: !!a.already_assigned,
@@ -132,12 +135,47 @@ export class AppointmentList implements OnInit, OnDestroy {
       });
   }
 
+  // ✅ LOGIC UPDATED: Dropdown select hone par marks auto-fill honge
+  // onAssessmentSelect(event: any): void {
+  //   const id = +event.target.value;
+  //   // Pura assessment object filter karke nikalen
+  //   this.selectedAssessment = this.assessmentTitles.find((a) => a.id === id) || null;
+
+  //   if (this.selectedAssessment) {
+  //     // Form mein total_marks aur time auto-fill kar den
+  //     this.assignForm.patchValue({
+  //       assessment_id: id,
+  //       total_marks: this.selectedAssessment.total_marks,
+  //       time_to_complete: this.selectedAssessment.time_to_complete,
+  //     });
+  //   } else {
+  //     this.assignForm.patchValue({ assessment_id: null, total_marks: '', time_to_complete: '' });
+  //   }
+  //   this.cdr.detectChanges();
+  // }
   onAssessmentSelect(event: any): void {
     const id = +event.target.value;
     this.selectedAssessment = this.assessmentTitles.find((a) => a.id === id) || null;
-    this.assignForm.patchValue({ assessment_id: id });
+
+    if (this.selectedAssessment) {
+      this.assignForm.patchValue({
+        assessment_id: id,
+        total_marks: this.selectedAssessment.total_marks ?? '', // ✅ DB se aa raha hai
+        time_to_complete: this.selectedAssessment.time_to_complete ?? '', // optional
+      });
+    } else {
+      this.assignForm.patchValue({
+        assessment_id: null,
+        total_marks: '',
+        time_to_complete: '',
+      });
+    }
+    this.cdr.detectChanges();
   }
 
+
+
+  
   submitAssign(): void {
     if (this.assignForm.invalid) {
       this.assignForm.markAllAsTouched();
@@ -156,13 +194,10 @@ export class AppointmentList implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          // Update BOTH the selected object and the main list locally
           this.selectedAppointment.isAssessmentAssigned = true;
-
           const index = this.appointments.findIndex((a) => a.id === this.selectedAppointment.id);
           if (index !== -1) {
             this.appointments[index].isAssessmentAssigned = true;
-            // Update allAppointments as well for search consistency
             const allIndex = this.allAppointments.findIndex(
               (a) => a.id === this.selectedAppointment.id,
             );
@@ -182,7 +217,6 @@ export class AppointmentList implements OnInit, OnDestroy {
       });
   }
 
-  // Search logic
   onSearch(): void {
     const s = this.searchTerm.trim().toLowerCase();
     this.appointments = !s

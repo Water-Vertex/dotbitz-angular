@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class AppointmentService {
-  private apiUrl = environment.AdminApiUrl + '/appointments';
+  private apiUrl = environment.AdminApiUrl + '/assessments';
 
   constructor(private http: HttpClient) {}
 
@@ -61,15 +61,14 @@ export class AppointmentService {
       );
   }
 
-  // ✅ Get all Appointments
-  getAppointments(): Observable<any> {
+  getAssessmentQueries(): Observable<any> {
     return this.http
-      .get<any>(this.apiUrl, {
+      .get<any>(this.apiUrl + '/queries', {
         headers: this.getHeaders(),
       })
       .pipe(
         catchError((error) => {
-          console.error('Error fetching appointments:', error);
+          console.error('Error fetching assessments:', error);
           return throwError(() => error);
         }),
       );
@@ -78,7 +77,7 @@ export class AppointmentService {
   // Appointment ki course ke assessments fetch karo
   getAssessmentsForAppointment(appointmentId: number): Observable<any> {
     return this.http
-      .get<any>(`${this.apiUrl}/${appointmentId}/assessments`, {
+      .get<any>(`${this.apiUrl}/${appointmentId}`, {
         headers: this.getHeaders(),
       })
       .pipe(
@@ -93,7 +92,7 @@ export class AppointmentService {
   // Assign assessment save karo
   assignAssessment(data: any): Observable<any> {
     return this.http
-      .post<any>(`${this.apiUrl.replace('/appointments', '/assign-assessments')}`, data, {
+      .post<any>(`${this.apiUrl.replace('/assessments', '/assign-assessments')}`, data, {
         headers: this.getHeaders(),
       })
       .pipe(

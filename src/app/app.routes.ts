@@ -85,6 +85,10 @@ import { AssignAssessmentList } from './components/admin/pages/assign_assessment
 import { StudentAssessmentList } from './components/student/pages/assessment/assign_assessments/assign-assessment-list/assign-assessment-list';
 import { GuardianAssessmentList } from './components/guardian/pages/assign_assessments/assign-assessment-list/assign-assessment-list';
 import { AttemptAssessment } from './components/student/pages/assessment/attempt-assessment/attempt-assessment';
+import { AttemptedAssessment } from './components/admin/pages/assessment/attempted-assessment/attempted-assessment';
+import { CheckAssessment } from './components/admin/pages/assessment/check-assessment/check-assessment';
+import { GradedAssessmentDetails } from './components/admin/pages/assessment/graded-assessment-details/graded-assessment-details';
+import { RecheckAssessment } from './components/admin/pages/assessment/recheck-assessment/recheck-assessment';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -163,8 +167,14 @@ export const routes: Routes = [
       { path: 'admin/batches/add', component: BatchAdd },
       { path: 'admin/batches/edit/:id', component: BatchEdit },
 
+      // Assessments routes
       { path: 'admin/assign-assessments/list', component: AssignAssessmentList },
-      // { path: 'admin/assign-assessments/edit/:id', component: AssignAssessmentEdit },
+      { path: 'admin/assessment-attempts/list', component: AttemptedAssessment },
+      { path: 'admin/assessment/check/:id', component: CheckAssessment },
+      { path: 'admin/assessment/graded-details/:id',component: GradedAssessmentDetails},
+
+{ path: 'admin/assessment/recheck/:id', component: RecheckAssessment },
+
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
     ],

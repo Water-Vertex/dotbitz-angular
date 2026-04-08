@@ -10,6 +10,7 @@ import { environment } from '../../environments/environment';
 export class AssessmentAttemptService {
   private studentApiUrl = environment.StudentApiUrl + '/my-assessments';
   private studentBaseUrl = environment.StudentApiUrl;
+  private adminApiUrl = environment.AdminApiUrl + '/assessment-attempts';
 
   constructor(private http: HttpClient) {}
 
@@ -54,6 +55,39 @@ export class AssessmentAttemptService {
 
   myAttempts(): Observable<any> {
     return this.http.get(`${this.studentBaseUrl}/assessment-my-attempts`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+
+
+
+  // ==========================
+  //  ADMIN SIDE METHODS
+  // ==========================
+
+  // ✅ Get all attempts
+  getAllAttempts(): Observable<any> {
+    return this.http.get(`${this.adminApiUrl}`, {
+      headers: this.getHeaders(),
+    }).pipe(
+      catchError((error) => {
+        console.error('Error fetching attempts:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ✅ Get single attempt detail
+  getAttemptById(id: number): Observable<any> {
+    return this.http.get(`${this.adminApiUrl}/${id}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  // ✅ Grade attempt
+  gradeAttempt(id: number, payload: any): Observable<any> {
+    return this.http.put(`${this.adminApiUrl}/${id}/grade`, payload, {
       headers: this.getHeaders(),
     });
   }

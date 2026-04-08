@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AssignAssessmentEdit } from './assign-assessment-edit';
+import { RecheckAssessment } from './recheck-assessment';
 
-describe('AssignAssessmentEdit', () => {
-  let component: AssignAssessmentEdit;
-  let fixture: ComponentFixture<AssignAssessmentEdit>;
+describe('RecheckAssessment', () => {
+  let component: RecheckAssessment;
+  let fixture: ComponentFixture<RecheckAssessment>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AssignAssessmentEdit]
+      imports: [RecheckAssessment]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AssignAssessmentEdit);
+    fixture = TestBed.createComponent(RecheckAssessment);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

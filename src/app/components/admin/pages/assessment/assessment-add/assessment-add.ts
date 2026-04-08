@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -22,37 +22,45 @@ export class AssessmentAdd implements OnInit {
     private assessmentService: AssessmentService,
     private toast: ToastService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
+  /**
+   * Initialize the component, build the form, and load initial data.
+   */
   ngOnInit(): void {
     this.buildForm();
     this.loadCourses();
-    this.addQuestion(); // default one question
+    this.addQuestion();
   }
 
-  // ================= FORM =================
-  buildForm() {
+  /**
+   * Configure the main Reactive Form structure.
+   */
+  private buildForm(): void {
     this.form = this.fb.group({
       course_id: [null, Validators.required],
-
-      // ✅ ADDED FIELD
       assessment_title: ['', Validators.required],
-
       questions: this.fb.array([]),
     });
   }
 
-  // ================= QUESTIONS ARRAY =================
+  // ================= QUESTIONS ARRAY MANAGEMENT =================
+
   get questions(): FormArray {
     return this.form.get('questions') as FormArray;
   }
 
-  addQuestion() {
+  /**
+   * Append a new question group to the questions FormArray.
+   */
+  addQuestion(): void {
     this.questions.push(
       this.fb.group({
         assessment_type: ['mcqs', Validators.required],
         question: ['', [Validators.required, Validators.minLength(5)]],
         answer: ['', Validators.required],
+        marks: [0, [Validators.required, Validators.min(0)]],
         is_single: [true],
         options: this.fb.array([
           this.fb.control('', Validators.required),
@@ -62,25 +70,48 @@ export class AssessmentAdd implements OnInit {
     );
   }
 
-  removeQuestion(index: number) {
+  /**
+   * Remove a question from the array by its index.
+   */
+  removeQuestion(index: number): void {
     this.questions.removeAt(index);
   }
 
-  // ================= OPTIONS =================
+  /**
+   * Calculate the sum of marks for all questions in the form.
+   */
+  get totalMarks(): number {
+    return this.questions.controls
+      .map((q) => q.get('marks')?.value || 0)
+      .reduce((acc, curr) => acc + curr, 0);
+  }
+
+  // ================= OPTIONS MANAGEMENT =================
+
   getOptions(qIndex: number): FormArray {
     return this.questions.at(qIndex).get('options') as FormArray;
   }
 
-  addOption(qIndex: number) {
+  /**
+   * Add a new option control to a specific question.
+   */
+  addOption(qIndex: number): void {
     this.getOptions(qIndex).push(this.fb.control('', Validators.required));
   }
 
-  removeOption(qIndex: number, optIndex: number) {
+  /**
+   * Remove an option from a specific question by its index.
+   */
+  removeOption(qIndex: number, optIndex: number): void {
     this.getOptions(qIndex).removeAt(optIndex);
   }
 
-  // ================= TYPE CHANGE =================
-  onTypeChange(qIndex: number) {
+  // ================= HELPERS & API CALLS =================
+
+  /**
+   * Handle UI logic when switching between MCQ and Q/A types.
+   */
+  onTypeChange(qIndex: number): void {
     const question = this.questions.at(qIndex);
     const type = question.get('assessment_type')?.value;
     const options = question.get('options') as FormArray;
@@ -89,29 +120,30 @@ export class AssessmentAdd implements OnInit {
       while (options.length !== 0) {
         options.removeAt(0);
       }
-
       options.clearValidators();
-      options.updateValueAndValidity();
     } else {
       if (options.length === 0) {
         options.push(this.fb.control('', Validators.required));
         options.push(this.fb.control('', Validators.required));
       }
-
       options.setValidators(Validators.required);
-      options.updateValueAndValidity();
     }
+    options.updateValueAndValidity();
   }
 
-  // ================= COURSES =================
-  loadCourses() {
+  /**
+   * Retrieve the list of available courses from the database.
+   */
+  loadCourses(): void {
     this.assessmentService.getCourses().subscribe((courses) => {
       this.courses = courses;
     });
   }
 
-  // ================= SUBMIT =================
-  submit() {
+  /**
+   * Validate form and submit the assessment payload to the server.
+   */
+  submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.toast.error('Validation Error', 'Please fill all required fields');
@@ -119,10 +151,7 @@ export class AssessmentAdd implements OnInit {
     }
 
     this.isSubmitting = true;
-
-    const payload = this.form.value;
-
-    this.assessmentService.createAssessment(payload).subscribe({
+    this.assessmentService.createAssessment(this.form.value).subscribe({
       next: () => {
         this.toast.success('Success', 'Assessment added successfully');
         this.router.navigate(['/admin/assessments/list']);
@@ -130,11 +159,15 @@ export class AssessmentAdd implements OnInit {
       error: () => {
         this.toast.error('Error', 'Failed to save assessment');
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       },
     });
   }
 
-  cancel() {
+  /**
+   * Cancel the operation and return to the list view.
+   */
+  cancel(): void {
     this.router.navigate(['/admin/assessments/list']);
   }
 }

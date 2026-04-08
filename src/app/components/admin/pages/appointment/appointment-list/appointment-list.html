@@ -104,10 +104,13 @@
           <label class="block text-sm font-semibold text-blue-900 mb-2">
             Select Assessment <span class="text-red-500">*</span>
           </label>
-          <select (change)="onAssessmentSelect($event)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"> 
-            <option value="">-- Select Assessment Title --</option> 
-            <option *ngFor="let a of assessmentTitles" [value]="a.id"> {{ a.assessment_title }} </option>
-          </select>
+         <select (change)="onAssessmentSelect($event)" 
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"> 
+  <option value="">-- Select Assessment Title --</option> 
+  <option *ngFor="let a of assessmentTitles" [value]="a.id"> 
+    {{ a.assessment_title }} 
+  </option>
+</select>
         </div>
 
         <div class="pt-2">
