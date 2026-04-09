@@ -223,52 +223,58 @@ export class StudentEdit implements OnInit {
 
 loadStudentData(id: number): void {
   this.isLoading = true;
+
   this.studentService.getStudentById(id).subscribe({
-    next: (data) => {
-      // Main form fields
+    next: (res: any) => {
+
+      const student = res.data; // ✅ correct access
+
       this.registrationForm.patchValue({
-        firstName: data.first_name,
-        lastName: data.last_name,
-        userName: data.user_name,
-        email: data.email,
-        phone: data.phone,
-        dateOfBirth: data.date_of_birth ? this.formatDateForInput(data.date_of_birth) : '',
-        gender: data.gender,
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        zipcode: data.zipcode,
-        guardianFirstName: data.guardian?.first_name,
-        guardianLastName: data.guardian?.last_name,
-        guardianEmail: data.guardian?.email,
-        guardianPhone: data.guardian?.phone,
-        guardianRelationship: data.guardian?.relationship
+        firstName: student.first_name || '',
+        lastName: student.last_name || '',
+        userName: student.user_name || '',
+        email: student.email || '',
+        phone: student.phone || '',
+        dateOfBirth: student.date_of_birth
+          ? this.formatDateForInput(student.date_of_birth)
+          : '',
+        gender: student.gender || '',
+        address: student.address || '',
+        city: student.city || '',
+        state: student.state || '',
+        zipcode: student.zipcode || '',
+        guardianFirstName: student.guardian?.first_name || '',
+        guardianLastName: student.guardian?.last_name || '',
+        guardianEmail: student.guardian?.email || '',
+        guardianPhone: student.guardian?.phone || '',
+        guardianRelationship: student.guardian?.relationship || ''
       });
 
-      // Calculate age & guardian visibility
       this.calculateAge();
 
-      // Clear existing studentDetails
+      // Clear old education
       this.studentDetails.clear();
 
-      // Add FormGroups for each student detail
-      if (data.student_details?.length) {
-        data.student_details.forEach((edu: any) => this.addStudentDetail({
-          institution: edu.institution,
-          degree: edu.degree,
-          fieldOfStudy: edu.field_of_study,
-          startDate: this.formatDateForInput(edu.start_date),
-          endDate: edu.end_date ? this.formatDateForInput(edu.end_date) : '',
-          isCurrent: edu.is_current,
-          description: edu.description
-        }));
+      // Add education
+      if (student.student_details?.length) {
+        student.student_details.forEach((edu: any) => {
+          this.addStudentDetail({
+            institution: edu.institution || '',
+            degree: edu.degree || '',
+            fieldOfStudy: edu.field_of_study || '',
+            startDate: this.formatDateForInput(edu.start_date),
+            endDate: edu.end_date ? this.formatDateForInput(edu.end_date) : '',
+            isCurrent: edu.is_current || false,
+            description: edu.description || ''
+          });
+        });
       }
 
       this.isLoading = false;
     },
+
     error: (err) => {
-      console.error('Error loading student:', err);
-      this.apiError = err?.error?.message || err?.message || 'Failed to load student';
+      console.error(err);
       this.isLoading = false;
     }
   });

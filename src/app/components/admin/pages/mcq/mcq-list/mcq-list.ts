@@ -1,4 +1,124 @@
+// import { Component, OnInit } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { RouterModule } from '@angular/router';
+// import { FormsModule } from '@angular/forms';
+// import { McqService } from '../../../../../services/mcq.service';
+// import { Mcq } from '../../../../../models/mcq.model';
 
+// @Component({
+//   selector: 'app-mcqs-list',
+//   standalone: true,
+//   imports: [CommonModule, RouterModule, FormsModule],
+//   templateUrl: './mcqs-list.html',
+//   styleUrls: ['./mcqs-list.css']
+// })
+// export class McqsList implements OnInit {
+//   mcqs: Mcq[] = [];
+//   filteredMcqs: Mcq[] = [];
+//   searchText: string = '';
+//   loading = false;
+
+//   constructor(private mcqService: McqService) {}
+
+//   ngOnInit() {
+//     console.log('🚀 MCQ List Component Initialized');
+//     this.loadMcqs();
+//   }
+
+//   loadMcqs() {
+//     console.log('📥 Loading MCQs from API...');
+//     this.loading = true;
+    
+//     // Set timeout to prevent infinite loading
+//     const timeoutId = setTimeout(() => {
+//       if (this.loading) {
+//         console.error('⏱️ Request timed out after 30 seconds');
+//         this.loading = false;
+//         alert('Request timed out. Please check your server.');
+//       }
+//     }, 30000); // 30 seconds timeout
+    
+//     this.mcqService.getAllMcqs().subscribe({
+//       next: (data) => {
+//         clearTimeout(timeoutId);
+//         console.log('✅ MCQs received:', data);
+//         console.log('📊 Total MCQs:', data.length);
+        
+//         if (Array.isArray(data)) {
+//           this.mcqs = data;
+//           this.filteredMcqs = data;
+//           console.log('✅ MCQs assigned to component');
+//         } else {
+//           console.error('❌ Response is not an array:', data);
+//           this.mcqs = [];
+//           this.filteredMcqs = [];
+//         }
+        
+//         this.loading = false;
+//       },
+//       error: (err) => {
+//         clearTimeout(timeoutId);
+//         console.error('❌ Error loading MCQs:', err);
+//         console.error('Error status:', err.status);
+//         console.error('Error message:', err.message);
+//         console.error('Full error:', err);
+        
+//         this.loading = false;
+//         this.mcqs = [];
+//         this.filteredMcqs = [];
+        
+//         // Better error message
+//         let errorMsg = 'Failed to load MCQs. ';
+//         if (err.status === 0) {
+//           errorMsg += 'Cannot connect to server. Is Laravel running on port 8000?';
+//         } else if (err.status === 401) {
+//           errorMsg += 'Unauthorized. Please login again.';
+//         } else if (err.status === 500) {
+//           errorMsg += 'Server error. Check Laravel logs.';
+//         } else {
+//           errorMsg += `Error: ${err.message}`;
+//         }
+        
+//         alert(errorMsg);
+//       },
+//       complete: () => {
+//         console.log('🏁 MCQ loading completed');
+//       }
+//     });
+//   }
+
+//   onSearch() {
+//     if (!this.searchText.trim()) {
+//       this.filteredMcqs = this.mcqs;
+//       return;
+//     }
+
+//     const search = this.searchText.toLowerCase();
+//     this.filteredMcqs = this.mcqs.filter(mcq => 
+//       mcq.question.toLowerCase().includes(search) ||
+//       mcq.course?.course_name?.toLowerCase().includes(search) ||
+//       mcq.status.toLowerCase().includes(search)
+//     );
+    
+//     console.log(`🔍 Search results: ${this.filteredMcqs.length} / ${this.mcqs.length}`);
+//   }
+
+//   deleteMcq(id: number) {
+//     if (confirm('Are you sure you want to delete this MCQ?')) {
+//       this.mcqService.deleteMcq(id).subscribe({
+//         next: () => {
+//           console.log('✅ MCQ deleted successfully');
+//           this.loadMcqs();
+//           alert('MCQ deleted successfully!');
+//         },
+//         error: (err) => {
+//           console.error('❌ Error deleting MCQ:', err);
+//           alert('Failed to delete MCQ');
+//         }
+//       });
+//     }
+//   }
+// }
 
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -8,12 +128,13 @@ import { McqService } from '../../../../../services/mcq.service';
 import { Mcq } from '../../../../../models/mcq.model';
 import { Course } from '../../../../../models/course.model';
 
+
 @Component({
-  selector: 'app-mcq-list',
+  selector: 'app-mcqs-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './mcq-list.html',
-
+  
   styleUrls: ['./mcq-list.css']
 })
 export class McqsList implements OnInit {
@@ -41,9 +162,13 @@ export class McqsList implements OnInit {
   this.mcqService.getAllCourses().subscribe({
     next: (data) => {
       this.courses = data;
+      this.cdr.detectChanges();  
+
     },
     error: () => {
       this.courses = [];
+      this.cdr.detectChanges();   
+
     }
   });
 }
@@ -151,6 +276,6 @@ export class McqsList implements OnInit {
   }
 
   trackById(index: number, item: Mcq): number {
-    return item.msq_id!;
+    return item.id!;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule} from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule} from '@angular/forms';
@@ -9,7 +9,7 @@ import { Mcq } from '../../../../../models/mcq.model';
 import { forkJoin } from 'rxjs';
 
 @Component({
-  selector: 'app-mcq-add',
+  selector: 'app-mcqs-add',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule,RouterModule],
   templateUrl: './mcq-add.html',
@@ -20,10 +20,12 @@ export class McqsAdd implements OnInit {
   courses: Course[] = [];
   loading = false;
   coursesLoading = false;
+  answerErrors: boolean[] = [];
 
   constructor(
     private fb: FormBuilder,
     private mcqService: McqService,
+    private cdr: ChangeDetectorRef,
     private router: Router
   ) {}
 
@@ -38,16 +40,28 @@ export class McqsAdd implements OnInit {
       mcqs: this.fb.array([this.createSingleMcq()])
     });
   }
-
   createSingleMcq(): FormGroup {
-    return this.fb.group({
-      question: ['', [Validators.required, Validators.minLength(10)]],
-      issingle: [true, Validators.required],
-      options: this.fb.array([this.createOption(), this.createOption()]),
-      correctAnswers: this.fb.array([]),
-      status: ['active', Validators.required]
-    });
-  }
+  return this.fb.group({
+    question: ['', [Validators.required, Validators.minLength(10)]],
+    answer: ['', Validators.required],
+    issingle: [true, Validators.required],
+    options: this.fb.array([this.createOption(), this.createOption()]),
+    marks:    ['', Validators.required],
+    correctAnswers: this.fb.array([]),
+    status: ['active', Validators.required]
+  });
+}
+
+
+  // createSingleMcq(): FormGroup {
+  //   return this.fb.group({
+  //     question: ['', [Validators.required, Validators.minLength(10)]],
+  //     issingle: [true, Validators.required],
+  //     options: this.fb.array([this.createOption(), this.createOption()]),
+  //     correctAnswers: this.fb.array([]),
+  //     status: ['active', Validators.required]
+  //   });
+  // }
 
   createOption(): FormGroup {
     return this.fb.group({
@@ -123,14 +137,34 @@ export class McqsAdd implements OnInit {
       next: (data) => {
         this.courses = data.filter(c => c.status === 'active');
         this.coursesLoading = false;
+        this.cdr.detectChanges();
+
       },
       error: (err) => {
         console.error('Error loading courses:', err);
         this.coursesLoading = false;
+        this.cdr.detectChanges();
         alert('Failed to load courses. Please try again.');
       }
     });
   }
+  // Answer validation — options mein se koi match kare
+validateAnswers(): boolean {
+  let valid = true;
+  this.answerErrors = [];
+
+  this.mcqs.controls.forEach((mcqControl, i) => {
+    const mcqValue = mcqControl.value;
+    const opts = mcqValue.options.map((o: any) => o.value.trim().toLowerCase());
+    const answers = mcqValue.answer.split(',').map((a: string) => a.trim().toLowerCase());
+
+    const allMatch = answers.every((ans: string) => opts.includes(ans));
+    this.answerErrors[i] = !allMatch;
+    if (!allMatch) valid = false;
+  });
+
+  return valid;
+}
 
   // onSubmit() {
   //   if (this.mcqForm.invalid) {
@@ -189,6 +223,10 @@ onSubmit() {
     alert('Please fill all required fields correctly');
     return;
   }
+  if (!this.validateAnswers()) {
+    alert('Please fix the answer errors — answers must match one of the options.');
+    return;
+  }
 
   const courseId = Number(this.mcqForm.value.course_id);
 
@@ -196,29 +234,33 @@ onSubmit() {
     const mcqValue = mcqControl.value;
     const opts = mcqValue.options.map((o: any) => o.value);
 
-    let answer: string;
-    if (mcqValue.issingle) {
-      if (mcqValue.correctAnswers.length === 0) {
-        throw alert('Please select a correct answer for each MCQ');
-      }
-      answer = opts[mcqValue.correctAnswers[0]];
-    } else {
-      if (mcqValue.correctAnswers.length === 0) {
-        throw alert('Please select at least one correct answer for each MCQ');
-      }
-      answer = mcqValue.correctAnswers
-        .sort((a: number, b: number) => a - b)
-        .map((i: number) => opts[i])
-        .join(',');
-    }
+    // let answer: string;
+    // if (mcqValue.issingle) {
+    //   if (mcqValue.correctAnswers.length === 0) {
+    //     throw alert('Please select a correct answer for each MCQ');
+    //   }
+    //   answer = opts[mcqValue.correctAnswers[0]];
+    // } else {
+    //   if (mcqValue.correctAnswers.length === 0) {
+    //     throw alert('Please select at least one correct answer for each MCQ');
+    //   }
+    //   answer = mcqValue.correctAnswers
+    //     .sort((a: number, b: number) => a - b)
+    //     .map((i: number) => opts[i])
+    //     .join(',');
+    // }
+
+
 
     const mcqData: Mcq = {
       question: mcqValue.question,
       options: opts,
-      answer: answer,
+      answer: mcqValue.answer,
       course_id: courseId,
       status: mcqValue.status,
-      issingle: mcqValue.issingle
+      issingle: mcqValue.issingle,
+      marks:     mcqValue.marks,
+
     };
 
     return this.mcqService.createMcq(mcqData);
@@ -229,7 +271,7 @@ onSubmit() {
   forkJoin(observables).subscribe({
     next: () => {
       alert('All MCQs created successfully!');
-      this.router.navigate(['/admin/mcqs']);
+      this.router.navigate(['/admin/mcqs/list']);
     },
     error: (err: any) => {
       console.error('Error creating MCQs:', err);

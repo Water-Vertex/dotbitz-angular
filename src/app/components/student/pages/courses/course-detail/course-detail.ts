@@ -37,7 +37,7 @@ export class StudentCourseDetail implements OnInit {
     this.course = null;
 
     // USE THE STUDENT API CALL HERE
-    this.courseService.getStudentCourseDetail(+this.id).subscribe({
+    this.courseService.getCourseDetail(+this.id).subscribe({
       next: (res: any) => {
         this.course = res.data;
         this.loading = false;
@@ -58,5 +58,5 @@ export class StudentCourseDetail implements OnInit {
       ? this.course.benefits.split(',')
       : this.course.benefits;
   }
-  
+
 }

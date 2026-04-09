@@ -164,7 +164,6 @@ export class GuardianCheckout implements OnInit {
     });
   }
 
-
   onBatchChange(): void {
     const batch = this.batches.find((b) => b.id == this.selectedBatchId);
 

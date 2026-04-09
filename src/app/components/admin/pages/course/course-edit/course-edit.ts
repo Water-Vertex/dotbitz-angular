@@ -24,7 +24,6 @@ export class CourseEdit implements OnInit {
   isSubmitting: boolean = false;
   isLoading: boolean = true;
   courseId!: number;
-  instructors: Instructor[] = [];
   selectedFile: File | null = null;
   isEditMode: boolean = true;
 
@@ -58,7 +57,6 @@ export class CourseEdit implements OnInit {
   ngOnInit(): void {
     this.courseId = Number(this.route.snapshot.paramMap.get('id'));
     this.initForm();
-    this.loadInstructors();
     this.loadCourse();
   }
 
@@ -76,7 +74,6 @@ export class CourseEdit implements OnInit {
       end_date: [''],
       status: ['active', Validators.required],
       is_featured: [false],
-      instructor_id: ['', Validators.required],
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
@@ -101,15 +98,7 @@ export class CourseEdit implements OnInit {
     }
   }
 
-  loadInstructors() {
-    this.courseService.getInstructors().subscribe({
-      next: (res) => {
-        this.instructors = res.data;
-        this.cdr.detectChanges();
-      },
-      error: () => this.toast.error('Error', 'Failed to load instructors'),
-    });
-  }
+ 
 
   loadCourse(): void {
     this.courseService.getCourse(this.courseId).subscribe({

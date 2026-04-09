@@ -64,7 +64,7 @@ export class StudentCheckout implements OnInit {
     this.loading = true;
     forkJoin({
       student: this.studentService.getProfile(),
-      course: this.courseService.getStudentCourseDetail(courseId)
+      course: this.courseService.getCourseDetail(courseId)
     }).subscribe({
       next: ({ student, course }) => {
         this.student = student;
@@ -98,66 +98,33 @@ export class StudentCheckout implements OnInit {
     });
   }
 
-//   onBatchChange(): void {
-//   this.batchFull = false;
-//   if (!this.batchId) {
-//     this.batchSchedules = [];
-//     this.selectedBatch = null;
-//     return;
-//   }
-//   this.selectedBatch = this.batches.find(b => b.id == this.batchId);
+  onBatchChange(): void {
+    this.batchFull = false;
+    this.batchSchedules = [];
 
-//   // Batch full check
-//   if (this.selectedBatch?.students !== null) {
-//     this.orderService.getBatchEnrolledCount(this.batchId!).subscribe({
-//       next: (res: any) => {
-//         if (res.enrolled_count >= this.selectedBatch.students) {
-//           this.batchFull = true;
-//         }
-//       }
-//     });
-//   }
+    if (!this.batchId) {
+      this.selectedBatch = null;
+      return;
+    }
 
-//   this.loadingSchedules = true;
-//   this.orderService.getSchedulesByBatch(this.batchId!).subscribe({
-//     next: (res: any) => {
-//       this.batchSchedules = res.data;
-//       this.loadingSchedules = false;
-//       this.cdr.detectChanges();
-//     },
-//     error: () => {
-//       this.loadingSchedules = false;
-//     }
-//   });
-// }
+    this.selectedBatch = this.batches.find(b => b.id == this.batchId);
+    this.batchFull = this.selectedBatch?.is_full ?? false;
 
-onBatchChange(): void {
-  this.batchFull = false;
-  this.batchSchedules = [];
+    this.loadingSchedules = true;
+    this.orderService.getSchedulesByBatch(this.batchId!).subscribe({
+      next: (res: any) => {
+        this.batchSchedules = res.data;
+        this.loadingSchedules = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loadingSchedules = false;
+      }
+    });
 
-  if (!this.batchId) {
-    this.selectedBatch = null;
-    return;
+    this.cdr.detectChanges();
   }
 
-  this.selectedBatch = this.batches.find(b => b.id == this.batchId);
-
-  this.batchFull = this.selectedBatch?.is_full ?? false;
-
-  this.loadingSchedules = true;
-  this.orderService.getSchedulesByBatch(this.batchId!).subscribe({
-    next: (res: any) => {
-      this.batchSchedules = res.data;
-      this.loadingSchedules = false;
-      this.cdr.detectChanges();
-    },
-    error: () => {
-      this.loadingSchedules = false;
-    }
-  });
-
-  this.cdr.detectChanges();
-}
   // -----------------------------------------------
   // Amounts
   // -----------------------------------------------
@@ -226,6 +193,7 @@ onBatchChange(): void {
   // Submit Order
   // -----------------------------------------------
   proceedToPay(): void {
+    // Validation checks
     if (!this.batchId) {
       alert('Please select a batch.');
       return;
@@ -239,40 +207,60 @@ onBatchChange(): void {
       return;
     }
     if (this.batchFull) {
-  alert('This batch is full. Please select another batch.');
-  return;
-}
+      alert('This batch is full. Please select another batch.');
+      return;
+    }
 
     this.submitting = true;
 
-    const payload = {
-      course_id:        this.course.id,
-      batch_id:         this.batchId,        
-      sub_amount:       this.subAmount,
-      total_amount:     this.totalAmount,
-      discount:         this.discountAmount,
-      coupon_code:      this.couponApplied ? this.couponCode : null,
-      payment_method:   this.paymentMethod,
-      note:             this.note,
-      status:           this.status,
-      is_financed:      this.isFinanced,
-      finance_id:       this.isFinanced ? this.financeId : null,
+    const payload: any = {
+      course_id: this.course.id,
+      batch_id: this.batchId,
+      sub_amount: this.subAmount,
+      total_amount: this.totalAmount,
+      discount: this.discountAmount,
+      coupon_code: this.couponApplied ? this.couponCode : null,
+      payment_method: this.paymentMethod,
+      note: this.note,
+      status: this.status,
+      is_financed: this.isFinanced,
+      finance_id: this.isFinanced ? this.financeId : null,
       finance_provider: this.isFinanced ? this.financeProvider : null,
     };
+
+    // Add success and cancel URLs for Stripe payment
+    if (this.paymentMethod === 'stripe') {
+      payload.success_url = `${window.location.origin}/student/payment/confirmation`;
+      payload.cancel_url = `${window.location.origin}/student/payment/cancellation`;
+    }
 
     this.orderService.placeOrder(payload).subscribe({
       next: (res: any) => {
         this.submitting = false;
         if (res.success) {
-          alert('Order placed successfully! Order #' + res.data.order_number);
-          this.router.navigate(['/student/courses/list']);
+          // Check if this is a Stripe payment that requires redirect
+          if (res.data?.redirect && res.data?.checkout_url) {
+            // Redirect to Stripe Checkout page
+            window.location.href = res.data.checkout_url;
+          } else {
+            // Non-Stripe payment (cash, bank transfer, etc.)
+            alert('Order placed successfully! Order #' + res.data.order_number);
+            this.router.navigate(['/student/courses/list']);
+          }
+        } else {
+          alert(res.message || 'Failed to place order. Please try again.');
         }
       },
       error: (err) => {
         this.submitting = false;
         if (err.status === 409) {
           alert('You are already enrolled in this course!');
+        } else if (err.status === 422) {
+          // Handle validation errors
+          const errorMessage = err.error?.message || 'Invalid data. Please check your input.';
+          alert(errorMessage);
         } else {
+          console.error('Order placement error:', err);
           alert('Failed to place order. Please try again.');
         }
       }

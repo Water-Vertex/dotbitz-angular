@@ -15,10 +15,8 @@ export class GuardianCourseDetails implements OnInit {
   id!: string;
   loading = false;
 
-  // Set default tab to 'instructor'
   activeTab: 'instructor' | 'curriculum' | 'assignment' | 'quiz' = 'instructor';
 
-  // Assignments tab
   assignments: any[] = [];
   assignmentsLoading = false;
   assignmentsLoaded = false;
@@ -31,32 +29,26 @@ export class GuardianCourseDetails implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1. Check last visited tab from localStorage
-    const lastTab = localStorage.getItem('guardianTab');
-    this.activeTab = lastTab ? (lastTab as any) : 'instructor';
+    // always start on instructor
+    this.activeTab = 'instructor';
 
-    // 2. Listen for ID changes
     this.route.paramMap.subscribe((params) => {
       const newId = params.get('id');
       if (newId) {
         this.id = newId;
         this.getCourseDetail();
 
-        // 3. If URL query param is assignment, load assignments
         const currentTab = this.route.snapshot.queryParams['tab'];
         if (currentTab === 'assignment') {
           this.activeTab = 'assignment';
-          this.loadAssignments();
         }
       }
     });
 
-    // 4. Listen for tab changes in query params
     this.route.queryParams.subscribe((params) => {
       const newTab = params['tab'];
       if (newTab) {
         this.activeTab = newTab;
-        localStorage.setItem('guardianTab', newTab); // remember last tab
         if (this.activeTab === 'assignment' && this.id && !this.assignmentsLoaded) {
           this.loadAssignments();
         }
@@ -67,10 +59,15 @@ export class GuardianCourseDetails implements OnInit {
 
   getCourseDetail() {
     this.loading = true;
+    this.assignmentsLoaded = false; // ← reset on course change
+    this.assignments = []; // ← clear old assignments
     this.courseService.getGuardianCourseDetail(+this.id).subscribe({
       next: (res: any) => {
         this.course = res.data;
         this.loading = false;
+        if (this.activeTab === 'assignment') {
+          this.loadAssignments(); // ← load if already on assignment tab
+        }
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -93,8 +90,8 @@ export class GuardianCourseDetails implements OnInit {
     this.assignmentsLoading = true;
     this.assignmentService.getAssignmentsGuardian(+this.id).subscribe({
       next: (res: any) => {
-        console.log('Assignments raw response:', res); // debug
-        this.assignments = res.assignments || [];
+        console.log('Assignments raw response:', res);
+        this.assignments = res.data || [];
         this.assignmentsLoaded = true;
         this.assignmentsLoading = false;
         this.cdr.detectChanges();

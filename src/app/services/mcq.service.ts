@@ -55,21 +55,20 @@ export class McqService {
   /**
    * Create new MCQ (Admin route - needs auth)
    */
-  createMcq(mcq: Mcq): Observable<Mcq> {
-    return this.http
-      .post<Mcq>(`${this.adminApiUrl}/add`, mcq, { headers: this.getHeaders() })
-      .pipe(
-        map(response => {
-          console.log('MCQ Created:', response);
-          return response;
-        }),
-        catchError(err => {
-          console.error('Error creating MCQ:', err);
-          return throwError(() => err);
-        })
-      );
-  }
-
+ createMcq(mcq: Mcq): Observable<Mcq> {
+  return this.http
+    .post<Mcq>(`${this.adminApiUrl}`, mcq, { headers: this.getHeaders() })
+    .pipe(
+      map(response => {
+        console.log('MCQ Created:', response);
+        return response;
+      }),
+      catchError(err => {
+        console.error('Error creating MCQ:', err);
+        return throwError(() => err);
+      })
+    );
+}
   createMultipleMcqs(mcqs: Mcq[]): Observable<any> {
     return this.http.post(`${this.apiUrl}/bulk`, mcqs);
   }
@@ -135,4 +134,48 @@ export class McqService {
         catchError(err => throwError(() => err))
       );
   }
+  // Instructor MCQ methods
+getInstructorMcqs(): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/mcqs`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorMcq(id: number): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/mcqs/${id}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+createInstructorMcq(mcq: any): Observable<any> {
+  return this.http.post(
+    `${environment.InstructorApiUrl}/mcqs`,
+    mcq,
+    { headers: this.getHeaders() }
+  );
+}
+
+updateInstructorMcq(id: number, mcq: any): Observable<any> {
+  return this.http.put(
+    `${environment.InstructorApiUrl}/mcqs/${id}`,
+    mcq,
+    { headers: this.getHeaders() }
+  );
+}
+
+deleteInstructorMcq(id: number): Observable<any> {
+  return this.http.delete(
+    `${environment.InstructorApiUrl}/mcqs/${id}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorCourses(): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/courses`,
+    { headers: this.getHeaders() }
+  );
+}
 }

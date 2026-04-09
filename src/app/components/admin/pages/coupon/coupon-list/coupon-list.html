@@ -32,7 +32,7 @@
         <p class="text-gray-500 mt-2">Loading coupons...</p>
     </div>
 
-    
+
     <!-- Main Content -->
     <div *ngIf="!isLoading">
         <!-- No Data -->
@@ -87,7 +87,7 @@
                         <div>
                             <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Value</h4>
                             <p class="text-sm text-gray-900">
-                                {{coupon.discount_type === 'percentage' ? coupon.discount_value + '%' : '$' + coupon.discount_value}}
+                                {{coupon.discount_type === 'percentage' ? coupon.discount_amount + '%' : '$' + coupon.discount_amount}}
                             </p>
                         </div>
                         <div>
@@ -121,7 +121,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{{coupon.code}}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">{{coupon.discount_type}}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{coupon.discount_type === 'percentage' ? coupon.discount_value + '%' : '$' + coupon.discount_value}}
+                                {{coupon.discount_type === 'percentage' ? coupon.discount_amount + '%' : '$' + coupon.discount_amount}}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{coupon.used_count}} / {{coupon.usage_limit ?? '∞'}}

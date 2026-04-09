@@ -51,6 +51,7 @@ export class ClassScheduleEdit implements OnInit {
 
     this.scheduleForm = this.fb.group({
       course_id: ['', Validators.required],
+      batch_id: ['', Validators.required], // ✅ ADD THIS
       start_time: ['', Validators.required],
       end_time: ['', Validators.required],
       meeting_link: ['', [Validators.required, Validators.pattern('https?://.+')]],
@@ -149,35 +150,28 @@ export class ClassScheduleEdit implements OnInit {
   }
 
   private initializeFormWithSchedule(schedule: any): void {
-    // Handle single schedule (not array)
-    const scheduleData = Array.isArray(schedule) ? schedule[0] : schedule;
+  const scheduleData = Array.isArray(schedule) ? schedule[0] : schedule;
 
-    if (!scheduleData) {
-      this.toastService.error('Error', 'No schedule data found');
-      this.router.navigate(['/instructor/class-schedule/list']);
-      return;
-    }
+  this.selectedDay = scheduleData.day || '';
+  this.selectedDayLabel = this.getDayLabel(this.selectedDay);
 
-    // Set the day value and label
-    this.selectedDay = scheduleData.day || '';
-    this.selectedDayLabel = this.getDayLabel(this.selectedDay);
+  this.scheduleForm.patchValue({
+    course_id: Number(scheduleData.course_id),
+    batch_id: Number(scheduleData.batch_id),
+    start_time: this.formatDateForInput(scheduleData.start_time),
+    end_time: scheduleData.end_time
+      ? this.formatDateForInput(scheduleData.end_time)
+      : '',
+    meeting_link: scheduleData.meeting_link || '',
+    status: scheduleData.status || 'scheduled',
+    note: scheduleData.note || ''
+  });
 
-    // Patch form values
-    this.scheduleForm.patchValue({
-      course_id: scheduleData.course_id,
-      batch_id: scheduleData.batch_id,
-      start_time: this.formatDateForInput(scheduleData.start_time),
-      end_time: this.formatDateForInput(scheduleData.end_time),
-      meeting_link: scheduleData.meeting_link,
-      status: scheduleData.status,
-      note: scheduleData.note || ''
-    });
-
-    // Load batches for the course
-    if (scheduleData.course_id) {
-
-    }
+  // ✅ VERY IMPORTANT
+  if (scheduleData.course_id) {
+    this.loadBatches(Number(scheduleData.course_id));
   }
+}
 
   getDayLabel(dayValue: string): string {
     if (!dayValue) return '';

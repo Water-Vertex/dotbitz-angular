@@ -38,6 +38,10 @@ export interface Assignment {
   created_at?: string;
   updated_at?: string;
   course?: Course; // relation
+
+  description?: string;
+  start_date?: string;
+  active_status?: string | number;
 }
 
 // ===== Payload (Create / Update) =====

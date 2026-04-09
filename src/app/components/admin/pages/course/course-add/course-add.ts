@@ -48,7 +48,6 @@ export class CourseAdd implements OnInit {
   constructor(
     private fb: FormBuilder,
     private courseService: CourseService,
-    private instructorService: InstructorService,
     private toast: ToastService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -67,32 +66,15 @@ export class CourseAdd implements OnInit {
       end_date: [''],
       status: ['active'],
       is_featured: [false],
-      instructor_id: ['', Validators.required],
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
     });
 
-    this.loadInstructors();
   }
 
-  loadInstructors() {
-    this.instructorService.getInstructors().subscribe({
-      next: (res) => {
-        this.instructors = Array.isArray(res.data) ? res.data : [];
-        this.isLoadingInstructors = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.toast.error('Error', 'Failed to load instructors');
-        this.isLoadingInstructors = false;
-      },
-    });
-  }
 
-  get instructor_id() {
-    return this.courseForm.get('instructor_id');
-  }
+  
   get course_name() {
     return this.courseForm.get('course_name');
   }

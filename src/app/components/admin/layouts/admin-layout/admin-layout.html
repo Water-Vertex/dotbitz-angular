@@ -219,6 +219,13 @@
                                <i class="fas fa-book-open mr-3 w-5 text-center"></i>
                                Course Curriculum
                             </a>
+
+                            <a routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-plus mr-3 w-5 text-center"></i>
+                               Assigned Courses to Instructor
+
+                            </a>
                         </div>
                     </div>
 
@@ -246,18 +253,74 @@
                         MCQs
 
                     </a>
+                    <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-clipboard-question mr-3 w-5 text-content"></i>
+                      Quizzes
+                    </a>
+                    <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-tasks mr-3 w-5 text-content"></i>
+                      Attempted Quizzes
+                    </a>
                     <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                       <i class="fas fa-file mr-3 w-5 text-content"></i>
                         Policies
 
                     </a>
-                    <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assessments
+                    <div class="courses-menu-item" data-has-submenu="true">
+                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
+                            <div class="flex items-center">
 
-                    </a>
+                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
+                               Manage Assessments
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
+                        </button>
+
+                        <!-- Submenu -->
+                        <div class="submenu mt-1 space-y-1 hidden">
+                          <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                                Assessments Queries
+
+                            </a>
+                           <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                                Assessments List
+
+                            </a>
+                            <a routerLink="/admin/assigned-assessments/list" data-nav-item data-href="/admin/assigned-assessments/list"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                                Assigned Assessments
+
+                            </a>
+                            <a
+                              routerLink="/admin/assessment-attempts/list"
+                              data-nav-item
+                              data-href="/admin/assessment-attempts/list"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900"
+                            >
+                              <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
+                              Attempted Assessments
+                            </a>
+
+                        </div>
+                        <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
+                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                          <i class="fas fa-users mr-3 w-5 text-content"></i>
+                          Batches
+                        </a>
+                        <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
+                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                          <i class="fas fa-calendar-alt mr-3 w-5 text-content"></i>
+                          Class Schedule
+                        </a>
+                    </div>
                     <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                       <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
@@ -372,6 +435,12 @@
                                <i class="fas fa-book-open mr-3 w-5 text-center"></i>
                                Course Curriculum
                             </a>
+                            <a routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-plus mr-3 w-5 text-center"></i>
+                               Assigned Courses to Instructor
+
+                            </a>
                         </div>
                         <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
@@ -397,18 +466,75 @@
                         MCQs
 
                     </a>
+                    <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-clipboard-question mr-3 w-5 text-content"></i>
+                      Quizzes
+                    </a>
+                    <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-tasks mr-3 w-5 text-content"></i>
+                      Attempted Quizzes
+                    </a>
                     <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                       <i class="fas fa-file mr-3 w-5 text-content"></i>
                         Policies
 
                     </a>
-                    <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assessments
+                    <div class="courses-menu-item" data-has-submenu="true">
+                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
+                            <div class="flex items-center">
 
-                    </a>
+                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
+                               Manage Assessments
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
+                        </button>
+
+                        <!-- Submenu -->
+                        <div class="submenu mt-1 space-y-1 hidden">
+                          <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                                Assessments Queries
+
+                            </a>
+                           <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                                Assessments List
+
+                            </a>
+                            <a routerLink="/admin/assigned-assessments/list" data-nav-item data-href="/admin/assigned-assessments/list"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                                Assigned Assessments
+
+                            </a>
+                            <a
+                              routerLink="/admin/assessment-attempts/list"
+                              data-nav-item
+                              data-href="/admin/assessment-attempts/list"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900"
+                            >
+                              <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
+                              Attempted Assessments
+                            </a>
+
+                        </div>
+                        <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
+                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                          <i class="fas fa-users mr-3 w-5 text-content"></i>
+                          Batches
+                        </a>
+                        <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
+                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                          <i class="fas fa-calendar-alt mr-3 w-5 text-content"></i>
+                          Class Schedule
+                        </a>
+                    </div>
+
                     <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                       <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>

@@ -5,12 +5,16 @@ import { Router, RouterLink } from '@angular/router';
 import { AssignmentService } from '../../../../../services/assignment.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Course } from '../../../../../models/assignment.model';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-assignment-add',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CKEditorModule],
   templateUrl: './assignment-add.html',
+  styleUrls: ['./assignment-add.css'],
+ 
 })
 export class AssignmentAdd implements OnInit {
   assignmentForm: FormGroup;
@@ -19,19 +23,44 @@ export class AssignmentAdd implements OnInit {
   courses: Course[] = [];
   selectedFile: File | null = null;
 
+  // CKEditor
+  public Editor: any = ClassicEditor;
+  public editorConfig = {
+    toolbar: [
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      'strikethrough',
+      '|',
+      'link',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'blockQuote',
+      '|',
+      'undo',
+      'redo',
+    ],
+  };
+
   constructor(
     private fb: FormBuilder,
     private assignmentService: AssignmentService,
     private toastService: ToastService,
-    public router: Router, // <-- make public for template access
+    public router: Router,
     private cdr: ChangeDetectorRef,
   ) {
     this.assignmentForm = this.fb.group({
       course_id: ['', Validators.required],
       title: ['', Validators.required],
-      assignment_file: [''], // UI placeholder for file name
+      description: [''],
+      assignment_file: [''],
       due_date: ['', Validators.required],
       total_marks: [''],
+      start_date: ['', Validators.required], // ✅ added
+      active_status: ['active', Validators.required],
     });
   }
 
@@ -76,7 +105,6 @@ export class AssignmentAdd implements OnInit {
     }
 
     this.isSubmitting = true;
-
     const formData = new FormData();
     Object.keys(this.assignmentForm.value).forEach((key) => {
       if (key !== 'assignment_file') {
@@ -87,7 +115,6 @@ export class AssignmentAdd implements OnInit {
       }
     });
 
-    // Append file if selected
     if (this.selectedFile) {
       formData.append('assignment_file', this.selectedFile, this.selectedFile.name);
     }
@@ -110,17 +137,14 @@ export class AssignmentAdd implements OnInit {
     });
   }
 
-  /** ---------- CANCEL ---------- */
   cancel(): void {
     this.router.navigate(['/admin/assignment/list']);
   }
 
-  /** ---------- HELPER TO MARK FORM CONTROLS AS TOUCHED ---------- */
   markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach((control) => control.markAsTouched());
   }
 
-  /** ---------- GETTER FOR FORM CONTROLS ---------- */
   get f() {
     return this.assignmentForm.controls;
   }

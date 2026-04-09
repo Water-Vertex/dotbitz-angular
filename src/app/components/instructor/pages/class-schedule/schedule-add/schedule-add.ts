@@ -53,6 +53,7 @@ export class ClassScheduleAdd implements OnInit {
   ) {
     this.scheduleForm = this.fb.group({
       course_id: ['', Validators.required],
+      batch_id: ['', Validators.required],
       start_time: ['', Validators.required],
       end_time: ['', Validators.required],
       meeting_link: ['', [Validators.required, Validators.pattern('https?://.+')]],

@@ -12,7 +12,7 @@ export class CourseService {
   // private apiUrl = 'http://localhost:8000/api/courses';
 
   private apiUrl = environment.AdminApiUrl + '/courses';
-  private StudentApiUrl = environment.StudentApiUrl + '/courses';
+  private StudentApiUrl = environment.StudentApiUrl + '/my-courses';
   private guardianApiUrl = environment.GuardianApiUrl + '/courses';
   private instructorApiUrl = environment.InstructorApiUrl + '/courses';
 
@@ -100,6 +100,12 @@ export class CourseService {
   /**
    * Fetches a single course detail for the Student.
    */
+
+  getCourseDetail(id: number): Observable<CourseApiResponse> {
+    return this.http
+      .get<CourseApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
   getStudentCourseDetail(id: number): Observable<CourseApiResponse> {
     return this.http
       .get<CourseApiResponse>(`${this.StudentApiUrl}/${id}`, { headers: this.getHeaders() })
@@ -143,5 +149,34 @@ export class CourseService {
       .get<CourseApiResponse>(`${this.instructorApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
+  getQuizzesByBatch(batchId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quizzes/batch/${batchId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+checkQuizAttempt(quizId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quiz-attempts/check/${quizId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+startQuiz(quizId: number): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz-attempts/start/${quizId}`,
+    {},
+    { headers: this.getHeaders() }
+  );
+}
+
+submitQuiz(attemptId: number, payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz-attempts/submit/${attemptId}`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
 
 }

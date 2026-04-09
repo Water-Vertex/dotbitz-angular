@@ -1,6 +1,14 @@
 // student-registration.component.ts
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StudentService } from '../../../../../services/student.service';
@@ -12,7 +20,7 @@ import { ToastService } from '../../../../../services/toast.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './student-add.html',
-  styleUrls: ['./student-add.css']
+  styleUrls: ['./student-add.css'],
 })
 export class StudentAdd implements OnInit {
   registrationForm: FormGroup;
@@ -26,21 +34,21 @@ export class StudentAdd implements OnInit {
     private fb: FormBuilder,
     private studentService: StudentService,
     private router: Router,
-    private toastService: ToastService // Inject toast service
+    private toastService: ToastService, // Inject toast service
   ) {
     this.registrationForm = this.createForm();
   }
 
   ngOnInit(): void {
     // Listen for email changes to check availability
-    this.registrationForm.get('email')?.valueChanges.subscribe(email => {
+    this.registrationForm.get('email')?.valueChanges.subscribe((email) => {
       if (email && this.registrationForm.get('email')?.valid) {
         this.checkEmailAvailability(email);
       }
     });
 
     // Listen for username changes to check availability
-    this.registrationForm.get('userName')?.valueChanges.subscribe(username => {
+    this.registrationForm.get('userName')?.valueChanges.subscribe((username) => {
       if (username && this.registrationForm.get('userName')?.valid) {
         this.checkUsernameAvailability(username);
       }
@@ -57,35 +65,38 @@ export class StudentAdd implements OnInit {
   }
 
   createForm(): FormGroup {
-    return this.fb.group({
-      // Step 1: Personal Information
-      firstName: ['', [Validators.required, Validators.maxLength(100)]],
-      lastName: ['', [Validators.required, Validators.maxLength(100)]],
-      userName: ['', [Validators.required, Validators.maxLength(100)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]],
-      phone: ['', [Validators.required, Validators.maxLength(20)]],
-      dateOfBirth: ['', Validators.required],
-      gender: ['', Validators.required],
-      address: ['', Validators.maxLength(255)],
-      city: ['', Validators.maxLength(255)],
-      state: ['', Validators.maxLength(255)],
-      zipcode: ['', Validators.maxLength(255)],
+    return this.fb.group(
+      {
+        // Step 1: Personal Information
+        firstName: ['', [Validators.required, Validators.maxLength(100)]],
+        lastName: ['', [Validators.required, Validators.maxLength(100)]],
+        userName: ['', [Validators.required, Validators.maxLength(100)]],
+        email: ['', [Validators.required, Validators.email, Validators.maxLength(50)]],
+        phone: ['', [Validators.required, Validators.maxLength(20)]],
+        dateOfBirth: ['', Validators.required],
+        gender: ['', Validators.required],
+        address: ['', Validators.maxLength(255)],
+        city: ['', Validators.maxLength(255)],
+        state: ['', Validators.maxLength(255)],
+        zipcode: ['', Validators.maxLength(255)],
 
-      // Step 2: Student Details (FormArray)
-      studentDetails: this.fb.array([this.createStudentForm()]),
+        // Step 2: Student Details (FormArray)
+        studentDetails: this.fb.array([this.createStudentForm()]),
 
-      // Step 3: Guardian & Security
-      guardianFirstName: ['', Validators.maxLength(100)],
-      guardianLastName: ['', Validators.maxLength(100)],
-      guardianEmail: ['', [Validators.email, Validators.maxLength(50)]],
-      guardianPhone: ['', Validators.maxLength(20)],
-      guardianRelationship: [''],
+        // Step 3: Guardian & Security
+        guardianFirstName: ['', Validators.maxLength(100)],
+        guardianLastName: ['', Validators.maxLength(100)],
+        guardianEmail: ['', [Validators.email, Validators.maxLength(50)]],
+        guardianPhone: ['', Validators.maxLength(20)],
+        guardianRelationship: [''],
 
-      // Security
-      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(255)]],
-      confirmPassword: ['', Validators.required],
-      terms: [false, Validators.requiredTrue]
-    }, { validators: this.passwordMatchValidator });
+        // Security
+        password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(255)]],
+        confirmPassword: ['', Validators.required],
+        terms: [false, Validators.requiredTrue],
+      },
+      { validators: this.passwordMatchValidator },
+    );
   }
 
   createStudentForm(): FormGroup {
@@ -96,7 +107,7 @@ export class StudentAdd implements OnInit {
       startDate: ['', Validators.required],
       endDate: [''],
       isCurrent: [false],
-      description: ['']
+      description: [''],
     });
   }
 
@@ -131,10 +142,10 @@ export class StudentAdd implements OnInit {
         'guardianLastName',
         'guardianEmail',
         'guardianPhone',
-        'guardianRelationship'
+        'guardianRelationship',
       ];
 
-      guardianControls.forEach(controlName => {
+      guardianControls.forEach((controlName) => {
         const control = this.registrationForm.get(controlName);
         if (control) {
           if (this.showGuardianInfo) {
@@ -172,37 +183,46 @@ export class StudentAdd implements OnInit {
   }
 
   isStepValid(step: number): boolean {
-    switch(step) {
+    switch (step) {
       case 1:
         const step1Controls = [
-          'firstName', 'lastName', 'userName',
-          'email', 'phone', 'dateOfBirth', 'gender'
+          'firstName',
+          'lastName',
+          'userName',
+          'email',
+          'phone',
+          'dateOfBirth',
+          'gender',
         ];
-        return step1Controls.every(control =>
-          this.registrationForm.get(control)?.valid
-        );
+        return step1Controls.every((control) => this.registrationForm.get(control)?.valid);
 
       case 2:
-        return this.studentDetails.valid &&
-               this.studentDetails.controls.length > 0;
+        return this.studentDetails.valid && this.studentDetails.controls.length > 0;
 
       case 3:
         if (this.showGuardianInfo) {
           const guardianControls = [
-            'guardianFirstName', 'guardianLastName',
-            'guardianEmail', 'guardianPhone', 'guardianRelationship'
+            'guardianFirstName',
+            'guardianLastName',
+            'guardianEmail',
+            'guardianPhone',
+            'guardianRelationship',
           ];
-          const guardianValid = guardianControls.every(control =>
-            this.registrationForm.get(control)?.valid
+          const guardianValid = guardianControls.every(
+            (control) => this.registrationForm.get(control)?.valid,
           );
-          return guardianValid &&
-                 this.registrationForm.get('password')?.valid &&
-                 this.registrationForm.get('confirmPassword')?.valid &&
-                 this.registrationForm.get('terms')?.value;
+          return (
+            guardianValid &&
+            this.registrationForm.get('password')?.valid &&
+            this.registrationForm.get('confirmPassword')?.valid &&
+            this.registrationForm.get('terms')?.value
+          );
         } else {
-          return this.registrationForm.get('password')?.valid &&
-                 this.registrationForm.get('confirmPassword')?.valid &&
-                 this.registrationForm.get('terms')?.value;
+          return (
+            this.registrationForm.get('password')?.valid &&
+            this.registrationForm.get('confirmPassword')?.valid &&
+            this.registrationForm.get('terms')?.value
+          );
         }
 
       default:
@@ -231,7 +251,7 @@ export class StudentAdd implements OnInit {
       },
       error: (error) => {
         console.error('Error checking email:', error);
-      }
+      },
     });
   }
 
@@ -244,7 +264,7 @@ export class StudentAdd implements OnInit {
       },
       error: (error) => {
         console.error('Error checking username:', error);
-      }
+      },
     });
   }
 
@@ -272,7 +292,7 @@ export class StudentAdd implements OnInit {
         state: this.registrationForm.value.state,
         city: this.registrationForm.value.city,
         zipcode: this.registrationForm.value.zipcode,
-        password: this.registrationForm.value.password
+        password: this.registrationForm.value.password,
       },
       student_details: this.registrationForm.value.studentDetails.map((std_dt: any) => ({
         institution: std_dt.institution,
@@ -281,15 +301,17 @@ export class StudentAdd implements OnInit {
         start_date: std_dt.startDate,
         end_date: std_dt.isCurrent ? null : std_dt.endDate,
         is_current: std_dt.isCurrent,
-        description: std_dt.description
+        description: std_dt.description,
       })),
-      guardian: this.showGuardianInfo ? {
-        first_name: this.registrationForm.value.guardianFirstName,
-        last_name: this.registrationForm.value.guardianLastName,
-        email: this.registrationForm.value.guardianEmail,
-        phone: this.registrationForm.value.guardianPhone,
-        relationship: this.registrationForm.value.guardianRelationship
-      } : undefined
+      guardian: this.showGuardianInfo
+        ? {
+            first_name: this.registrationForm.value.guardianFirstName,
+            last_name: this.registrationForm.value.guardianLastName,
+            email: this.registrationForm.value.guardianEmail,
+            phone: this.registrationForm.value.guardianPhone,
+            relationship: this.registrationForm.value.guardianRelationship,
+          }
+        : undefined,
     };
 
     // Call API
@@ -298,8 +320,11 @@ export class StudentAdd implements OnInit {
         this.isLoading = false;
         // Show success message and redirect
         // Show success toast
-        this.toastService.success('Registration Successful', 'Your account has been created successfully! Please login with your credentials.');
-         // Redirect to login after a short delay
+        this.toastService.success(
+          'Registration Successful',
+          'Your account has been created successfully! Please login with your credentials.',
+        );
+        // Redirect to login after a short delay
         setTimeout(() => {
           this.router.navigate(['/admin/student/list']);
         }, 2000);
@@ -310,7 +335,7 @@ export class StudentAdd implements OnInit {
         this.toastService.error('Registration Failed', error.error?.message);
 
         console.error('Registration error:', error);
-      }
+      },
     });
   }
 }

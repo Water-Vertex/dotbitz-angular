@@ -99,35 +99,7 @@
           </div>
         </div>
 
-        <!-- Instructor -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Instructor <span class="text-red-500">*</span></label
-          >
-          <select
-            formControlName="instructor_id"
-            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-          >
-            <option value="">Select Instructor</option>
-            <option *ngFor="let inst of instructors" [value]="inst.id">
-              {{ inst.first_name }} {{ inst.last_name }}
-            </option>
-          </select>
-          <div
-            *ngIf="
-              courseForm.get('instructor_id')?.invalid && courseForm.get('instructor_id')?.touched
-            "
-            class="mt-2 text-xs text-red-600 space-y-1"
-          >
-            <div
-              *ngIf="courseForm.get('instructor_id')?.errors?.['required']"
-              class="flex items-center space-x-1"
-            >
-              <i class="fas fa-exclamation-circle text-xs"></i>
-              <span>Instructor is required</span>
-            </div>
-          </div>
-        </div>
+        
 
         <!-- Course Level -->
         <div>

@@ -16,13 +16,14 @@ export interface Course {
     thumbnail_image?: string;
 }
 export interface Mcq {
-  msq_id?: number;
+  id?: number;
   question: string;
   answer: string;
   options: string[];
   course_id: number;
   status: 'active' | 'inactive';
   issingle: boolean;
+  marks: string,
   course?: Course; // Relation - full course object
   created_at?: string;
   updated_at?: string;
