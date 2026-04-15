@@ -179,4 +179,23 @@ submitQuiz(attemptId: number, payload: any): Observable<any> {
   );
 }
 
+  getBatchesByCourse(courseId: number): Observable<any> {
+    return this.http.get(
+      `${environment.AdminApiUrl}/batches/course/${courseId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+  resumeQuizCheck(quizId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quiz-attempts/resume/${quizId}`,
+    { headers: this.getHeaders() }
+  );
+}
+saveQuizProgress(attemptId: number, answers: any[]): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz-attempts/save-progress/${attemptId}`,
+    { answers },
+    { headers: this.getHeaders() }
+  );
+}
 }

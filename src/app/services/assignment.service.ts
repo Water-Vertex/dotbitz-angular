@@ -144,24 +144,22 @@ export class AssignmentService {
     );
   }
 
-
-
   /** =========================
- *  Student - Get Assignments by Course
- *  ========================= */
-getAssignmentsByCourse(courseId: number): Observable<any> {
-  return this.http
-    .get<any>(`${this.StudentApiUrl}/course/${courseId}`, {
-      headers: this.getHeaders()
-    })
-    .pipe(
-      catchError((err) => {
-        console.error('Error fetching assignments by course:', err);
-        return throwError(() => err);
-      }),
-    );
-}
- /** =========================
+   *  Student - Get Assignments by Course
+   *  ========================= */
+  getAssignmentsByCourse(courseId: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.StudentApiUrl}/course/${courseId}`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        catchError((err) => {
+          console.error('Error fetching assignments by course:', err);
+          return throwError(() => err);
+        }),
+      );
+  }
+  /** =========================
    * Guardian: Get Assignments by Course
    * ========================= */
   getAssignmentsGuardian(courseId: number): Observable<AssignmentApiResponse> {
@@ -186,4 +184,85 @@ getAssignmentsByCourse(courseId: number): Observable<any> {
         }),
       );
   }
+
+  checkAssignmentAttempt(assignmentId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/assignment-attempts/check/${assignmentId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+submitAssignment(assignmentId: number, formData: FormData): Observable<any> {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return this.http.post(
+    `${environment.StudentApiUrl}/assignment-attempts/submit/${assignmentId}`,
+    formData,
+    { headers }
+  );
+}
+// Instructor methods
+getInstructorAssignments(): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/assignments`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorAssignment(id: number): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/assignments/${id}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+createInstructorAssignment(payload: FormData): Observable<any> {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignments`,
+    payload,
+    { headers }
+  );
+}
+
+updateInstructorAssignment(id: number, payload: FormData): Observable<any> {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignments/${id}`,
+    payload,
+    { headers }
+  );
+}
+
+deleteInstructorAssignment(id: number): Observable<any> {
+  return this.http.delete(
+    `${environment.InstructorApiUrl}/assignments/${id}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorCourses(): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/courses`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorBatchesByCourse(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/courses/${courseId}/batches`,
+    { headers: this.getHeaders() }
+  );
+}
 }

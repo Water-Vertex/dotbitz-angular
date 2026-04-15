@@ -57,6 +57,47 @@
             [alt]="course.course_name"
           />
         </div>
+
+        <!-- Submit Assignment Modal -->
+<div *ngIf="showSubmitModal"
+  class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+    <div class="text-center mb-4">
+      <div class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i class="fas fa-upload text-2xl text-[#073a89]"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900">Submit Assignment</h3>
+      <p class="text-sm text-gray-500 mt-1">Upload your completed assignment file</p>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Select File <span class="text-red-500">*</span>
+      </label>
+      <input type="file" (change)="onSubmitFileSelected($event)"
+        accept=".pdf,.doc,.docx,.ppt,.pptx"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50">
+      <p class="text-xs text-gray-500 mt-1">Allowed: PDF, DOC, DOCX, PPT (Max: 10MB)</p>
+      <p *ngIf="submitFileError" class="text-xs text-red-600 mt-1">{{ submitFileError }}</p>
+      <p *ngIf="selectedSubmitFile" class="text-xs text-green-600 mt-1">
+        <i class="fas fa-check-circle mr-1"></i>
+        {{ selectedSubmitFile.name }}
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <button (click)="cancelSubmitModal()" [disabled]="submittingAssignment"
+        class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 disabled:opacity-50">
+        Cancel
+      </button>
+      <button (click)="confirmSubmitAssignment()" [disabled]="submittingAssignment"
+        class="flex-1 px-4 py-3 bg-[#073a89] text-white rounded-xl text-sm font-medium hover:bg-[#052b63] disabled:opacity-60 flex items-center justify-center gap-2">
+        <span *ngIf="submittingAssignment" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+        {{ submittingAssignment ? 'Submitting...' : 'Submit' }}
+      </button>
+    </div>
+  </div>
+</div>
 <!-- Start Quiz Confirm Modal -->
 <div *ngIf="showStartConfirm"
   class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -159,60 +200,101 @@
             </ng-template>
           </div>
 
-          <!-- Assignment Tab -->
-          <div *ngIf="activeTab === 'assignment'">
-            <div *ngIf="assignmentsLoading" class="flex justify-center py-12">
-              <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
-            </div>
-            <div *ngIf="!assignmentsLoading && assignments.length === 0" class="text-center py-12 text-gray-400">
-              <i class="fas fa-tasks text-4xl mb-3"></i>
-              <p class="text-sm">No assignments for this course yet.</p>
-            </div>
-            <div *ngIf="!assignmentsLoading && assignments.length > 0" class="space-y-3">
-              <div *ngFor="let assignment of assignments; let i = index"
-                class="p-5 bg-gray-50 rounded-lg border border-gray-200">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                      {{ i + 1 }}
-                    </div>
-                    <div>
-                      <h4 class="font-medium text-gray-900">{{ assignment.title }}</h4>
-                      <div class="flex items-center gap-3 mt-1 text-xs">
-                        <span [class]="isOverdue(assignment.due_date) ? 'text-red-600' : 'text-gray-500'">
-                          <i class="far fa-calendar mr-1"></i>
-                          Due {{ assignment.due_date | date: 'MMM d, yyyy' }}
-                        </span>
-                        <span *ngIf="isOverdue(assignment.due_date)"
-                              class="text-red-600 bg-red-100 px-1.5 py-0.5 rounded text-[10px] font-medium">
-                          Overdue
-                        </span>
-                        <span class="text-gray-500">
-                          <i class="far fa-star mr-1"></i>
-                          {{ assignment.total_marks }} marks
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="shrink-0 ml-13">
-                    <a *ngIf="assignment.assignment_file"
-                      [href]="'http://localhost:8000/assets/assignments/' + assignment.assignment_file"
-                      target="_blank"
-                      download
-                      class="inline-flex items-center gap-1 text-sm font-medium text-[#073a89] hover:text-[#052b63]">
-                      <i class="fas fa-download"></i>
-                      Download
-                    </a>
-                    <span *ngIf="!assignment.assignment_file"
-                      class="text-sm text-gray-400">
-                      <i class="fas fa-file-slash mr-1"></i>
-                      No file
-                    </span>
-                  </div>
-                </div>
-              </div>
+       <!-- Assignment Tab -->
+<div *ngIf="activeTab === 'assignment'">
+  <div *ngIf="assignmentsLoading" class="flex justify-center py-12">
+    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+  </div>
+
+  <div *ngIf="!assignmentsLoading && assignments.length === 0" class="text-center py-12 text-gray-400">
+    <i class="fas fa-tasks text-4xl mb-3"></i>
+    <p class="text-sm">No assignments for this course yet.</p>
+  </div>
+
+  <div *ngIf="!assignmentsLoading && assignments.length > 0" class="space-y-4">
+    <div *ngFor="let assignment of assignments; let i = index"
+      class="p-5 bg-gray-50 rounded-lg border border-gray-200">
+
+      <div class="flex flex-col gap-4">
+
+        <!-- Assignment Info -->
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
+            {{ i + 1 }}
+          </div>
+          <div class="flex-1">
+            <h4 class="font-medium text-gray-900">{{ assignment.title }}</h4>
+            <div class="flex flex-wrap items-center gap-3 mt-1 text-xs">
+              <span [class]="isOverdue(assignment.due_date) ? 'text-red-600' : 'text-gray-500'">
+                <i class="far fa-calendar mr-1"></i>
+                Due {{ assignment.due_date | date: 'MMM d, yyyy' }}
+              </span>
+              <span *ngIf="isOverdue(assignment.due_date) && !getAssignmentAttempt(assignment.id)"
+                class="text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                Late Submission Allowed
+              </span>
+        <span class="text-gray-500">
+  <i class="far fa-star mr-1"></i>
+  {{ assignment.total_marks || 0 }} marks
+</span>
             </div>
           </div>
+        </div>
+
+        <!-- Buttons Row -->
+        <div class="flex flex-wrap items-center gap-3 ml-13">
+
+          <!-- Download Assignment File -->
+         <a *ngIf="assignment.assignment_file"
+  [href]="getBaseUrl() + '/assets/assignments/' + assignment.assignment_file"
+  target="_blank"
+  download
+  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#073a89] border border-[#073a89]/30 bg-[#073a89]/5 rounded-lg hover:bg-[#073a89]/10 transition-colors">
+  <i class="fas fa-download"></i>
+  Download Assignment
+</a>
+          <span *ngIf="!assignment.assignment_file" class="text-sm text-gray-400">
+            <i class="fas fa-file-slash mr-1"></i> No file
+          </span>
+
+          <!-- Attempt submitted -->
+          <ng-container *ngIf="getAssignmentAttempt(assignment.id) as attempt">
+            <!-- Attempted badge -->
+            <span class="px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+              [ngClass]="attempt.is_late
+                ? 'bg-orange-100 text-orange-700'
+                : 'bg-green-100 text-green-700'">
+              <i [class]="attempt.is_late ? 'fas fa-clock' : 'fas fa-check-circle'"></i>
+              {{ attempt.is_late ? 'Submitted (Late)' : 'Submitted' }}
+            </span>
+
+            <!-- Download your submitted file -->
+<a *ngIf="attempt.doc_file"
+  [href]="getBaseUrl() + '/assets/assignment_attempts/' + attempt.doc_file"
+  target="_blank"
+  download
+  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+  <i class="fas fa-file-download"></i>
+  Download My Submission
+</a>
+          </ng-container>
+
+          <!-- Submit button — agar attempt nahi hua -->
+          <button *ngIf="!getAssignmentAttempt(assignment.id)"
+            (click)="onSubmitAssignment(assignment.id)"
+            class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-[#073a89] rounded-lg hover:bg-[#052b63] transition-colors">
+            <i class="fas fa-upload"></i>
+            Submit Assignment
+            <span *ngIf="isOverdue(assignment.due_date)"
+              class="ml-1 text-xs bg-orange-400 px-1.5 py-0.5 rounded-full">Late</span>
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <!-- Quiz Tab -->
@@ -255,27 +337,43 @@
         </div>
 
        <!-- Action Button -->
+<!-- Action Button -->
 <div class="shrink-0">
 
-  <!-- Already Attempted (completed) ✅ -->
+  <!-- Already Attempted (completed) -->
   <span *ngIf="getAttemptStatus(quiz.id) === 'completed'"
     class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium flex items-center gap-2">
     <i class="fas fa-check-circle"></i> Attempted
   </span>
 
-  <!-- Time Up ✅ -->
+  <!-- Time Up -->
   <span *ngIf="getAttemptStatus(quiz.id) === 'time_up'"
     class="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-medium flex items-center gap-2">
     <i class="fas fa-clock"></i> Time Up
   </span>
 
-  <!-- Due Date Over (not attempted) ✅ -->
-  <span *ngIf="!getAttemptStatus(quiz.id) && isOverdue(quiz.due_date)"
+  <!-- In Progress — Resume button -->
+  <button *ngIf="getAttemptStatus(quiz.id) === 'pending'"
+    (click)="onStartQuiz(quiz)"
+    class="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors flex items-center gap-2">
+    <i class="fas fa-play-circle"></i> Resume Quiz
+  </button>
+
+  <!-- ✅ 1 week se zyada overdue — expired -->
+  <span *ngIf="!getAttemptStatus(quiz.id) && isMoreThanWeekOverdue(quiz.due_date)"
     class="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium flex items-center gap-2">
     <i class="fas fa-ban"></i> Expired
   </span>
 
-  <!-- Start Quiz — sirf tab show ho jab attempt nahi OR due date nahi gayi ✅ -->
+  <!-- ✅ Overdue but within 1 week — start with warning -->
+  <button
+    *ngIf="!getAttemptStatus(quiz.id) && isOverdue(quiz.due_date) && !isMoreThanWeekOverdue(quiz.due_date)"
+    (click)="onStartQuiz(quiz)"
+    class="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-2">
+    <i class="fas fa-exclamation-triangle"></i> Start (Overdue -5%)
+  </button>
+
+  <!-- ✅ Normal — start quiz -->
   <button
     *ngIf="!getAttemptStatus(quiz.id) && !isOverdue(quiz.due_date)"
     (click)="onStartQuiz(quiz)"

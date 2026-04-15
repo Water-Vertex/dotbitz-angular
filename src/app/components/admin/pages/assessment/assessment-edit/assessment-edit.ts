@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } fr
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AssessmentService } from '../../../../../services/assessment.service';
 import { ToastService } from '../../../../../services/toast.service';
-import { Course, Assessment } from '../../../../../models/assessment.model';
+import { Course } from '../../../../../models/assessment.model';
 
 @Component({
   selector: 'app-assessment-edit',
@@ -18,7 +18,6 @@ export class AssessmentEdit implements OnInit {
   isSubmitting = false;
   isLoading = false;
   assessmentId!: number;
-  originalAssessment: any = null;
 
   constructor(
     private fb: FormBuilder,
@@ -29,9 +28,6 @@ export class AssessmentEdit implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
-  /**
-   * Initialize the component, build the form, and load initial data.
-   */
   ngOnInit(): void {
     this.assessmentId = Number(this.route.snapshot.paramMap.get('id'));
     this.buildForm();
@@ -39,26 +35,19 @@ export class AssessmentEdit implements OnInit {
     this.loadAssessment();
   }
 
-  /**
-   * Configure the main Reactive Form structure.
-   */
   private buildForm(): void {
     this.form = this.fb.group({
       course_id: [null, Validators.required],
       assessment_title: ['', Validators.required],
+      due_date: ['', Validators.required],
       questions: this.fb.array([]),
     });
   }
-
-  // ================= QUESTIONS ARRAY MANAGEMENT =================
 
   get questions(): FormArray {
     return this.form.get('questions') as FormArray;
   }
 
-  /**
-   * Append a new question group to the questions FormArray.
-   */
   addQuestion(): void {
     this.questions.push(
       this.fb.group({
@@ -75,9 +64,6 @@ export class AssessmentEdit implements OnInit {
     );
   }
 
-  /**
-   * Remove a question from the array by its index.
-   */
   removeQuestion(index: number): void {
     if (this.questions.length > 1) {
       this.questions.removeAt(index);
@@ -86,34 +72,20 @@ export class AssessmentEdit implements OnInit {
     }
   }
 
-  /**
-   * Calculate the sum of marks for all questions in the form.
-   */
   get totalMarks(): number {
     return this.questions.controls
-      .map((q) => {
-        const marks = q.get('marks')?.value;
-        return typeof marks === 'string' ? parseFloat(marks) : (marks || 0);
-      })
+      .map((q) => q.get('marks')?.value || 0)
       .reduce((acc, curr) => acc + curr, 0);
   }
-
-  // ================= OPTIONS MANAGEMENT =================
 
   getOptions(qIndex: number): FormArray {
     return this.questions.at(qIndex).get('options') as FormArray;
   }
 
-  /**
-   * Add a new option control to a specific question.
-   */
   addOption(qIndex: number): void {
     this.getOptions(qIndex).push(this.fb.control('', Validators.required));
   }
 
-  /**
-   * Remove an option from a specific question by its index.
-   */
   removeOption(qIndex: number, optIndex: number): void {
     if (this.getOptions(qIndex).length > 2) {
       this.getOptions(qIndex).removeAt(optIndex);
@@ -122,11 +94,6 @@ export class AssessmentEdit implements OnInit {
     }
   }
 
-  // ================= HELPERS & API CALLS =================
-
-  /**
-   * Handle UI logic when switching between MCQ and Q/A types.
-   */
   onTypeChange(qIndex: number): void {
     const question = this.questions.at(qIndex);
     const type = question.get('assessment_type')?.value;
@@ -147,9 +114,6 @@ export class AssessmentEdit implements OnInit {
     options.updateValueAndValidity();
   }
 
-  /**
-   * Retrieve the list of available courses from the database.
-   */
   loadCourses(): void {
     this.assessmentService.getCourses().subscribe({
       next: (courses) => {
@@ -162,19 +126,17 @@ export class AssessmentEdit implements OnInit {
     });
   }
 
-  /**
-   * Load assessment data for editing
-   */
   loadAssessment(): void {
     this.isLoading = true;
     this.assessmentService.getAssessment(this.assessmentId).subscribe({
       next: (assessment: any) => {
-        this.originalAssessment = assessment;
+        console.log('Loaded assessment:', assessment);
         this.populateForm(assessment);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (error) => {
+        console.error('Load error:', error);
         this.toast.error('Error', 'Failed to load assessment');
         this.router.navigate(['/admin/assessments/list']);
         this.isLoading = false;
@@ -182,14 +144,12 @@ export class AssessmentEdit implements OnInit {
     });
   }
 
-  /**
-   * Populate the form with assessment data
-   */
   private populateForm(assessment: any): void {
     // Set basic info
     this.form.patchValue({
       course_id: assessment.course_id,
       assessment_title: assessment.assessment_title,
+      due_date: assessment.due_date ? this.formatDateForInput(assessment.due_date) : '',
     });
 
     // Clear existing questions
@@ -198,29 +158,28 @@ export class AssessmentEdit implements OnInit {
     }
 
     // Add questions from assessment
-    assessment.questions?.forEach((question: any) => {
-      const questionGroup = this.fb.group({
-        assessment_type: [question.assessment_type || 'mcqs', Validators.required],
-        question: [question.question, [Validators.required, Validators.minLength(5)]],
-        answer: [question.answer, Validators.required],
-        marks: [question.marks, [Validators.required, Validators.min(0)]],
-        is_single: [question.is_single !== undefined ? question.is_single : true],
-        options: this.fb.array([]),
-      });
-
-      // Add options if MCQ
-      if (question.assessment_type === 'mcqs' && question.options) {
-        const optionsArray = questionGroup.get('options') as FormArray;
-        question.options.forEach((option: string) => {
-          optionsArray.push(this.fb.control(option, Validators.required));
+    if (assessment.questions && assessment.questions.length > 0) {
+      assessment.questions.forEach((question: any) => {
+        const questionGroup = this.fb.group({
+          assessment_type: [question.assessment_type || 'mcqs', Validators.required],
+          question: [question.question, [Validators.required, Validators.minLength(5)]],
+          answer: [question.answer || '', Validators.required],
+          marks: [question.marks || 0, [Validators.required, Validators.min(0)]],
+          is_single: [question.is_single !== undefined ? question.is_single : true],
+          options: this.fb.array([]),
         });
-      } else {
-        const optionsArray = questionGroup.get('options') as FormArray;
-        optionsArray.clearValidators();
-      }
 
-      this.questions.push(questionGroup);
-    });
+        // Add options if MCQ
+        if (question.assessment_type === 'mcqs' && question.options && question.options.length > 0) {
+          const optionsArray = questionGroup.get('options') as FormArray;
+          question.options.forEach((option: string) => {
+            optionsArray.push(this.fb.control(option, Validators.required));
+          });
+        }
+
+        this.questions.push(questionGroup);
+      });
+    }
 
     // If no questions were added, add one default
     if (this.questions.length === 0) {
@@ -228,9 +187,22 @@ export class AssessmentEdit implements OnInit {
     }
   }
 
-  /**
-   * Validate form and submit the assessment payload to the server.
-   */
+  private formatDateForInput(dateString: string): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  }
+
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -239,8 +211,40 @@ export class AssessmentEdit implements OnInit {
     }
 
     this.isSubmitting = true;
-    const payload = this.preparePayload();
 
+    const formValue = { ...this.form.value };
+    if (formValue.due_date) {
+      formValue.due_date = new Date(formValue.due_date).toISOString();
+    }
+
+    // Prepare payload with questions
+    const payload = {
+      course_id: formValue.course_id,
+      assessment_title: formValue.assessment_title,
+      due_date: formValue.due_date,
+      questions: formValue.questions.map((q: any) => ({
+        assessment_type: q.assessment_type,
+        question: q.question,
+        answer: q.answer,
+        marks: parseFloat(q.marks) || 0,
+        is_single: q.is_single,
+        options: q.assessment_type === 'mcqs' ? (q.options || []).filter((opt: string) => opt.trim() !== '') : []
+      }))
+    };
+
+    console.log('Submitting payload:', payload);
+
+    // Use the service to update - if your service doesn't have a method for full assessment update,
+    // you may need to add one. For now, we'll use the existing update method with a modified payload
+    this.updateAssessment(payload);
+  }
+
+  /**
+   * Update assessment using the service
+   */
+  private updateAssessment(payload: any): void {
+    // If your backend expects the full assessment update with questions,
+    // you might need to call a specific endpoint
     this.assessmentService.updateAssessment(this.assessmentId, payload).subscribe({
       next: () => {
         this.toast.success('Success', 'Assessment updated successfully');
@@ -248,40 +252,14 @@ export class AssessmentEdit implements OnInit {
       },
       error: (error) => {
         console.error('Update error:', error);
-        this.toast.error('Error', 'Failed to update assessment');
+        this.toast.error('Error', error.error?.message || 'Failed to update assessment');
         this.isSubmitting = false;
         this.cdr.detectChanges();
       },
     });
   }
 
-  /**
-   * Prepare payload for API submission
-   */
-  private preparePayload(): any {
-    const formValue = this.form.value;
-
-    return {
-      course_id: formValue.course_id,
-      assessment_title: formValue.assessment_title,
-      questions: formValue.questions.map((q: any) => ({
-        assessment_type: q.assessment_type,
-        question: q.question,
-        answer: q.answer,
-        marks: parseFloat(q.marks) || 0,
-        is_single: q.is_single,
-        options: q.assessment_type === 'mcqs' ? q.options : []
-      }))
-    };
-  }
-
-  /**
-   * Cancel the operation and return to the list view.
-   */
   cancel(): void {
     this.router.navigate(['/admin/assessments/list']);
-  }
-  getOptionLetter(index: number): string {
-    return String.fromCharCode(65 + index);
   }
 }

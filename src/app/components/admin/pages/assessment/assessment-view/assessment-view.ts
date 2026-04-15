@@ -15,6 +15,10 @@ export class AssessmentView implements OnInit {
   loading: boolean = true;
   correctCount: number = 0;
   wrongCount: number = 0;
+  totalMcqMarks: number = 0;
+  totalQnaMarks: number = 0;
+  obtainedMcqMarks: number = 0;
+  obtainedQnaMarks: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,9 +27,6 @@ export class AssessmentView implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
-  /**
-   * Initialize component and subscribe to route parameters to get attempt ID.
-   */
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.attemptId = +params['id'];
@@ -35,48 +36,156 @@ export class AssessmentView implements OnInit {
     });
   }
 
-  /**
-   * Fetch assessment attempt details from the server and calculate result summaries.
-   */
   fetchAttempt(): void {
     this.loading = true;
     this.attemptService.getAttemptById(this.attemptId).subscribe({
       next: (res: any) => {
-        this.attemptData = res.data || res;
+        console.log('Assessment View Response:', res);
 
-        if (res && res.assign_assessment) {
-          this.attemptData.obtain_marks = res.assign_assessment.obtain_marks;
-          this.attemptData.remarks = res.assign_assessment.remarks;
-          this.attemptData.total_marks = res.assign_assessment.total_marks;
+        let responseData = res;
+        if (res && res.data) {
+          responseData = res.data;
         }
 
+        this.attemptData = responseData;
+
+        // Initialize counters
+        this.correctCount = 0;
+        this.wrongCount = 0;
+        this.totalMcqMarks = 0;
+        this.totalQnaMarks = 0;
+        this.obtainedMcqMarks = 0;
+        this.obtainedQnaMarks = 0;
+
         if (this.attemptData?.answers) {
-          this.correctCount = this.attemptData.answers.filter((a: any) => a.is_correct == 1).length;
-          this.wrongCount = this.attemptData.answers.filter(
-            (a: any) => !a.is_correct || a.is_correct == 0,
-          ).length;
+          this.attemptData.answers.forEach((a: any) => {
+            if (a.assessment_type === 'mcqs') {
+              this.totalMcqMarks += Number(a.marks) || 0;
+              if (a.is_correct === 1) {
+                this.correctCount++;
+                this.obtainedMcqMarks += Number(a.marks) || 0;
+              } else {
+                this.wrongCount++;
+              }
+            } else if (a.assessment_type === 'q-a') {
+              this.totalQnaMarks += Number(a.marks) || 0;
+              const obtainedMarks = Number(a.is_correct) || 0;
+              this.obtainedQnaMarks += obtainedMarks;
+
+              if (obtainedMarks > 0) {
+                this.correctCount++;
+              } else {
+                this.wrongCount++;
+              }
+            }
+          });
         }
 
         this.loading = false;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Fetch error:', err);
         this.loading = false;
         this.cdr.detectChanges();
       },
     });
   }
 
+  getQuestionTypeClass(question: any): string {
+    return question.assessment_type === 'mcqs' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700';
+  }
+
+  getQuestionTypeText(question: any): string {
+    return question.assessment_type === 'mcqs' ? 'MCQ' : 'Q&A';
+  }
+
+  getStatusClass(answer: any): string {
+    if (answer.assessment_type === 'mcqs') {
+      return answer.is_correct === 1 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+    } else {
+      const obtainedMarks = Number(answer.is_correct) || 0;
+      const totalMarks = Number(answer.marks) || 0;
+      if (obtainedMarks === 0) return 'bg-red-100 text-red-700';
+      if (obtainedMarks === totalMarks) return 'bg-green-100 text-green-700';
+      return 'bg-yellow-100 text-yellow-700';
+    }
+  }
+
+  getStatusText(answer: any): string {
+    if (answer.assessment_type === 'mcqs') {
+      return answer.is_correct === 1 ? 'Correct' : 'Wrong';
+    } else {
+      const obtainedMarks = Number(answer.is_correct) || 0;
+      const totalMarks = Number(answer.marks) || 0;
+      if (obtainedMarks === 0) return 'Wrong';
+      if (obtainedMarks === totalMarks) return 'Correct';
+      return `Partial (${obtainedMarks}/${totalMarks})`;
+    }
+  }
+
+  getObtainedMarks(answer: any): number {
+    if (answer.assessment_type === 'mcqs') {
+      return answer.is_correct === 1 ? Number(answer.marks) || 0 : 0;
+    } else {
+      return Number(answer.is_correct) || 0;
+    }
+  }
+
+  getTotalMarks(answer: any): number {
+    return Number(answer.marks) || 0;
+  }
+
   /**
-   * Navigate to the assessment recheck page for manual grading updates.
+   * Check if obtained marks equal total marks
    */
+  isFullMarks(answer: any): boolean {
+    return this.getObtainedMarks(answer) === this.getTotalMarks(answer);
+  }
+
+  /**
+   * Check if obtained marks are partial (greater than 0 but less than total)
+   */
+  isPartialMarks(answer: any): boolean {
+    const obtained = this.getObtainedMarks(answer);
+    const total = this.getTotalMarks(answer);
+    return obtained > 0 && obtained < total;
+  }
+
+  /**
+   * Get color class for marks display
+   */
+  getMarksColorClass(answer: any): string {
+    if (this.isFullMarks(answer)) return 'text-green-600';
+    if (this.isPartialMarks(answer)) return 'text-yellow-600';
+    return 'text-red-600';
+  }
+
+  formatOptions(options: any): string[] {
+    if (!options) return [];
+    if (Array.isArray(options)) return options;
+    if (typeof options === 'string') {
+      try {
+        return JSON.parse(options);
+      } catch(e) {
+        return options.split(',').map((opt: string) => opt.trim());
+      }
+    }
+    return [];
+  }
+
+  get totalObtainedMarks(): number {
+    return this.obtainedMcqMarks + this.obtainedQnaMarks;
+  }
+
+  get totalPossibleMarks(): number {
+    return this.totalMcqMarks + this.totalQnaMarks;
+  }
+
   goRecheck(): void {
     this.router.navigate(['admin/assessment/recheck', this.attemptId]);
   }
 
-  /**
-   * Navigate back to the main list of assessment attempts.
-   */
   goBack(): void {
     this.router.navigate(['/admin/assessment-attempts/list']);
   }

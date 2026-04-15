@@ -41,6 +41,7 @@ export class AssessmentAdd implements OnInit {
     this.form = this.fb.group({
       course_id: [null, Validators.required],
       assessment_title: ['', Validators.required],
+      due_date: ['', Validators.required], // Added due_date field
       questions: this.fb.array([]),
     });
   }
@@ -151,7 +152,15 @@ export class AssessmentAdd implements OnInit {
     }
 
     this.isSubmitting = true;
-    this.assessmentService.createAssessment(this.form.value).subscribe({
+
+    // Format the due_date to ensure it's in the correct format
+    const formValue = { ...this.form.value };
+    if (formValue.due_date) {
+      // Convert to ISO string if needed
+      formValue.due_date = new Date(formValue.due_date).toISOString();
+    }
+
+    this.assessmentService.createAssessment(formValue).subscribe({
       next: () => {
         this.toast.success('Success', 'Assessment added successfully');
         this.router.navigate(['/admin/assessments/list']);

@@ -31,6 +31,13 @@ export class MyCourseDetail implements OnInit {
   showStartConfirm = false;
   pendingQuiz: any = null;
 
+  assignmentAttempts: { [assignmentId: number]: any } = {};
+  showSubmitModal = false;
+  pendingAssignmentId: number | null = null;
+  selectedSubmitFile: File | null = null;
+  submittingAssignment = false;
+  submitFileError: string = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -75,18 +82,113 @@ export class MyCourseDetail implements OnInit {
     }
   }
 
-  loadAssignments(): void {
-    this.assignmentsLoading = true;
-    this.assignmentService.getAssignmentsByCourse(this.courseId).subscribe({
+loadAssignments(): void {
+  this.assignmentsLoading = true;
+  this.assignmentService.getAssignmentsByCourse(this.courseId).subscribe({
+    next: (res: any) => {
+      this.assignments = res.data || [];
+      this.assignmentsLoaded = true;
+      this.assignmentsLoading = false;
+      this.checkAllAssignmentAttempts();
+      this.cdr.detectChanges();
+    },
+    error: () => { this.assignmentsLoading = false; }
+  });
+}
+checkAllAssignmentAttempts(): void {
+  this.assignments.forEach(assignment => {
+    this.assignmentService.checkAssignmentAttempt(assignment.id).subscribe({
       next: (res: any) => {
-        this.assignments = res.data || [];
-        this.assignmentsLoaded = true;
-        this.assignmentsLoading = false;
+        if (res.attempted) {
+          this.assignmentAttempts = {
+            ...this.assignmentAttempts,
+            [assignment.id]: res.attempt
+          };
+        }
         this.cdr.detectChanges();
       },
-      error: () => { this.assignmentsLoading = false; }
+      error: () => {}
     });
+  });
+}
+
+getAssignmentAttempt(assignmentId: number): any {
+  return this.assignmentAttempts[assignmentId] || null;
+}
+getBaseUrl(): string {
+  return window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://dotbitz.com/public';
+}
+// Submit modal
+onSubmitAssignment(assignmentId: number): void {
+  this.pendingAssignmentId = assignmentId;
+  this.selectedSubmitFile = null;
+  this.submitFileError = '';
+  this.showSubmitModal = true;
+}
+
+onSubmitFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    this.selectedSubmitFile = input.files[0];
+    this.submitFileError = '';
   }
+}
+isMoreThanWeekOverdue(dueDate: string): boolean {
+  if (!dueDate) return false;
+  const due     = new Date(dueDate);
+  const oneWeek = new Date(due.getTime() + 7 * 24 * 60 * 60 * 1000);
+  return new Date() > oneWeek;
+}
+
+cancelSubmitModal(): void {
+  this.showSubmitModal = false;
+  this.pendingAssignmentId = null;
+  this.selectedSubmitFile = null;
+}
+
+confirmSubmitAssignment(): void {
+  if (!this.selectedSubmitFile) {
+    this.submitFileError = 'Please select a file to submit.';
+    return;
+  }
+
+  this.submittingAssignment = true;
+  const formData = new FormData();
+  formData.append('doc_file', this.selectedSubmitFile, this.selectedSubmitFile.name);
+
+  this.assignmentService.submitAssignment(this.pendingAssignmentId!, formData).subscribe({
+    next: (res: any) => {
+      this.submittingAssignment = false;
+      this.showSubmitModal = false;
+
+      // Update attempts
+      this.assignmentAttempts = {
+        ...this.assignmentAttempts,
+        [this.pendingAssignmentId!]: res.data
+      };
+
+      if (res.is_late) {
+        alert('Assignment submitted successfully! Note: This was a late submission.');
+      } else {
+        alert('Assignment submitted successfully!');
+      }
+
+      this.pendingAssignmentId = null;
+      this.selectedSubmitFile = null;
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      this.submittingAssignment = false;
+      if (err.status === 409) {
+        alert('You have already submitted this assignment.');
+      } else {
+        alert('Failed to submit assignment. Please try again.');
+      }
+    }
+  });
+}
 
   // loadQuizzes(): void {
   //   this.quizzesLoading = true;
@@ -147,6 +249,42 @@ export class MyCourseDetail implements OnInit {
   });
 }
 
+// checkAllAttempts(): void {
+//   if (this.quizzes.length === 0) {
+//     this.quizzesLoading = false;
+//     this.cdr.detectChanges();
+//     return;
+//   }
+
+//   let completed = 0;
+//   const total = this.quizzes.length;
+
+//   this.quizzes.forEach(quiz => {
+//     this.courseService.checkQuizAttempt(quiz.id).subscribe({
+//       next: (res: any) => {
+//         if (res.attempted) {
+//           // ✅ Spread operator — Angular naya object detect karega
+//           this.quizAttempts = {
+//             ...this.quizAttempts,
+//             [quiz.id]: res.attempt.status
+//           };
+//         }
+//         completed++;
+//         if (completed === total) {
+//           this.quizzesLoading = false;
+//           this.cdr.detectChanges();
+//         }
+//       },
+//       error: () => {
+//         completed++;
+//         if (completed === total) {
+//           this.quizzesLoading = false;
+//           this.cdr.detectChanges();
+//         }
+//       }
+//     });
+//   });
+// }
 checkAllAttempts(): void {
   if (this.quizzes.length === 0) {
     this.quizzesLoading = false;
@@ -161,10 +299,9 @@ checkAllAttempts(): void {
     this.courseService.checkQuizAttempt(quiz.id).subscribe({
       next: (res: any) => {
         if (res.attempted) {
-          // ✅ Spread operator — Angular naya object detect karega
           this.quizAttempts = {
             ...this.quizAttempts,
-            [quiz.id]: res.attempt.status
+            [quiz.id]: res.attempt.status  
           };
         }
         completed++;

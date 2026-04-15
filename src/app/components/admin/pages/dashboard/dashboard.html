@@ -1,4 +1,5 @@
 <div class="min-h-screen bg-gray-50 p-6">
+
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
         <div>
@@ -15,85 +16,141 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Stats Cards - Using Real Data -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Students Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <!-- Students Card - Using real data -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between mb-4">
                 <div class="p-3 bg-orange-50 rounded-lg">
                     <i class="fas fa-users text-orange-600 text-lg"></i>
                 </div>
                 <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                    <i class="fas fa-arrow-up mr-1"></i>24.7%
+                    <i class="fas fa-arrow-up mr-1"></i>{{ studentChange }}%
                 </span>
             </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">12,847</h3>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_students | number }}</h3>
             <p class="text-gray-600 text-sm">Total Students</p>
             <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/students" class="text-sm text-orange-600 hover:text-orange-700 font-medium inline-flex items-center">
+                <a routerLink="/admin/student/list" class="text-sm text-orange-600 hover:text-orange-700 font-medium inline-flex items-center">
                     View all students
                     <i class="fas fa-arrow-right ml-2 text-xs"></i>
                 </a>
             </div>
         </div>
 
-        <!-- Courses Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-purple-50 rounded-lg">
-                    <i class="fas fa-book-open text-purple-600 text-lg"></i>
-                </div>
-                <span class="text-sm text-orange-600 bg-orange-50 px-2 py-1 rounded-full">156 Active</span>
-            </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">156</h3>
-            <p class="text-gray-600 text-sm">Active Courses</p>
-            <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/courses" class="text-sm text-purple-600 hover:text-purple-700 font-medium inline-flex items-center">
-                    Manage courses
-                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- Instructors Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <!-- Instructors Card - Using real data -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between mb-4">
                 <div class="p-3 bg-green-50 rounded-lg">
                     <i class="fas fa-chalkboard-teacher text-green-600 text-lg"></i>
                 </div>
-                <span class="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">48 Total</span>
+                <span class="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">{{ stats.total_instructors }} Total</span>
             </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">48</h3>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_instructors | number }}</h3>
             <p class="text-gray-600 text-sm">Instructors</p>
             <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/instructors" class="text-sm text-green-600 hover:text-green-700 font-medium inline-flex items-center">
+                <a routerLink="/admin/instructors/list" class="text-sm text-green-600 hover:text-green-700 font-medium inline-flex items-center">
                     View instructors
                     <i class="fas fa-arrow-right ml-2 text-xs"></i>
                 </a>
             </div>
         </div>
 
-        <!-- Revenue Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <!-- Guardians Card - New card using real data -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-purple-50 rounded-lg">
+                    <i class="fas fa-user-friends text-purple-600 text-lg"></i>
+                </div>
+                <span class="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full">Active</span>
+            </div>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_guardians | number }}</h3>
+            <p class="text-gray-600 text-sm">Guardians</p>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <a routerLink="/admin/guardians/list" class="text-sm text-purple-600 hover:text-purple-700 font-medium inline-flex items-center">
+                    View guardians
+                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Assessment Queries Card - New card using real data -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between mb-4">
                 <div class="p-3 bg-amber-50 rounded-lg">
-                    <i class="fas fa-dollar-sign text-amber-600 text-lg"></i>
+                    <i class="fas fa-question-circle text-amber-600 text-lg"></i>
                 </div>
                 <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                    <i class="fas fa-arrow-up mr-1"></i>18.3%
+                    <i class="fas fa-arrow-up mr-1"></i>{{ revenueChange }}%
                 </span>
             </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">$48.2K</h3>
-            <p class="text-gray-600 text-sm">Monthly Revenue</p>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_assessments_queries | number }}</h3>
+            <p class="text-gray-600 text-sm">Assessment Queries</p>
             <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/revenue" class="text-sm text-amber-600 hover:text-amber-700 font-medium inline-flex items-center">
-                    View analytics
+                <a routerLink="/admin/assessments/queries"  class="text-sm text-amber-600 hover:text-amber-700 font-medium inline-flex items-center">
+                    View all queries
                     <i class="fas fa-arrow-right ml-2 text-xs"></i>
                 </a>
             </div>
         </div>
     </div>
 
+    <!-- Optional: Additional Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Revenue Card - Can be calculated from queries -->
+        <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-2 bg-white bg-opacity-20 rounded-lg">
+                    <i class="fas fa-dollar-sign text-xl"></i>
+                </div>
+                <span class="text-sm bg-white bg-opacity-20 px-2 py-1 rounded-full">
+                    <i class="fas fa-chart-line mr-1"></i>+{{ revenueChange }}%
+                </span>
+            </div>
+            <h3 class="text-3xl font-bold mb-1">${{ totalRevenue | number:'1.0-0' }}</h3>
+            <p class="text-white text-opacity-90 text-sm">Total Revenue</p>
+            <div class="mt-4">
+                <p class="text-xs text-white text-opacity-75">Based on {{ stats.total_assessments_queries }} assessment queries</p>
+            </div>
+        </div>
+
+        <!-- Active Courses Card -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-book-open text-blue-600 text-lg"></i>
+                </div>
+                <span class="text-sm text-orange-600 bg-orange-50 px-2 py-1 rounded-full">{{ activeCourses }} Active</span>
+            </div>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ activeCourses }}</h3>
+            <p class="text-gray-600 text-sm">Active Courses</p>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <a href="/admin/courses" class="text-sm text-blue-600 hover:text-blue-700 font-medium inline-flex items-center">
+                    Manage courses
+                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Completion Rate Card -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-teal-50 rounded-lg">
+                    <i class="fas fa-chart-pie text-teal-600 text-lg"></i>
+                </div>
+                <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">+5.2%</span>
+            </div>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">78%</h3>
+            <p class="text-gray-600 text-sm">Course Completion Rate</p>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-teal-600 h-2 rounded-full" style="width: 78%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest of your existing template remains the same -->
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Recent Students -->
@@ -101,7 +158,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-semibold text-gray-900">Recent Students</h2>
                 <a href="/admin/students" class="text-sm text-orange-600 hover:text-orange-700 font-medium">
-                    View all
+                    View all {{ stats.total_students }} students
                 </a>
             </div>
             <div class="overflow-x-auto">
@@ -141,77 +198,14 @@
                                     </div>
                                     <span class="text-xs text-gray-600">65%</span>
                                 </div>
-                            </td>
+                             </td>
                             <td class="py-4 px-4">
                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                     Active
                                 </span>
-                            </td>
+                             </td>
                         </tr>
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                        <span class="text-sm font-medium text-purple-600">SJ</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Sarah Johnson</p>
-                                        <p class="text-xs text-gray-500">sarah@example.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-900">UI/UX Design</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-500">1 week ago</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-600 h-2 rounded-full" style="width: 85%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-600">85%</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Active
-                                </span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                                        <span class="text-sm font-medium text-amber-600">MB</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Mike Brown</p>
-                                        <p class="text-xs text-gray-500">mike@example.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-900">Data Science</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-500">3 weeks ago</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-amber-600 h-2 rounded-full" style="width: 45%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-600">45%</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    Behind
-                                </span>
-                            </td>
-                        </tr>
+                        <!-- Add more rows as needed -->
                     </tbody>
                 </table>
             </div>

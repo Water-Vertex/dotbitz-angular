@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CourseService } from '../../../../../../services/course.service';
 
 @Component({
-  selector: 'app-my-quiz',
+  selector: 'my-quiz',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './quiz.html',
@@ -17,21 +17,20 @@ export class MyQuiz implements OnInit, OnDestroy {
   attempt: any = null;
   loading = true;
   submitting = false;
+  isResume = false;
 
-  // Answers — mcq_id → student_answer
   answers: { [mcqId: number]: string } = {};
-objectKeys(obj: any): string[] {
-  return Object.keys(obj);
-}
-  // Timer
+
   totalSeconds = 0;
   remainingSeconds = 0;
   timerInterval: any = null;
+  timerStartTime: number = 0;
 
-  // Modals
   showTimeUpModal = false;
   showSuccessModal = false;
   successData: any = null;
+
+  isOverdueAttempt = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -42,21 +41,70 @@ objectKeys(obj: any): string[] {
 
   ngOnInit(): void {
     this.quizId = Number(this.route.snapshot.paramMap.get('quizId'));
-    this.startQuiz();
+    this.startOrResumeQuiz();
   }
 
   ngOnDestroy(): void {
     this.clearTimer();
+    // ✅ Auto-save on destroy (tab change/close)
+    this.autoSaveAnswers();
   }
 
-  startQuiz(): void {
+  // ✅ Browser close/tab change detect
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: any): void {
+    this.autoSaveAnswers();
+  }
+
+@HostListener('document:visibilitychange')
+onVisibilityChange(): void {
+  if (document.hidden) {
+    this.autoSaveAnswers();
+  }
+}
+
+  autoSaveAnswers(): void {
+    if (!this.attempt || !this.quiz || this.submitting) return;
+    if (Object.keys(this.answers).length === 0) return;
+
+    const answersPayload = (this.quiz?.mcqs || []).map((mcq: any) => ({
+      mcq_id:         mcq.id,
+      student_answer: this.answers[mcq.id] || '',
+    }));
+
+    // Save to localStorage as backup
+    localStorage.setItem(
+      `quiz_answers_${this.attempt.id}`,
+      JSON.stringify({
+        answers:          this.answers,
+        remainingSeconds: this.remainingSeconds,
+        savedAt:          Date.now(),
+      })
+    );
+
+    // Also save to server
+    this.courseService.saveQuizProgress(this.attempt.id, answersPayload).subscribe({
+      next: () => {},
+      error: () => {}
+    });
+  }
+
+  startOrResumeQuiz(): void {
     this.loading = true;
     this.courseService.startQuiz(this.quizId).subscribe({
       next: (res: any) => {
         if (res.success) {
-          this.quiz    = res.data.quiz;
-          this.attempt = res.data.attempt;
-          this.loading = false;
+          this.quiz       = res.data.quiz;
+          this.attempt    = res.data.attempt;
+          this.isResume   = res.is_resume || false;
+          this.isOverdueAttempt = res.data.attempt?.is_overdue || false;
+          this.loading    = false;
+
+          if (this.isResume) {
+            // Load saved answers
+            this.loadSavedAnswers();
+          }
+
           this.initTimer();
           this.cdr.detectChanges();
         }
@@ -66,7 +114,7 @@ objectKeys(obj: any): string[] {
         if (err.status === 409) {
           alert('You have already attempted this quiz.');
         } else if (err.status === 403) {
-          alert('Due date has passed. You cannot attempt this quiz.');
+          alert(err.error?.message || 'Quiz deadline has passed.');
         } else {
           alert('Failed to start quiz.');
         }
@@ -75,13 +123,69 @@ objectKeys(obj: any): string[] {
     });
   }
 
+  loadSavedAnswers(): void {
+    // Load from localStorage first (faster)
+    const saved = localStorage.getItem(`quiz_answers_${this.attempt.id}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        this.answers = parsed.answers || {};
+
+        // Timer restore karo agar localStorage mein saved hai
+        if (parsed.remainingSeconds && parsed.savedAt) {
+          const elapsed = Math.floor((Date.now() - parsed.savedAt) / 1000);
+          this.remainingSeconds = Math.max(0, parsed.remainingSeconds - elapsed);
+        }
+      } catch (e) {}
+    }
+
+    // Server se bhi load karo
+    this.courseService.resumeQuizCheck(this.quizId).subscribe({
+      next: (res: any) => {
+        if (res.success && res.data.savedAnswers) {
+          const serverAnswers = res.data.savedAnswers;
+          // Server answers se merge karo
+          Object.keys(serverAnswers).forEach(mcqId => {
+            if (serverAnswers[mcqId]) {
+              this.answers[Number(mcqId)] = serverAnswers[mcqId];
+            }
+          });
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {}
+    });
+  }
+
   initTimer(): void {
-    this.totalSeconds     = (this.quiz.duration || 30) * 60;
-    this.remainingSeconds = this.totalSeconds;
+    const totalSecs = (this.quiz.duration || 30) * 60;
+    this.totalSeconds = totalSecs;
+
+    // Agar resume hai aur remainingSeconds already set hai
+    if (this.isResume && this.remainingSeconds > 0) {
+      // Keep existing remainingSeconds
+    } else if (this.isResume && this.attempt?.created_at) {
+      // Calculate remaining from attempt start time
+      const startTime = new Date(this.attempt.created_at).getTime();
+      const elapsed   = Math.floor((Date.now() - startTime) / 1000);
+      this.remainingSeconds = Math.max(0, totalSecs - elapsed);
+    } else {
+      this.remainingSeconds = totalSecs;
+    }
+
+    if (this.remainingSeconds <= 0) {
+      this.onTimeUp();
+      return;
+    }
 
     this.timerInterval = setInterval(() => {
       this.remainingSeconds--;
       this.cdr.detectChanges();
+
+      // Auto-save every 30 seconds
+      if (this.remainingSeconds % 30 === 0) {
+        this.autoSaveAnswers();
+      }
 
       if (this.remainingSeconds <= 0) {
         this.clearTimer();
@@ -125,7 +229,6 @@ objectKeys(obj: any): string[] {
   onTimeUp(): void {
     this.showTimeUpModal = true;
     this.cdr.detectChanges();
-    // Auto submit after 3 seconds
     setTimeout(() => {
       this.submitQuiz('time_up');
     }, 3000);
@@ -153,28 +256,32 @@ objectKeys(obj: any): string[] {
       student_answer: this.answers[mcq.id] || '',
     }));
 
-    const payload = {
-      answers: answersPayload,
-      status:  status,
-    };
+    const payload = { answers: answersPayload, status };
 
     this.courseService.submitQuiz(this.attempt.id, payload).subscribe({
       next: (res: any) => {
-        this.submitting     = false;
+        // Clear localStorage
+        localStorage.removeItem(`quiz_answers_${this.attempt.id}`);
+
+        this.submitting      = false;
         this.showTimeUpModal = false;
-        this.successData    = res;
+        this.successData     = res;
         this.showSuccessModal = true;
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.submitting = false;
         console.error(err);
-        alert('Failed to submit quiz. Please try again.');
+        alert('Failed to submit quiz.');
       }
     });
   }
 
   goBack(): void {
     this.router.navigate(['/student/my-courses']);
+  }
+
+  objectKeys(obj: any): string[] {
+    return Object.keys(obj);
   }
 }

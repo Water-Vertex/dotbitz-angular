@@ -34,7 +34,7 @@ export interface Assignment {
   due_date?: string; // assignment due date
   total_marks?: number; // total marks
   uploaded_at?: string; // timestamp when uploaded
-
+  batch_id?: number; // FK to batch
   created_at?: string;
   updated_at?: string;
   course?: Course; // relation

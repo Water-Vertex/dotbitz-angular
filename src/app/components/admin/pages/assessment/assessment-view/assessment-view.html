@@ -1,94 +1,150 @@
-<div class="space-y-6 p-6 bg-gray-50 min-h-screen">
+<div class="space-y-6 p-4 bg-gray-50 min-h-screen">
+  <!-- Header -->
   <div class="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-center shadow-sm">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Assessment Result</h1>
-      <p class="text-gray-500 mt-1 text-sm italic">Reviewing graded performance</p>
+      <p class="text-gray-500 mt-1 text-sm">Review submitted answers and marks</p>
     </div>
     <div class="flex gap-3">
-      <button (click)="goRecheck()" class="inline-flex items-center gap-2 px-6 py-2 bg-[#ff6500] text-white rounded-lg hover:bg-[#e55b00] text-sm font-bold transition-all cursor-pointer shadow-sm">
-        <i class="fas fa-sync-alt"></i> Recheck
+      <button (click)="goRecheck()" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium transition-all cursor-pointer">
+        <i class="fas fa-edit"></i> Recheck & Regrade
       </button>
-      <button (click)="goBack()" class="inline-flex items-center gap-2 px-6 py-2 bg-[#073a89] text-white rounded-lg hover:bg-[#063174] text-sm font-medium transition-all cursor-pointer shadow-sm">
-        <i class="fas fa-arrow-left"></i> Back
+      <button (click)="goBack()" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-all cursor-pointer">
+        <i class="fas fa-arrow-left"></i> Back to Attempts
       </button>
     </div>
   </div>
 
-  <div *ngIf="!loading && attemptData" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-    <div class="p-6 border-b border-gray-100">
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div class="border-r border-gray-100 pr-4">
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Student</p>
-          <p class="font-bold text-gray-900">{{ attemptData?.student_name }}</p>
-          <p class="text-[10px] text-gray-500 font-medium">ID: #{{ attemptData?.student_id }}</p>
-        </div>
-        <div class="border-r border-gray-100 pr-4">
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Course</p>
-          <p class="text-sm font-bold text-gray-800">{{ attemptData?.course_name }}</p>
-        </div>
-        <div class="border-r border-gray-100 pr-4">
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Assessment</p>
-          <p class="text-sm font-bold text-gray-800">{{ attemptData?.assessment_title }}</p>
-        </div>
-        <div class="border-r border-gray-100 pr-4">
-          <p class="text-[10px] font-bold text-[#073a89] uppercase tracking-widest mb-1">Obtained Marks</p>
-          <p class="text-lg font-black text-[#073a89]">{{ attemptData?.obtain_marks ?? 0 }}</p>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2 text-sm font-bold uppercase tracking-widest">Loading assessment...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && attemptData">
+    <!-- Student Info Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-xs font-bold text-gray-500 uppercase">Student Name</p>
+          <p class="text-lg font-semibold text-gray-900">{{ attemptData.student_name }}</p>
         </div>
         <div>
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Marks</p>
-          <p class="text-lg font-bold text-gray-800">{{ attemptData?.total_marks }}</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Student ID</p>
+          <p class="text-lg font-semibold text-gray-900">{{ attemptData.student_id }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-500 uppercase">Course</p>
+          <p class="text-lg font-semibold text-gray-900">{{ attemptData.course_name }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-500 uppercase">Assessment</p>
+          <p class="text-lg font-semibold text-gray-900">{{ attemptData.assessment_title }}</p>
         </div>
       </div>
     </div>
 
-    <div class="bg-gray-50/50 px-6 py-3 border-b border-gray-100 flex items-center gap-8">
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-        <span class="text-xs font-bold text-gray-600">Correct: <span class="text-green-600">{{ correctCount }}</span></span>
+    <!-- Results Summary Card -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+      <h3 class="text-lg font-bold text-gray-900 mb-4">Results Summary</h3>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="text-center p-4 bg-green-50 rounded-lg">
+          <p class="text-xs font-bold text-green-600 uppercase">Correct Answers</p>
+          <p class="text-2xl font-black text-green-700">{{ correctCount }}</p>
+        </div>
+        <div class="text-center p-4 bg-red-50 rounded-lg">
+          <p class="text-xs font-bold text-red-600 uppercase">Wrong/Partial Answers</p>
+          <p class="text-2xl font-black text-red-700">{{ wrongCount }}</p>
+        </div>
+        <div class="text-center p-4 bg-blue-50 rounded-lg">
+          <p class="text-xs font-bold text-blue-600 uppercase">Total Questions</p>
+          <p class="text-2xl font-black text-blue-700">{{ attemptData.answers?.length || 0 }}</p>
+        </div>
+        <div class="text-center p-4 bg-purple-50 rounded-lg">
+          <p class="text-xs font-bold text-purple-600 uppercase">Obtained Marks</p>
+          <p class="text-2xl font-black text-purple-700">{{ totalObtainedMarks }} / {{ totalPossibleMarks }}</p>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-        <span class="text-xs font-bold text-gray-600">Wrong: <span class="text-red-600">{{ wrongCount }}</span></span>
+
+      <!-- Marks Breakdown -->
+      <div class="mt-4 grid md:grid-cols-2 gap-4">
+        <div class="p-3 bg-gray-50 rounded-lg">
+          <p class="text-sm font-semibold text-gray-700">MCQ Marks:</p>
+          <p class="text-lg font-bold text-gray-900">{{ obtainedMcqMarks }} / {{ totalMcqMarks }}</p>
+        </div>
+        <div class="p-3 bg-gray-50 rounded-lg">
+          <p class="text-sm font-semibold text-gray-700">Q&A Marks:</p>
+          <p class="text-lg font-bold text-gray-900">{{ obtainedQnaMarks }} / {{ totalQnaMarks }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="attemptData.remarks" class="mt-4 p-3 bg-yellow-50 rounded-lg">
+        <p class="text-xs font-bold text-yellow-700 uppercase">Admin Remarks</p>
+        <p class="text-sm text-gray-700">{{ attemptData.remarks }}</p>
       </div>
     </div>
 
-    <div class="divide-y divide-gray-100">
-      <div *ngFor="let ans of attemptData?.answers; let i = index" class="p-6 hover:bg-gray-50/30 transition-colors">
-        <div class="flex items-start justify-between gap-4 mb-4">
+    <!-- Answers List -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-bold text-gray-900">Detailed Answers</h3>
+
+      <div *ngFor="let ans of attemptData?.answers; let i = index" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
           <div class="flex items-start gap-3">
-            <span class="text-xs font-bold text-gray-400 mt-1">Q{{ i + 1 }}</span>
-            <div>
-              <p class="text-sm font-bold text-gray-800 leading-relaxed">{{ ans.question }}</p>
-              <p class="text-[10px] mt-1 font-bold" [ngClass]="ans.is_correct ? 'text-green-600' : 'text-red-500'">
-                Score: {{ ans.is_correct ? ans.marks : 0 }} / {{ ans.marks }} Marks
-              </p>
+            <span class="w-7 h-7 rounded-full bg-[#073a89] text-white flex items-center justify-center text-xs font-bold shrink-0">{{ i + 1 }}</span>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-800 leading-relaxed">{{ ans.question }}</p>
+              <span class="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded"
+                    [ngClass]="getQuestionTypeClass(ans)">
+                {{ getQuestionTypeText(ans) }}
+              </span>
             </div>
           </div>
-          <span class="shrink-0 px-2 py-1 rounded text-[9px] font-black uppercase border"
-            [ngClass]="ans.is_correct ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'">
-            {{ ans.is_correct ? 'Correct' : 'Wrong' }}
-          </span>
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">{{ ans.marks }} marks</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="getStatusClass(ans)">
+              {{ getStatusText(ans) }}
+            </span>
+          </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-4 ml-7">
-          <div class="space-y-1">
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Student's Response</p>
-            <div class="p-3 bg-gray-50 rounded border border-gray-100 text-sm text-gray-700">
-              {{ ans.student_answer || 'N/A' }}
+        <div class="p-6 space-y-4">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-[11px] font-bold text-gray-500 uppercase mb-2">Student's Answer</p>
+              <div class="px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800 font-medium">
+                {{ ans.student_answer || 'No answer' }}
+              </div>
+            </div>
+            <div>
+              <p class="text-[11px] font-bold text-green-600 uppercase mb-2">Correct Answer</p>
+              <div class="px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800 font-medium">
+                {{ ans.answer || '-' }}
+              </div>
+              <!-- Show options for MCQ -->
+              <div *ngIf="ans.assessment_type === 'mcqs' && ans.options" class="mt-2">
+                <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Available Options:</p>
+                <div class="text-xs text-gray-600">
+                  <div *ngFor="let option of formatOptions(ans.options)" class="mb-0.5">
+                    • {{ option }}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="space-y-1">
-            <p class="text-[9px] font-bold text-emerald-600 uppercase tracking-wider">Correct Answer</p>
-            <div class="p-3 bg-emerald-50/30 rounded border border-emerald-100 text-sm font-medium text-emerald-800">
-              {{ ans.correct_answer || '—' }}
+
+          <!-- Marks Obtained Display -->
+          <div class="pt-2 border-t border-gray-100">
+            <div class="flex justify-between items-center">
+              <p class="text-sm font-bold text-gray-700">Marks Obtained:</p>
+              <div class="text-lg font-bold" [ngClass]="getMarksColorClass(ans)">
+                {{ getObtainedMarks(ans) }} / {{ getTotalMarks(ans) }}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div *ngIf="loading" class="bg-white rounded-xl border border-gray-200 p-20 text-center shadow-sm">
-    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89] mx-auto"></div>
   </div>
 </div>

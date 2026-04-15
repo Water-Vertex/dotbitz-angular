@@ -11,13 +11,15 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./assessment-check.css'],
   imports: [CommonModule, FormsModule],
 })
-export class CheckAssessment implements OnInit {
+export class AssessmentCheck implements OnInit {
   attemptId!: number;
   attemptData: any = null;
   loading: boolean = true;
   submitting: boolean = false;
   adminRemarks: string = '';
   answers: { [key: number]: boolean } = {};
+  autoMarked: { [key: number]: boolean } = {};
+  qnaMarks: { [key: number]: number } = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -26,9 +28,6 @@ export class CheckAssessment implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
-  /**
-   * Initialize component and capture the attempt ID from route parameters.
-   */
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.attemptId = +params['id'];
@@ -38,20 +37,39 @@ export class CheckAssessment implements OnInit {
     });
   }
 
-  /**
-   * Fetch attempt details and initialize the answer status object.
-   */
   fetchAttempt(): void {
     this.loading = true;
     this.attemptService.getAttemptById(this.attemptId).subscribe({
       next: (res: any) => {
-        this.attemptData = res.data || res;
-        this.adminRemarks = '';
+        console.log('API Response:', res);
 
-        if (this.attemptData.answers) {
+        let responseData = res;
+        if (res && res.data) {
+          responseData = res.data;
+        }
+
+        this.attemptData = responseData;
+        this.adminRemarks = this.attemptData.remarks || '';
+
+        if (this.attemptData && this.attemptData.answers) {
           this.attemptData.answers.forEach((a: any) => {
-            if (a.is_correct !== null && a.is_correct !== undefined) {
-              this.answers[a.question_id] = a.is_correct == 1;
+            const isMcq = a.assessment_type === 'mcqs';
+
+            if (isMcq) {
+              // Auto-mark MCQ
+              const isCorrect = this.autoMarkMcq(a.student_answer, a.answer);
+              this.answers[a.question_id] = isCorrect;
+              this.autoMarked[a.question_id] = true;
+            }
+            else if (a.assessment_type === 'q-a') {
+              // For Q&A, initialize with existing marks if available
+              // Note: is_correct might store marks (not just 0/1)
+              if (a.is_correct !== null && a.is_correct !== undefined && a.is_correct > 0) {
+                this.qnaMarks[a.question_id] = a.is_correct;
+              } else {
+                this.qnaMarks[a.question_id] = 0;
+              }
+              this.autoMarked[a.question_id] = false;
             }
           });
         }
@@ -67,48 +85,116 @@ export class CheckAssessment implements OnInit {
     });
   }
 
-  /**
-   * Set the correctness status for a specific question.
-   */
-  setAnswer(questionId: number, isCorrect: boolean): void {
-    this.answers[questionId] = isCorrect;
+  autoMarkMcq(studentAnswer: string, correctAnswer: string): boolean {
+    if (!studentAnswer || !correctAnswer) return false;
+    return studentAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+  }
+
+  updateQnaMarks(questionId: number, marks: number, maxMarks: number): void {
+    if (marks > maxMarks) {
+      marks = maxMarks;
+    }
+    if (marks < 0) {
+      marks = 0;
+    }
+    this.qnaMarks[questionId] = marks;
     this.cdr.detectChanges();
   }
 
+  getQuestionTypeText(question: any): string {
+    return question.assessment_type === 'mcqs' ? 'MCQ (Auto-graded)' : 'Q&A (Manual marking)';
+  }
+
+  getQuestionTypeClass(question: any): string {
+    return question.assessment_type === 'mcqs' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700';
+  }
+
+  formatOptions(options: any): string[] {
+    if (!options) return [];
+    if (Array.isArray(options)) return options;
+    if (typeof options === 'string') {
+      try {
+        return JSON.parse(options);
+      } catch(e) {
+        return options.split(',').map((opt: string) => opt.trim());
+      }
+    }
+    return [];
+  }
+
   /**
-   * Calculate total obtained marks dynamically based on correct answers.
+   * Calculate total obtained marks dynamically
    */
   get calculatedObtainMarks(): number {
     let total = 0;
     if (!this.attemptData || !this.attemptData.answers) return 0;
 
-    this.attemptData.answers.forEach((ans: any) => {
-      if (this.answers[ans.question_id] === true) {
-        total += Number(ans.marks) || 0;
+    for (const ans of this.attemptData.answers) {
+      if (ans.assessment_type === 'mcqs') {
+        // MCQ: full marks if correct
+        if (this.answers[ans.question_id] === true) {
+          total += Number(ans.marks) || 0;
+        }
+      } else if (ans.assessment_type === 'q-a') {
+        // Q&A: use manually entered marks
+        const marks = this.qnaMarks[ans.question_id];
+        if (marks !== undefined && marks !== null) {
+          total += Number(marks);
+        }
       }
-    });
+    }
+
+    console.log('Total calculated marks:', total);
     return total;
   }
 
   /**
-   * Submit the final grading results and remarks to the server.
+   * Get total possible marks
    */
+  get totalPossibleMarks(): number {
+    if (!this.attemptData || !this.attemptData.answers) return 0;
+
+    let total = 0;
+    for (const ans of this.attemptData.answers) {
+      total += Number(ans.marks) || 0;
+    }
+    return total;
+  }
+
   submitGrading(): void {
     if (this.submitting) return;
+
+    if (!confirm('Are you sure you want to submit these grades?')) {
+      return;
+    }
+
     this.submitting = true;
 
     const payload = {
       obtain_marks: this.calculatedObtainMarks,
       remarks: this.adminRemarks,
-      answers: this.attemptData.answers.map((a: any) => ({
-        question_id: a.question_id,
-        is_correct: this.answers[a.question_id] === true ? 1 : 0,
-      })),
+      answers: this.attemptData.answers.map((a: any) => {
+        if (a.assessment_type === 'mcqs') {
+          // For MCQ: is_correct is boolean (0 or 1)
+          return {
+            question_id: a.question_id,
+            is_correct: this.answers[a.question_id] === true ? 1 : 0,
+          };
+        } else {
+          // For Q&A: is_correct stores the actual marks obtained
+          return {
+            question_id: a.question_id,
+            is_correct: this.qnaMarks[a.question_id] || 0,
+          };
+        }
+      }),
     };
+
+    console.log('Submitting payload:', payload);
 
     this.attemptService.gradeAttempt(this.attemptId, payload).subscribe({
       next: (res) => {
-        console.log('Grading saved successfully!');
+        console.log('Grading saved successfully!', res);
         this.router.navigate(['/admin/assessment-attempts/list']);
       },
       error: (err) => {
@@ -120,9 +206,11 @@ export class CheckAssessment implements OnInit {
     });
   }
 
-  /**
-   * Navigate back to the assessment attempts list.
-   */
+  parseFloatValue(value: any): number {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
   goBack(): void {
     this.router.navigate(['/admin/assessment-attempts/list']);
   }

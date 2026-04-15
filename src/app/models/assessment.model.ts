@@ -7,6 +7,7 @@ export interface Assessment {
   assessment_type: 'mcqs' | 'q-a';
   status: 'active' | 'inactive';
   is_single: boolean;
+  due_date?: string;          // Added due_date field (optional for backward compatibility)
   created_at?: string;
   updated_at?: string;
 }
@@ -45,6 +46,7 @@ export interface AssessmentFormData {
   assessment_type: 'mcqs' | 'q-a';
   status?: 'active' | 'inactive';
   is_single?: boolean;
+  due_date?: string;          // Added due_date field
 }
 
 export interface AssessmentListResponse {
@@ -64,4 +66,39 @@ export interface AssessmentListResponse {
     total: number;
   };
   message?: string;
+}
+
+// Optional: Add a new interface for Create Assessment Request
+export interface CreateAssessmentRequest {
+  course_id: number;
+  assessment_title: string;
+  due_date: string;
+  questions: Array<{
+    assessment_type: 'mcqs' | 'q-a';
+    question: string;
+    answer: string;
+    marks: number;
+    is_single?: boolean;
+    options?: string[];
+  }>;
+}
+
+// Optional: Add a new interface for Assessment Response (for single assessment view)
+export interface AssessmentResponse {
+  id: number;
+  course_id: number;
+  assessment_title: string;
+  due_date?: string;
+  total_marks: number;
+  questions: Array<{
+    id: number;
+    question: string;
+    answer: string;
+    options: string[];
+    assessment_type: 'mcqs' | 'q-a';
+    marks: number;
+    is_single: boolean;
+  }>;
+  created_at?: string;
+  updated_at?: string;
 }

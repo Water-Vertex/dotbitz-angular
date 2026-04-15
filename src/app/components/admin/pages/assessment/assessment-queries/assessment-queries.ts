@@ -174,7 +174,7 @@ export class AssessmentQueries implements OnInit, OnDestroy {
       this.assignForm.markAllAsTouched();
       this.toast.error('Validation', 'Please fill all required fields');
       // ✅ Re-disable fields
-      this.assignForm.get('time_to_complete')?.disable();
+      
       this.assignForm.get('total_marks')?.disable();
       return;
     }

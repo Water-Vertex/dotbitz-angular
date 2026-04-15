@@ -105,8 +105,11 @@ import { AdminQuizAttempts } from './components/admin/pages/quiz/quiz-attempt/qu
 import { AdminQuizCheck } from './components/admin/pages/quiz/quiz-check/quiz-check';
 import { AdminQuizView } from './components/admin/pages/quiz/quiz-view/quiz-view';
 import { AttemptedAssessment } from './components/admin/pages/assessment/assessment-attempt/assessment-attempt';
-import { CheckAssessment } from './components/admin/pages/assessment/assessment-check/assessment-check';
+import { AssessmentCheck } from './components/admin/pages/assessment/assessment-check/assessment-check';
 import { AssessmentView } from './components/admin/pages/assessment/assessment-view/assessment-view';
+import { InstructorAssignmentList } from './components/instructor/pages/assignment/assignment-list/assignment-list';
+import { InstructorAssignmentAdd } from './components/instructor/pages/assignment/assignment-add/assignment-add';
+import { InstructorAssignmentEdit } from './components/instructor/pages/assignment/assignment-edit/assignment-edit';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -184,7 +187,7 @@ export const routes: Routes = [
       { path: 'admin/assessments/queries', component: AssessmentQueries },
       { path: 'admin/assigned-assessments/list', component: AssignAssessmentList },
       { path: 'admin/assessment-attempts/list', component: AttemptedAssessment },
-      { path: 'admin/assessment/check/:id', component: CheckAssessment },
+      { path: 'admin/assessment/check/:id', component: AssessmentCheck },
       { path: 'admin/assessment/view/:id',component: AssessmentView},
 
 
@@ -296,6 +299,10 @@ export const routes: Routes = [
       { path: 'instructor/quiz/list', component: InstructorQuizList },
       { path: 'instructor/quiz/add', component: InstructorQuizAdd },
       { path: 'instructor/quiz/edit/:id', component: InstructorQuizEdit },
+
+      { path: 'instructor/assignment/list', component: InstructorAssignmentList },
+      { path: 'instructor/assignment/add', component: InstructorAssignmentAdd },
+      { path: 'instructor/assignment/edit/:id', component: InstructorAssignmentEdit },
     ]
   },
   { path: '**', redirectTo: '' }
