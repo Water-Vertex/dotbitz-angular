@@ -1,3 +1,4 @@
+
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -26,6 +27,8 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
   searchTerm: string = '';
   isLoading: boolean = false;
   studentName: string = '';
+  selectedCourseFilter: string = '';
+  uniqueCourses: string[] = [];
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -37,7 +40,6 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
-    // Watch for route navigation to refresh if needed
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -51,10 +53,8 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // 1. Initially load the list of children for the dropdown
     this.fetchStudents();
 
-    // 2. Setup search debounce
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((term) => {
@@ -62,7 +62,6 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
       });
   }
 
-  // Fetch initial student list
   fetchStudents(): void {
     this.loadingStudents = true;
     this.coursesService
@@ -82,7 +81,6 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
       });
   }
 
-  // Triggered when guardian selects a child from the dropdown
   onStudentSelect(studentIdValue: string): void {
     const studentId = studentIdValue ? Number(studentIdValue) : null;
     this.selectedStudentId = studentId;
@@ -90,6 +88,8 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
     // Reset data when switching students
     this.assessments = [];
     this.filteredAssessments = [];
+    this.uniqueCourses = [];  // 
+    this.selectedCourseFilter = ''; 
 
     if (!studentId) {
       this.studentName = '';
@@ -99,18 +99,33 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
     this.loadAssessmentsByStudent(studentId);
   }
 
-  // Load assessments for specific student ID
+  
+  onCourseFilterChange(courseName: string): void {
+    this.selectedCourseFilter = courseName;
+    this.applyFilter(this.searchTerm);
+  }
+
+  
+  extractUniqueCourses(): void {
+    const courses = this.assessments.map(item => item.assessment_query?.course?.course_name).filter(Boolean);
+    this.uniqueCourses = [...new Set(courses)] as string[];
+  }
+
   loadAssessmentsByStudent(studentId: number): void {
     this.isLoading = true;
     this.cdr.detectChanges();
 
     this.assignService
-      .getGuardianStudentAssessments(studentId) // Ensure service is updated to accept this ID
+      .getGuardianStudentAssessments(studentId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
           this.assessments = response?.assessments || [];
           this.studentName = response?.student_name || 'Student';
+          
+          
+          this.extractUniqueCourses();
+          
           this.applyFilter(this.searchTerm);
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -125,16 +140,25 @@ export class GuardianAssessmentList implements OnInit, OnDestroy {
   }
 
   applyFilter(term: string): void {
-    if (!term) {
-      this.filteredAssessments = [...this.assessments];
-    } else {
+    let filtered = [...this.assessments];
+
+    if (term) {
       const lowerTerm = term.toLowerCase();
-      this.filteredAssessments = this.assessments.filter(
+      filtered = filtered.filter(
         (item) =>
-          item.appointment?.course?.course_name?.toLowerCase().includes(lowerTerm) ||
+          item.assessment_query?.course?.course_name?.toLowerCase().includes(lowerTerm) ||
           item.assessment?.assessment_title?.toLowerCase().includes(lowerTerm),
       );
     }
+
+   
+    if (this.selectedCourseFilter) {
+      filtered = filtered.filter(
+        (item) => item.assessment_query?.course?.course_name === this.selectedCourseFilter
+      );
+    }
+
+    this.filteredAssessments = filtered;
   }
 
   onSearch(): void {

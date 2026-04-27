@@ -110,6 +110,27 @@ import { AssessmentView } from './components/admin/pages/assessment/assessment-v
 import { InstructorAssignmentList } from './components/instructor/pages/assignment/assignment-list/assignment-list';
 import { InstructorAssignmentAdd } from './components/instructor/pages/assignment/assignment-add/assignment-add';
 import { InstructorAssignmentEdit } from './components/instructor/pages/assignment/assignment-edit/assignment-edit';
+import { GuestLayout } from './components/guest/layout/guest-layout/guest-layout';
+import { GuestAssessmentList } from './components/guest/pages/assessment/assessment-list/assessment-list';
+import { GuestAssessmentAttempt } from './components/guest/pages/assessment/assessment-attempt/assessment-attempt';
+import { GuestAssessmentView } from './components/guest/pages/assessment/assessment-view/assessment-view';
+import { GuestAssessmentResult } from './components/guest/pages/assessment/assessment-result/assessment-result';
+import { StudentAssessmentView } from './components/student/pages/assessments/assessment-view/assessment-view';
+import { StudentAssessmentResult } from './components/student/pages/assessments/assessment-result/assessment-result';
+import { MyResult } from './components/student/pages/results/my-result/my-result';
+import { InstructorQuizAttempts } from './components/instructor/pages/quiz/quiz-attempts/quiz-attempts';
+import { InstructorQuizCheck } from './components/instructor/pages/quiz/quiz-check/quiz-check';
+import { InstructorQuizView } from './components/instructor/pages/quiz/quiz-view/quiz-view';
+import { InstructorAssignmentAttempts } from './components/instructor/pages/assignment/assignment-attempts/assignment-attempts';
+import { AdminAssignmentAttempts } from './components/admin/pages/assignment/assignment-attempts/assignment-attempts';
+import { AdminGrade } from './components/admin/pages/grades/grade/grade';
+import { InstructorGrade } from './components/instructor/pages/grades/grade/grade';
+import { InstructorStudentList } from './components/instructor/pages/students/student-list/student-list';
+import { InstructorBatchList } from './components/instructor/pages/batches/batch-list/batch-list';
+import { StudentResult } from './components/guardian/pages/results/student-result/student-result';
+import { StudentClassScheduleList } from './components/student/pages/class-schedule/schedule-list/schedule-list';
+import { GuardianConfirmation } from './components/guardian/pages/payment/confirmation/confirmation';
+import { GuardianList } from './components/admin/pages/guardians/guardian-list/guardian-list';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -159,10 +180,13 @@ export const routes: Routes = [
       { path: 'admin/student/add', component: StudentAdd },
       { path: 'admin/student/edit/:id', component: StudentEdit },
 
+      { path: 'admin/guardian/list', component: GuardianList },
+
       // Assignment routes
       { path: 'admin/assignment/list', component: AssignmentList },
       { path: 'admin/assignment/add', component: AssignmentAdd },
       { path: 'admin/assignment/edit/:id', component: AssignmentEdit },
+      { path: 'admin/assignment/attempts', component: AdminAssignmentAttempts },
 
       // Coupon routes
       { path: 'admin/coupon/list', component: CouponList },
@@ -211,6 +235,7 @@ export const routes: Routes = [
       { path: 'admin/quiz/view/:attemptId', component: AdminQuizView },
 
 
+      { path: 'admin/grade', component: AdminGrade },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
@@ -234,6 +259,8 @@ export const routes: Routes = [
       { path: 'guardian/my-courses', component: MyCoursesGuardian },
       { path: 'guardian/course/:id', component: GuardianCourseDetails},
       { path: 'guardian/student-assessments', component: GuardianAssessmentList },
+      { path: 'guardian/student-results', component: StudentResult },
+      { path: 'guardian/payment/confirmation',  component: GuardianConfirmation  },
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
@@ -254,6 +281,7 @@ export const routes: Routes = [
       { path: 'student/course/detail/:id', component: StudentCourseDetail},
       { path: 'student/checkout/:courseId', component: StudentCheckout },
       { path: 'student/my-courses', component: MyCourses },
+      { path: 'student/class-schedule', component: StudentClassScheduleList },
       { path: 'student/assignments/:courseId', component: AssignmentList },
       { path: 'student/course/:courseId', component: MyCourseDetail },
       { path: 'student/payment/confirmation', component: Confirmation },
@@ -261,6 +289,9 @@ export const routes: Routes = [
       { path: 'student/quiz/:quizId', component: MyQuiz },
       { path: 'student/my-assessments', component: StudentAssessmentList },
       { path: 'student/assessment/attempt/:assignAssessmentId', component: AttemptAssessment },
+      { path: 'student/assessment/view/:id', component: StudentAssessmentView },
+      { path: 'student/assessment-result', component: StudentAssessmentResult },
+      { path: 'student/my-results', component: MyResult }
 
     ]
   },
@@ -282,6 +313,8 @@ export const routes: Routes = [
     children: [
       { path: 'instructor/logout', component: InstructorLogout },
       { path: 'instructor/dashboard', component: InstructorDashboard },
+      { path: 'instructor/students/list', component: InstructorStudentList },
+      { path: 'instructor/batches/list', component: InstructorBatchList },
       { path: 'instructor/profile', component: InstructorProfile },
       { path: 'instructor/profile/edit', component: InstructorProfileEdit },
       { path: 'instructor/courses/list', component: InstructorCourseList },
@@ -292,7 +325,7 @@ export const routes: Routes = [
       { path: 'instructor/announcement/list', component: InstructorAnnouncementList },
       { path: 'instructor/announcement/add', component: InstructorAnnouncementAdd },
       { path: 'instructor/announcement/edit/:id', component: InstructorAnnouncementEdit },
-      { path: 'instructor/mcqs', component: InstructorMcqsList },
+      { path: 'instructor/mcqs/list', component: InstructorMcqsList },
       { path: 'instructor/mcqs/add', component: InstructorMcqsAdd },
       { path: 'instructor/mcqs/edit/:id', component: InstructorMcqsEdit },
       // Quiz routes
@@ -303,7 +336,28 @@ export const routes: Routes = [
       { path: 'instructor/assignment/list', component: InstructorAssignmentList },
       { path: 'instructor/assignment/add', component: InstructorAssignmentAdd },
       { path: 'instructor/assignment/edit/:id', component: InstructorAssignmentEdit },
+
+      { path: 'instructor/quiz/attempts', component: InstructorQuizAttempts },
+      { path: 'instructor/quiz/check/:attemptId', component: InstructorQuizCheck },
+      { path: 'instructor/quiz/view/:attemptId', component: InstructorQuizView },
+      { path: 'instructor/assignment/attempts', component: InstructorAssignmentAttempts },
+
+      { path: 'instructor/grade', component: InstructorGrade   },
+
+
     ]
   },
+  {path: 'guest',component: GuestLayout,
+      children: [
+      {path: 'guest-assessments', component: GuestAssessmentList },
+      { path: 'assessment/attempt/:assignAssessmentId', component: GuestAssessmentAttempt },
+      {path: 'assessment/attempt/:assignAssessmentId',component: GuestAssessmentAttempt },
+      { path: 'assessment/view/:id', component: GuestAssessmentView },
+        { path: 'assessment-result', component: GuestAssessmentResult },
+
+      { path: '', redirectTo: 'guest-assessments', pathMatch: 'full' }
+    ]
+  },
+
   { path: '**', redirectTo: '' }
 ];

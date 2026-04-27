@@ -1,0 +1,35 @@
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Toast colors */
+.bg-gray-800 {
+  background-color: #1f2937;
+}
+
+.bg-green-600 {
+  background-color: #059669;
+}
+
+.bg-red-600 {
+  background-color: #dc2626;
+}
+
+.bg-yellow-600 {
+  background-color: #d97706;
+}
+
+.bg-blue-600 {
+  background-color: #2563eb;
+}

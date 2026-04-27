@@ -7,7 +7,6 @@ export interface Assessment {
   assessment_type: 'mcqs' | 'q-a';
   status: 'active' | 'inactive';
   is_single: boolean;
-  due_date?: string;          // Added due_date field (optional for backward compatibility)
   created_at?: string;
   updated_at?: string;
 }
@@ -46,7 +45,6 @@ export interface AssessmentFormData {
   assessment_type: 'mcqs' | 'q-a';
   status?: 'active' | 'inactive';
   is_single?: boolean;
-  due_date?: string;          // Added due_date field
 }
 
 export interface AssessmentListResponse {
@@ -67,38 +65,34 @@ export interface AssessmentListResponse {
   };
   message?: string;
 }
+// ===== Assessment Result Interfaces =====
 
-// Optional: Add a new interface for Create Assessment Request
-export interface CreateAssessmentRequest {
-  course_id: number;
-  assessment_title: string;
-  due_date: string;
-  questions: Array<{
-    assessment_type: 'mcqs' | 'q-a';
-    question: string;
-    answer: string;
-    marks: number;
-    is_single?: boolean;
-    options?: string[];
-  }>;
+export interface AnswerDetail {
+  question_id: number;
+  question: string;
+  assessment_type: string;
+  options: string[];
+  correct_answer: string | null;
+  student_answer: string;
+  is_correct: boolean;
+  marks: number;
 }
 
-// Optional: Add a new interface for Assessment Response (for single assessment view)
-export interface AssessmentResponse {
-  id: number;
-  course_id: number;
+export interface ResultItem {
+  attempt_id: number;
+  assign_assessment_id: number;
   assessment_title: string;
-  due_date?: string;
+  course_name: string;
   total_marks: number;
-  questions: Array<{
-    id: number;
-    question: string;
-    answer: string;
-    options: string[];
-    assessment_type: 'mcqs' | 'q-a';
-    marks: number;
-    is_single: boolean;
-  }>;
-  created_at?: string;
-  updated_at?: string;
+  obtain_marks: number | null;
+  remarks: string | null;
+  status: string;
+  answers?: AnswerDetail[];
+}
+
+// Optional: Response wrapper agar aap use karna chahen
+export interface AssessmentResultResponse {
+  success: boolean;
+  data: ResultItem[];
+  message?: string;
 }

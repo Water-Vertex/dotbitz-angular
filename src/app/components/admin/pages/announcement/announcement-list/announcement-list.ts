@@ -30,7 +30,7 @@ export class AnnouncementList implements OnInit {
 
   ngOnInit(): void {
     this.loadAnnouncements();
-    
+
     // Setup search with debounce
     this.searchSubject.pipe(
       debounceTime(300),
@@ -66,7 +66,7 @@ export class AnnouncementList implements OnInit {
       this.filteredAnnouncements = [...this.announcements];
     } else {
       const term = searchTerm.toLowerCase();
-      this.filteredAnnouncements = this.announcements.filter(a => 
+      this.filteredAnnouncements = this.announcements.filter(a =>
         a.title.toLowerCase().includes(term) ||
         a.message.toLowerCase().includes(term)
       );

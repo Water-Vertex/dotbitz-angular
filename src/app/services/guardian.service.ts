@@ -28,4 +28,11 @@ export class GuardianService {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
+
+  getAllGuardians(): Observable<any> {
+    const token = localStorage.getItem('token');
+    return this.http.get(`${environment.AdminApiUrl}/guardians`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
 }

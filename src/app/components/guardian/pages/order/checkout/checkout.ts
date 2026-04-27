@@ -13,15 +13,27 @@ import { OrderService } from '../../../../../services/order.service';
   templateUrl: './checkout.html',
 })
 export class GuardianCheckout implements OnInit {
-  guardian: any = {};
-  students: any[] = [];
-  courseId: any = null;
   course: any = null;
+  guardian: any = null;
+  students: any[] = [];
+  loading = true;
+  submitting = false;
 
-  loading: boolean = true;
-  loadingGuardian: boolean = true;
-  loadingCourse: boolean = true;
-  submitting: boolean = false;
+  // Selected Student
+  selectedStudentId: number | null = null;
+  selectedStudent: any = null;
+
+  // Batch
+  batches: any[] = [];
+  selectedBatch: any = null;
+  batchSchedules: any[] = [];
+  batchId: number | null = null;
+  loadingBatches = false;
+  loadingSchedules = false;
+  showBatchChangeToast = false;
+  toastTimeout: any;
+  toastMessage = '';
+  toastType: 'info' | 'success' | 'error' | 'warning' = 'info';
 
   // Coupon
   couponCode: string = '';
@@ -31,215 +43,168 @@ export class GuardianCheckout implements OnInit {
   discountType: string = '';
   couponChecking: boolean = false;
 
-  // Enrolled check
+  // Order form fields
+  paymentMethod: string = '';
+  note: string = '';
+  status: string = 'pending';
+  isFinanced: boolean = false;
+  financeId: string = '';
+  financeProvider: string = '';
+  batchFull: boolean = false;
   isAlreadyEnrolled: boolean = false;
 
-  // Message
-  showMessage: boolean = false;
-  messageText: string = '';
-  messageType: 'success' | 'error' = 'success';
-
-  // Batch & Schedule
-  batches: any[] = [];
-  selectedBatchId: number | null = null;
-  selectedBatch: any = null;
-  schedule: any[] = [];
-  loadingBatches: boolean = false;
-  loadingSchedule: boolean = false;
-
-  // Order form fields
-  order: any = {
-    guardian_id: '',
-    student_id: '',
-    student_uid: '',
-    first_name: '',
-    last_name: '',
-    user_name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    gender: '',
-    address: '',
-    state: '',
-    city: '',
-    zipcode: '',
-    order_number: '',
-    sub_amount: 0,
-    total_amount: 0,
-    status: 'pending',
-    is_financed: false,
-    finance_id: '',
-    finance_provider: '',
-    discount: 0,
-    coupon_code: '',
-    payment_method: '',
-    note: '',
-    batch_id: null,
-  };
-
   constructor(
-    private guardianService: GuardianService,
-    private courseService: CourseService,
-    private orderService: OrderService,
-    private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
+    private courseService: CourseService,
+    private guardianService: GuardianService,
+    private orderService: OrderService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.courseId = this.route.snapshot.paramMap.get('id');
-    const incomingFee = this.route.snapshot.queryParamMap.get('fee');
-
-    if (incomingFee) {
-      this.order.sub_amount = Number(incomingFee);
+    const courseId = this.route.snapshot.paramMap.get('id');
+    if (courseId) {
+      this.fetchData(+courseId);
     }
-
-    this.generateOrderNumber();
-    this.loadData();
-    this.loadBatches();
   }
 
-  generateOrderNumber(): void {
-    const randomNum = Math.floor(100000 + Math.random() * 900000);
-    this.order.order_number = `ORD-${randomNum}`;
-  }
-
-  loadData(): void {
-    this.loadingGuardian = true;
+  fetchData(courseId: number): void {
+    this.loading = true;
+    
+    // Load guardian profile with students
     this.guardianService.getGuardianStudents().subscribe({
       next: (res: any) => {
         this.guardian = res;
         this.students = res.students || [];
-        this.order.guardian_id = this.guardian.id;
-        this.loadingGuardian = false;
-        this.checkLoading();
+        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Failed to load guardian data', err);
-        this.loadingGuardian = false;
-        this.checkLoading();
-      },
+        console.error('Error loading guardian:', err);
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
 
-    this.loadingCourse = true;
-    this.courseService.getGuardianCourseDetail(+this.courseId).subscribe({
+    // Load course details
+    this.courseService.getGuardianCourseDetail(courseId).subscribe({
       next: (res: any) => {
         this.course = res.data;
-        if (!this.order.sub_amount && this.course?.course_fee) {
-          this.order.sub_amount = Number(this.course.course_fee);
-        }
-        this.calculateTotal();
-        this.loadingCourse = false;
-        this.checkLoading();
+        this.loadBatches(courseId);
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Failed to load course', err);
-        this.loadingCourse = false;
-        this.checkLoading();
-      },
+        console.error('Error loading course:', err);
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
-  private checkLoading() {
-    if (!this.loadingGuardian && !this.loadingCourse) {
-      this.loading = false;
-      this.cdr.detectChanges();
+  onStudentChange(): void {
+    if (!this.selectedStudentId) {
+      this.selectedStudent = null;
+      this.isAlreadyEnrolled = false;
+      return;
     }
+
+    this.selectedStudent = this.students.find(s => s.id == this.selectedStudentId);
+    
+    // Check if student is already enrolled
+    if (this.selectedStudent?.enrollments) {
+      this.isAlreadyEnrolled = this.selectedStudent.enrollments.some(
+        (e: any) => e.course_id == this.course?.id
+      );
+    }
+    
+    this.cdr.detectChanges();
   }
 
-  loadBatches(): void {
+  loadBatches(courseId: number): void {
     this.loadingBatches = true;
-    this.orderService.getGuardianBatchesByCourse(this.courseId).subscribe({
+    this.orderService.getGuardianBatchesByCourse(courseId).subscribe({
       next: (res: any) => {
         this.batches = res;
         this.loadingBatches = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Failed to load batches', err);
+      error: () => {
         this.loadingBatches = false;
-      },
+        this.cdr.detectChanges();
+      }
     });
   }
 
   onBatchChange(): void {
-    const batch = this.batches.find((b) => b.id == this.selectedBatchId);
+    this.batchFull = false;
+    this.batchSchedules = [];
 
-    if (!batch) {
+    if (!this.batchId) {
       this.selectedBatch = null;
-      this.schedule = [];
-      this.order.batch_id = null;
+      this.showBatchChangeToastMessage('Please select a batch', 'info');
+      this.cdr.detectChanges();
       return;
     }
 
-    // Full check
-    if (batch.students !== null && batch.enrolled_count >= batch.students) {
-      this.messageText = 'This batch is full. Please select another batch.';
-      this.messageType = 'error';
-      this.showMessage = true;
-      setTimeout(() => (this.showMessage = false), 3000);
-
-      this.selectedBatchId = null;
-      this.selectedBatch = null;
+    this.selectedBatch = this.batches.find(b => b.id == this.batchId);
+    
+    if (!this.selectedBatch) {
       return;
     }
 
-    this.selectedBatch = batch;
-    this.order.batch_id = batch.id;
+    this.batchFull = this.selectedBatch?.is_full ?? false;
 
-    this.loadingSchedule = true;
-    this.schedule = [];
+    if (this.batchFull) {
+      this.showBatchChangeToastMessage('This batch is full. Please select another batch.', 'warning');
+      this.cdr.detectChanges();
+      return;
+    }
 
-    this.orderService.getGuardianScheduleByBatch(batch.id).subscribe({
+    this.showBatchChangeToastMessage(`Loading schedule for ${this.selectedBatch.name}...`, 'info');
+    this.loadingSchedules = true;
+    this.cdr.detectChanges();
+
+    this.orderService.getGuardianScheduleByBatch(this.batchId!).subscribe({
       next: (res: any) => {
-        this.schedule = res.data;
-        this.loadingSchedule = false;
+        this.batchSchedules = res.data || [];
+        this.loadingSchedules = false;
+        
+        if (this.batchSchedules.length > 0) {
+          this.showBatchChangeToastMessage(`✓ Schedule loaded for ${this.selectedBatch?.name}`, 'success');
+        } else {
+          this.showBatchChangeToastMessage('No schedule available for this batch', 'info');
+        }
         this.cdr.detectChanges();
       },
-      error: () => {
-        this.loadingSchedule = false;
-      },
+      error: (err) => {
+        console.error('Error loading schedules:', err);
+        this.loadingSchedules = false;
+        this.batchSchedules = [];
+        this.showBatchChangeToastMessage('Failed to load schedule. Please try again.', 'error');
+        this.cdr.detectChanges();
+      }
     });
   }
 
-  onStudentChange(): void {
-    const selectedStudent = this.students.find((s) => s.id == this.order.student_id);
-    this.isAlreadyEnrolled = false;
-
-    if (selectedStudent) {
-      if (selectedStudent.enrollments && Array.isArray(selectedStudent.enrollments)) {
-        this.isAlreadyEnrolled = selectedStudent.enrollments.some(
-          (e: any) => e.course_id == this.courseId || e.course?.id == this.courseId,
-        );
-      }
-
-      if (this.isAlreadyEnrolled) {
-        this.messageText = `${selectedStudent.first_name} is already enrolled in this course!`;
-        this.messageType = 'error';
-        this.showMessage = true;
-        setTimeout(() => (this.showMessage = false), 4000);
-      }
-
-      this.order.student_uid = selectedStudent.student_uid || '';
-      this.order.first_name = selectedStudent.first_name || '';
-      this.order.last_name = selectedStudent.last_name || '';
-      this.order.user_name = selectedStudent.user_name || '';
-      this.order.email = selectedStudent.email || '';
-      this.order.phone = selectedStudent.phone || '';
-      this.order.address = selectedStudent.address || '';
-      this.order.city = selectedStudent.city || '';
-      this.order.state = selectedStudent.state || '';
-      this.order.zipcode = selectedStudent.zipcode || '';
-      this.order.date_of_birth = selectedStudent.date_of_birth || '';
-      this.order.gender = selectedStudent.gender || '';
+  showBatchChangeToastMessage(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info'): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
     }
-    this.calculateTotal();
+    
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showBatchChangeToast = true;
+    this.cdr.detectChanges();
+    
+    this.toastTimeout = setTimeout(() => {
+      this.showBatchChangeToast = false;
+      this.cdr.detectChanges();
+    }, 3000);
   }
 
   get subAmount(): number {
-    return parseFloat(this.order.sub_amount || 0);
+    return parseFloat(this.course?.course_fee ?? 0);
   }
 
   get discountAmount(): number {
@@ -255,25 +220,6 @@ export class GuardianCheckout implements OnInit {
     return parseFloat((total < 0 ? 0 : total).toFixed(2));
   }
 
-  calculateTotal(): void {
-    const sub = Number(this.order.sub_amount) || 0;
-    if (this.couponApplied) {
-      const type = this.discountType;
-      const value = this.discount;
-      if (type === 'percentage') {
-        this.order.discount = (sub * value) / 100;
-      } else if (type === 'fixed') {
-        this.order.discount = value;
-      }
-    } else {
-      this.order.discount = 0;
-    }
-    if (this.order.discount > sub) this.order.discount = sub;
-    this.order.total_amount = sub - this.order.discount;
-    if (this.order.total_amount < 0) this.order.total_amount = 0;
-    this.cdr.detectChanges();
-  }
-
   applyCoupon(): void {
     this.couponError = '';
     this.couponApplied = false;
@@ -281,20 +227,21 @@ export class GuardianCheckout implements OnInit {
 
     if (!this.couponCode.trim()) {
       this.couponError = 'Please enter a coupon code.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.couponChecking = true;
+    this.cdr.detectChanges();
 
-    this.orderService.validateCoupon(this.couponCode.trim()).subscribe({
+    this.orderService.validateGuardianCoupon(this.couponCode.trim()).subscribe({
       next: (res: any) => {
         this.couponChecking = false;
         if (res.success) {
           this.couponApplied = true;
           this.discount = parseFloat(res.data.discount_value);
           this.discountType = res.data.discount_type;
-          this.order.coupon_code = this.couponCode;
-          this.calculateTotal();
+          this.showBatchChangeToastMessage(`Coupon applied! ${this.discount}${this.discountType === 'percentage' ? '%' : '$'} off`, 'success');
           this.cdr.detectChanges();
         } else {
           this.couponError = res.message || 'Invalid coupon code.';
@@ -305,7 +252,7 @@ export class GuardianCheckout implements OnInit {
         this.couponChecking = false;
         this.couponError = 'Invalid or expired coupon code.';
         this.cdr.detectChanges();
-      },
+      }
     });
   }
 
@@ -315,98 +262,159 @@ export class GuardianCheckout implements OnInit {
     this.discount = 0;
     this.discountType = '';
     this.couponError = '';
-    this.order.coupon_code = '';
-    this.calculateTotal();
+    this.showBatchChangeToastMessage('Coupon removed', 'info');
+    this.cdr.detectChanges();
   }
 
-  proceedToCheckout(): void {
-    if (this.isAlreadyEnrolled) return;
-
-    if (!this.order.student_id) {
-      this.messageText = 'Please select a student.';
-      this.messageType = 'error';
-      this.showMessage = true;
-      setTimeout(() => (this.showMessage = false), 3000);
+  proceedToPay(): void {
+    // Validation checks
+    if (!this.selectedStudentId) {
+      this.showBatchChangeToastMessage('Please select a student', 'warning');
       return;
     }
-
-    if (!this.order.batch_id) {
-      this.messageText = 'Please select a batch.';
-      this.messageType = 'error';
-      this.showMessage = true;
-      setTimeout(() => (this.showMessage = false), 3000);
+    if (this.isAlreadyEnrolled) {
+      this.showBatchChangeToastMessage('This student is already enrolled in this course!', 'warning');
       return;
     }
-
-    if (!this.order.payment_method) {
-      this.messageText = 'Please select a payment method.';
-      this.messageType = 'error';
-      this.showMessage = true;
-      setTimeout(() => (this.showMessage = false), 3000);
+    if (!this.batchId) {
+      this.showBatchChangeToastMessage('Please select a batch', 'warning');
       return;
     }
-
-    if (
-      this.order.is_financed &&
-      (!this.order.finance_id?.trim() || !this.order.finance_provider?.trim())
-    ) {
-      this.messageText = 'Please fill in Finance ID and Finance Provider.';
-      this.messageType = 'error';
-      this.showMessage = true;
-      setTimeout(() => (this.showMessage = false), 3000);
+    if (!this.paymentMethod) {
+      this.showBatchChangeToastMessage('Please select a payment method', 'warning');
       return;
     }
-
-    const payload = {
-      guardian_id: this.order.guardian_id,
-      student_id: Number(this.order.student_id),
-      course_id: Number(this.course?.id),
-      batch_id: this.order.batch_id,
-      first_name: this.order.first_name,
-      last_name: this.order.last_name,
-      email: this.order.email,
-      phone: this.order.phone,
-      sub_amount: Number(this.order.sub_amount),
-      total_amount: Number(this.totalAmount),
-      coupon_code: this.couponApplied ? this.couponCode : null,
-      discount: Number(this.discountAmount),
-      payment_method: this.order.payment_method,
-      note: this.order.note,
-      is_financed: this.order.is_financed,
-      finance_provider: this.order.is_financed ? this.order.finance_provider : null,
-      finance_id: this.order.is_financed ? this.order.finance_id : null,
-      order_number: this.order.order_number,
-      status: this.order.status,
-    };
+    if (this.isFinanced && (!this.financeId.trim() || !this.financeProvider.trim())) {
+      this.showBatchChangeToastMessage('Please fill in Finance ID and Finance Provider', 'warning');
+      return;
+    }
+    if (this.batchFull) {
+      this.showBatchChangeToastMessage('This batch is full. Please select another batch', 'warning');
+      return;
+    }
 
     this.submitting = true;
+    this.cdr.detectChanges();
+
+    const payload: any = {
+      guardian_id: this.guardian?.id,
+      student_id: this.selectedStudentId,
+      course_id: this.course.id,
+      batch_id: this.batchId,
+      sub_amount: this.subAmount,
+      total_amount: this.totalAmount,
+      discount: this.discountAmount,
+      coupon_code: this.couponApplied ? this.couponCode : null,
+      payment_method: this.paymentMethod,
+      note: this.note,
+      status: this.status,
+      is_financed: this.isFinanced,
+      finance_id: this.isFinanced ? this.financeId : null,
+      finance_provider: this.isFinanced ? this.financeProvider : null,
+    };
+
+    // Add success and cancel URLs for Stripe payment (EXACTLY like student checkout)
+    if (this.paymentMethod === 'stripe') {
+      payload.success_url = `${window.location.origin}/guardian/payment/confirmation`;
+      payload.cancel_url = `${window.location.origin}/guardian/payment/cancellation`;
+    }
+
     this.orderService.placeGuardianOrder(payload).subscribe({
       next: (res: any) => {
         this.submitting = false;
+        this.cdr.detectChanges();
+        
         if (res.success) {
-          this.messageText = 'Enrollment completed successfully!';
-          this.messageType = 'success';
-          this.showMessage = true;
-          this.cdr.detectChanges();
-
-          setTimeout(() => {
-            this.showMessage = false;
-            this.router.navigate(['/guardian/courses/list']);
-          }, 2500);
+          // Check if this is a Stripe payment that requires redirect (EXACTLY like student checkout)
+          if (res.data?.redirect && res.data?.checkout_url) {
+            // Redirect to Stripe Checkout page
+            window.location.href = res.data.checkout_url;
+          } else {
+            // Non-Stripe payment (cash, bank transfer, etc.)
+            this.showBatchChangeToastMessage(`Order placed successfully! Order #${res.data.order_number}`, 'success');
+            setTimeout(() => {
+              this.router.navigate(['/guardian/courses']);
+            }, 2000);
+          }
+        } else {
+          this.showBatchChangeToastMessage(res.message || 'Failed to place order. Please try again.', 'error');
         }
       },
       error: (err) => {
         this.submitting = false;
-        if (err.status === 409) {
-          this.messageText = 'This student is already enrolled in this course!';
-        } else {
-          this.messageText = err?.error?.message || 'Failed to place order. Please try again.';
-        }
-        this.messageType = 'error';
-        this.showMessage = true;
         this.cdr.detectChanges();
-        setTimeout(() => (this.showMessage = false), 4000);
-      },
+        
+        if (err.status === 409) {
+          this.showBatchChangeToastMessage('This student is already enrolled in this course!', 'warning');
+        } else if (err.status === 422) {
+          const errorMessage = err.error?.message || 'Invalid data. Please check your input.';
+          this.showBatchChangeToastMessage(errorMessage, 'error');
+        } else {
+          console.error('Order placement error:', err);
+          this.showBatchChangeToastMessage('Failed to place order. Please try again.', 'error');
+        }
+      }
     });
+  }
+
+  // Helper Methods
+  formatBatchDateRange(batch: any): string {
+    if (!batch || !batch.start_date || !batch.end_date) return 'Date TBD';
+    
+    const start = new Date(batch.start_date);
+    const end = new Date(batch.end_date);
+    
+    const startMonth = start.toLocaleString('default', { month: 'short' });
+    const endMonth = end.toLocaleString('default', { month: 'short' });
+    const startDay = start.getDate();
+    const endDay = end.getDate();
+    const year = end.getFullYear();
+    
+    if (startMonth === endMonth) {
+      return `${startMonth} ${startDay} - ${endDay}, ${year}`;
+    }
+    return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
+  }
+
+  formatTime(time: string): string {
+    if (!time) return 'TBD';
+    
+    const [hours, minutes] = time.split(':');
+    let hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minutes} ${ampm}`;
+  }
+
+  getDuration(startTime: string, endTime: string): string {
+    if (!startTime || !endTime) return 'TBD';
+    
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    
+    let durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+    if (durationMinutes < 0) durationMinutes += 24 * 60;
+    
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    
+    if (hours === 0) return `${minutes} min`;
+    if (minutes === 0) return `${hours} hr`;
+    return `${hours} hr ${minutes} min`;
+  }
+
+  getShortDay(day: string): string {
+    if (!day) return '';
+    
+    const dayMap: { [key: string]: string } = {
+      'monday': 'Mon',
+      'tuesday': 'Tue',
+      'wednesday': 'Wed',
+      'thursday': 'Thu',
+      'friday': 'Fri',
+      'saturday': 'Sat',
+      'sunday': 'Sun'
+    };
+    return dayMap[day.toLowerCase()] || day.substring(0, 3);
   }
 }

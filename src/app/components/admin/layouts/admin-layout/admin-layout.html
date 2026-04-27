@@ -108,28 +108,30 @@
             display: block !important;
         }
     }
+
     /* Add to your existing CSS */
-.submenu {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-}
+    .submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+    }
 
-.submenu.active {
-    max-height: 300px; /* Adjust based on your content */
-}
+    .submenu.active {
+        max-height: 300px; /* Adjust based on your content */
+    }
 
-.menu-toggle-btn .fa-chevron-down {
-    transition: transform 0.3s ease;
-}
+    .menu-toggle-btn .fa-chevron-down {
+        transition: transform 0.3s ease;
+    }
 
-.menu-toggle-btn.active .fa-chevron-down {
-    transform: rotate(180deg);
-}
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+    .menu-toggle-btn.active .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 </style>
 
 <!-- Mobile Overlay -->
@@ -139,19 +141,15 @@
 <div class="mobile-user-dropdown bg-white rounded-xl shadow-2xl border border-gray-100 py-2" id="mobileUserDropdown">
     <!-- User Info -->
     <div class="px-5 py-4 border-b border-gray-100">
-        <p class="text-sm font-semibold text-gray-900">Admin User</p>
-        <p class="text-xs text-gray-500 mt-1">admin@example.com</p>
+        <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
+        <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
     </div>
 
-    <!-- Menu Items -->
-    <a href="" wire:navigate class="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-        <i class="fas fa-user-circle mr-3 text-gray-400 w-5"></i>
-        <span>Profile</span>
-    </a>
+
 
     <div class="border-t border-gray-100 my-1"></div>
 
-    <a routerLink="/admin/logout" data-nav-item data-href="/admin/logout" class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+    <a (click)="navigateToLogout()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
         <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
         <span>Sign Out</span>
     </a>
@@ -176,70 +174,72 @@
                         Main Menu
                     </h3>
                     <a routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
-                       Dashboard
+                        Dashboard
                     </a>
                     <a routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
-                     Instructors
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
+                        Instructors
                     </a>
                     <a routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-users mr-3 w-5 text-content"></i>
-                      Students
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i>
+                        Students
                     </a>
-                    <!-- Replace the existing Courses menu item with this: -->
+
+                    <a routerLink="/admin/guardian/list" data-nav-item data-href="/admin/guardian/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i>
+                        Guardians
+                    </a>
+
+                    <!-- Courses Menu Item with Submenu -->
                     <div class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
-
-                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
+                                <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
                                 Courses
                             </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
                         <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
                             <a routerLink="/admin/course/add" data-nav-item data-href="/admin/course/add"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                               Add New course
-
+                                Add New Course
                             </a>
                             <a routerLink="/admin/course/list" data-nav-item data-href="/admin/course/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-list mr-3 w-5 text-center"></i>
                                 Course List
                             </a>
                             <a routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                               <i class="fas fa-book-open mr-3 w-5 text-center"></i>
-                               Course Curriculum
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-book-open mr-3 w-5 text-center"></i>
+                                Course Curriculum
                             </a>
-
                             <a routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                               Assigned Courses to Instructor
-
+                                Assigned Courses
                             </a>
                         </div>
                     </div>
 
                     <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-users mr-3 w-5 text-content"></i>
-                      Batches
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i>
+                        Batches
                     </a>
                     <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
-                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-calendar-alt mr-3 w-5 text-content"></i>
-                      Class Schedule
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i>
+                        Class Schedule
                     </a>
-
                 </div>
 
                 <!-- Content Section -->
@@ -248,83 +248,104 @@
                         Content
                     </h3>
                     <a routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-quote-left mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-quote-left mr-3 w-5 text-center"></i>
                         MCQs
+                    </a>
 
-                    </a>
-                    <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
-                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-clipboard-question mr-3 w-5 text-content"></i>
-                      Quizzes
-                    </a>
-                    <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
-                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-tasks mr-3 w-5 text-content"></i>
-                      Attempted Quizzes
-                    </a>
-                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file mr-3 w-5 text-content"></i>
-                        Policies
-
-                    </a>
+                    <!-- Manage Quiz Submenu -->
                     <div class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
-
-                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
-                               Manage Assessments
+                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
+                               Quiz
                             </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
                         <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
-                          <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
-                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                                Assessments Queries
-
+                            <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
+                                Quiz List
                             </a>
-                           <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
-                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                                Assessments List
-
+                            <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-tasks mr-3 w-5 text-center"></i>
+                                Attempted Quizzes
                             </a>
-                           
-                            <a
-                              routerLink="/admin/assessment-attempts/list"
-                              data-nav-item
-                              data-href="/admin/assessment-attempts/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900"
-                            >
-                              <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
-                              Attempted Assessments
-                            </a>
-
                         </div>
-                        <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                          <i class="fas fa-users mr-3 w-5 text-content"></i>
-                          Batches
-                        </a>
-                        <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                          <i class="fas fa-calendar-alt mr-3 w-5 text-content"></i>
-                          Class Schedule
-                        </a>
                     </div>
-                    <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assignments
 
+                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file mr-3 w-5 text-center"></i>
+                        Policies
+                    </a>
+
+                    <!-- Manage Assessments Submenu -->
+                    <div class="courses-menu-item" data-has-submenu="true">
+                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
+                            <div class="flex items-center">
+                                <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
+                                 Assessments
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
+                        </button>
+
+                        <!-- Submenu -->
+                        <div class="submenu mt-1 space-y-1 hidden">
+                            <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                Assessments Queries
+                            </a>
+                            <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                Assessments List
+                            </a>
+                            <a routerLink="/admin/assessment-attempts/list" data-nav-item data-href="/admin/assessment-attempts/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
+                                Attempted Assessments
+                            </a>
+                        </div>
+                    </div>
+
+                   <!-- Manage Assignments Submenu -->
+                    <div class="courses-menu-item" data-has-submenu="true">
+                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                 Assignments
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
+                        </button>
+
+                        <!-- Submenu -->
+                        <div class="submenu mt-1 space-y-1 hidden">
+                           <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                Assignments List
+                            </a>
+                            <a routerLink="/admin/assignment/attempts" data-nav-item data-href="/admin/assignment/attempts"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                               Attempted Assignments
+                            </a>
+                        </div>
+                    </div>
+                    <a routerLink="/admin/grade" data-nav-item data-href="/admin/grade"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                        Grades Book
                     </a>
                     <a routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-question-circle mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-question-circle mr-3 w-5 text-center"></i>
                         FAQs
                     </a>
                 </div>
@@ -335,16 +356,15 @@
                         Configuration
                     </h3>
                     <a routerLink="/admin/announcement/list" data-nav-item data-href="/admin/announcement/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-microphone mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-microphone mr-3 w-5 text-center"></i>
                         Announcements
                     </a>
                     <a routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-tags mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-tags mr-3 w-5 text-center"></i>
                         Coupons
                     </a>
-
                 </div>
             </div>
         </nav>
@@ -367,11 +387,11 @@
     </div>
 
     <!-- Mobile Sidebar -->
-    <div class="sidebar-mobile  bg-[#063989] text-gray-800 shadow-xl flex flex-col border-r border-gray-200">
+    <div class="sidebar-mobile bg-[#063989] text-gray-800 shadow-xl flex flex-col border-r border-gray-200">
         <!-- Mobile Header with Close Button -->
         <div class="p-2 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-               <img src="../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="150">
+                <img src="../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="150">
             </div>
             <button class="text-gray-400 hover:text-gray-600 text-lg close-sidebar w-10 h-10 rounded-lg hover:bg-gray-100 flex items-center justify-center">
                 <i class="fas fa-times"></i>
@@ -387,67 +407,72 @@
                         Main Menu
                     </h3>
                     <a routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
-                       Dashboard
+                        Dashboard
                     </a>
                     <a routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
-                     Instructors
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
+                        Instructors
                     </a>
                     <a routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-users mr-3 w-5 text-content"></i>
-                      Students
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i>
+                        Students
                     </a>
-                    <!-- Replace the existing Courses menu item with this: -->
+
+                     <a routerLink="/admin/guardian/list" data-nav-item data-href="/admin/guardian/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i>
+                        Guardians
+                    </a>
+
+                    <!-- Courses Menu Item with Submenu -->
                     <div class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
-
-                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
+                                <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
                                 Courses
                             </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
                         <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
                             <a routerLink="/admin/course/add" data-nav-item data-href="/admin/course/add"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                               Add New course
-
+                                Add New Course
                             </a>
                             <a routerLink="/admin/course/list" data-nav-item data-href="/admin/course/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-list mr-3 w-5 text-center"></i>
                                 Course List
                             </a>
                             <a routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                               <i class="fas fa-book-open mr-3 w-5 text-center"></i>
-                               Course Curriculum
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-book-open mr-3 w-5 text-center"></i>
+                                Course Curriculum
                             </a>
                             <a routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                               Assigned Courses to Instructor
-
+                                Assigned Courses
                             </a>
                         </div>
-                        <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                          <i class="fas fa-users mr-3 w-5 text-content"></i>
-                          Batches
-                        </a>
-                        <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                          <i class="fas fa-calendar-alt mr-3 w-5 text-content"></i>
-                          Class Schedule
-                        </a>
                     </div>
+
+                    <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i>
+                        Batches
+                    </a>
+                    <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i>
+                        Class Schedule
+                    </a>
                 </div>
 
                 <!-- Content Section -->
@@ -456,84 +481,106 @@
                         Content
                     </h3>
                     <a routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-quote-left mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-quote-left mr-3 w-5 text-center"></i>
                         MCQs
+                    </a>
 
-                    </a>
-                    <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
-                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-clipboard-question mr-3 w-5 text-content"></i>
-                      Quizzes
-                    </a>
-                    <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
-                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-tasks mr-3 w-5 text-content"></i>
-                      Attempted Quizzes
-                    </a>
-                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file mr-3 w-5 text-content"></i>
-                        Policies
-
-                    </a>
+                    <!-- Manage Quiz Submenu -->
                     <div class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
-
-                                    <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
-                               Manage Assessments
+                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
+                                 Quiz
                             </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200 group-hover:text-blue-500"></i>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
                         <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
-                          <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
-                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                                Assessments Queries
-
+                            <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
+                                Quiz List
                             </a>
-                           <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
-                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                              <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                                Assessments List
-
+                            <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-tasks mr-3 w-5 text-center"></i>
+                                Attempted Quizzes
                             </a>
-
-                            <a
-                              routerLink="/admin/assessment-attempts/list"
-                              data-nav-item
-                              data-href="/admin/assessment-attempts/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900"
-                            >
-                              <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
-                              Attempted Assessments
-                            </a>
-
                         </div>
-                        <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                          <i class="fas fa-users mr-3 w-5 text-content"></i>
-                          Batches
-                        </a>
-                        <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                          <i class="fas fa-calendar-alt mr-3 w-5 text-content"></i>
-                          Class Schedule
-                        </a>
                     </div>
 
-                    <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
-                        Assignments
+                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file mr-3 w-5 text-center"></i>
+                        Policies
+                    </a>
 
+                    <!-- Manage Assessments Submenu -->
+                    <div class="courses-menu-item" data-has-submenu="true">
+                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
+                            <div class="flex items-center">
+                                <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
+                                 Assessments
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
+                        </button>
+
+                        <!-- Submenu -->
+                        <div class="submenu mt-1 space-y-1 hidden">
+                            <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                Assessments Queries
+                            </a>
+                            <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                Assessments List
+                            </a>
+                            <a routerLink="/admin/assessment-attempts/list" data-nav-item data-href="/admin/assessment-attempts/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
+                                Attempted Assessments
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Manage Assignments Submenu -->
+                    <div class="courses-menu-item" data-has-submenu="true">
+                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                 Assignments
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
+                        </button>
+
+                        <!-- Submenu -->
+                        <div class="submenu mt-1 space-y-1 hidden">
+                           <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                Assignments List
+                            </a>
+                            <a routerLink="/admin/assignment/attempts" data-nav-item data-href="/admin/assignment/attempts"
+                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                                Attempted Assignments
+                            </a>
+                        </div>
+                    </div>
+
+
+                    <a routerLink="/admin/grade" data-nav-item data-href="/admin/grade"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
+                        Gradex Book
                     </a>
                     <a routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-question-circle mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-question-circle mr-3 w-5 text-center"></i>
                         FAQs
                     </a>
                 </div>
@@ -544,13 +591,13 @@
                         Configuration
                     </h3>
                     <a routerLink="/admin/announcement/list" data-nav-item data-href="/admin/announcement/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-microphone mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-microphone mr-3 w-5 text-center"></i>
                         Announcements
                     </a>
                     <a routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
-                     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                     <i class="fas fa-tags mr-3 w-5 text-content"></i>
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-tags mr-3 w-5 text-center"></i>
                         Coupons
                     </a>
                 </div>
@@ -599,20 +646,20 @@
                     </button>
 
                     <!-- Notifications -->
-                    <button class="notifications-btn relative p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors">
+                    <!-- <button class="notifications-btn relative p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-bell"></i>
                         <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
-                    </button>
+                    </button> -->
 
                     <!-- Help -->
-                    <button class="help-btn p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors">
+                    <!-- <button class="help-btn p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-question-circle"></i>
-                    </button>
+                    </button> -->
 
                     <!-- Desktop User Menu -->
                     <div class="relative desktop-user-menu">
                         <button class="flex items-center space-x-3 text-sm focus:outline-none bg-white hover:bg-gray-50 rounded-xl px-4 py-2.5 border border-gray-200 hover:border-gray-300 transition-all duration-200 user-menu-btn shadow-sm">
-                            <div class="w-9 h-9 bg-orange-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+                            <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center shadow-sm">
                                 <span class="text-white font-semibold text-sm">{{ userInitials }}</span>
                             </div>
                             <div class="text-left">
@@ -623,22 +670,15 @@
                         </button>
 
                         <!-- Desktop Dropdown Menu -->
-                        <div class="user-dropdown absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50" style="display: none;">
+                         <div class="user-dropdown absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50" style="display: none;">
                             <!-- User Info -->
                             <div class="px-5 py-4 border-b border-gray-100">
                                 <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
-                                <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}  </p>
+                                <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
                             </div>
-
-                            <!-- Menu Items -->
-                            <a href="" wire:navigate class="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
-                                <i class="fas fa-user-circle mr-3 text-gray-400 w-5"></i>
-                                <span>Profile</span>
-                            </a>
-
                             <div class="border-t border-gray-100 my-1"></div>
 
-                            <a routerLink="/admin/logout" data-nav-item data-href="/admin/logout" class="flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+                            <a (click)="navigateToLogout()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
                                 <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
                                 <span>Sign Out</span>
                             </a>
@@ -646,7 +686,7 @@
                     </div>
 
                     <!-- Mobile User Button -->
-                    <button class="mobile-user-btn hidden w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm" id="mobileUserBtn">
+                    <button class="mobile-user-btn hidden w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm" id="mobileUserBtn">
                         {{ userInitials }}
                     </button>
                 </div>
@@ -661,4 +701,3 @@
         </main>
     </div>
 </div>
-

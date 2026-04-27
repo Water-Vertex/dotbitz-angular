@@ -1,12 +1,12 @@
-<p>student-edit works!</p>
+
   <!-- Decorative blur -->
-    <div class="absolute top-0 right-0 w-64 h-64 bg-[#ffd500] opacity-10 blur-3xl rounded-full"></div>
+<div class="absolute top-0 right-0 w-64 h-64 bg-[#ffd500] opacity-10 blur-3xl rounded-full"></div>
 <div class="mt-12 relative z-1 bg-white p-6 sm:p-0">
   <div class="relative flex  w-full flex-col justify-center sm:p-0 lg:flex-row">
     <!-- Form Section -->
     <div class="flex w-full flex-1 flex-col lg:w-1/2">
 
-      <div class="mx-auto w-full max-w-4xl px-4 flex flex-1 flex-col justify-center"> <!-- Changed max-w-md to max-w-4xl and added px-4 -->
+      <div class="mx-auto w-full  px-4 flex flex-1 flex-col justify-center"> <!-- Changed max-w-md to max-w-4xl and added px-4 -->
         <div class="w-full">
 
           <!-- Progress Steps -->
@@ -15,7 +15,7 @@
               <div *ngFor="let step of [1, 2, 3]; let i = index" class="flex items-center">
                 <div
                   [class]="'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ' +
-                  (currentStep === i + 1 ? 'bg-[#161950] text-white' :
+                  (currentStep === i + 1 ? 'bg-[#FF6D00] text-white' :
                    currentStep > i + 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600')"
                 >
                   <span *ngIf="currentStep <= i + 1" class="text-sm font-bold">{{i + 1}}</span>
@@ -515,7 +515,7 @@
                     Previous
                   </button>
 
-                  <div [class.justify-end]="currentStep === 1" class="flex-1 flex">
+                  <div [class.justify-end]="currentStep === 1" class="">
                     <button type="button" *ngIf="currentStep < 3" (click)="nextStep()" [disabled]="!isStepValid(currentStep)"
                       [class]="'px-6 py-3 bg-[#161950] text-white rounded-lg hover:bg-[#1a1f6e] transition flex items-center text-sm ' +
                       (!isStepValid(currentStep) ? 'opacity-50 cursor-not-allowed' : '')">
@@ -538,69 +538,14 @@
                 </div>
               </div>
             </form>
-            <div class="mt-5">
-              <p class="text-center text-sm font-normal text-gray-700 sm:text-start">
-                Already have an account?
-                <a [routerLink]="['/login']" class="text-[#161950] hover:text-[#1a1f6e] font-medium">
-                  Sign In
-                </a>
-              </p>
-            </div>
+
           </div>
         </div>
       </div>
     </div>
 
   </div>
-<!-- Simple Preloader Modal -->
-<div *ngIf="isLoading" class="simple-preloader">
-  <div class="simple-loader">
-    <!-- Simple Spinner -->
-    <div class="simple-spinner"></div>
 
-    <!-- Title -->
-    <h3 class="loading-title">Updating Your Account</h3>
-    <p class="loading-subtitle">Please wait while we process your registration</p>
 
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar"></div>
-    </div>
 
-    <!-- Status Messages -->
-    <div class="status-list">
-      <div class="status-item">
-        <span class="status-text">Processing personal information...</span>
-        <span class="status-check">✓</span>
-      </div>
-      <div class="status-item">
-        <span class="status-text">Setting up education details...</span>
-        <span class="status-check">✓</span>
-      </div>
-      <div class="status-item">
-        <span class="status-text">Creating secure account...</span>
-        <span class="status-check">✓</span>
-      </div>
-    </div>
-
-    <!-- Simple Message -->
-    <p class="text-xs text-gray-500 mt-6">
-      You will be redirected to login shortly
-    </p>
-  </div>
-</div>
-
-<!-- Submit Button (Same as before) -->
-<button type="submit" *ngIf="currentStep === 3" [disabled]="registrationForm.invalid || isLoading"
-  [class]="'px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center text-sm ' +
-  (registrationForm.invalid || isLoading ? 'opacity-50 cursor-not-allowed' : '')">
-  <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-  </svg>
-  <span>{{ isLoading ? 'Processing...' : 'Complete Registration' }}</span>
-  <svg *ngIf="!isLoading" class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-  </svg>
-</button>
 </div>

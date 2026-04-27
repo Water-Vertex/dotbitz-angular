@@ -9,7 +9,7 @@
             </p>
         </div>
         <a routerLink="/instructor/class-schedule/list"
-           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium">
+           class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium">
             <i class="fas fa-arrow-left"></i>
             <span>Back to Schedules</span>
         </a>
@@ -18,7 +18,7 @@
 
 <!-- Loading State -->
 <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
-    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
     <p class="text-gray-500 mt-2">Loading schedule details...</p>
 </div>
 
@@ -48,7 +48,7 @@
             <select
                 formControlName="course_id"
                 (change)="onCourseChange()"
-                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                 [class.border-red-300]="f['course_id'].invalid && f['course_id'].touched"
             >
                 <option [ngValue]="null">-- Select Course --</option>
@@ -69,7 +69,7 @@
             <select
                 formControlName="batch_id"
                 [disabled]="!f['course_id'].value || batches.length === 0"
-                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                 [class.border-red-300]="f['batch_id'].invalid && f['batch_id'].touched"
             >
                 <option [ngValue]="null">-- Select Batch --</option>
@@ -85,7 +85,7 @@
             </div>
         </div>
 
-       
+
 
         <!-- Day Display (Disabled Input) -->
         <div>
@@ -110,7 +110,7 @@
                 <input
                     type="datetime-local"
                     formControlName="start_time"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                     [class.border-red-300]="f['start_time'].invalid && f['start_time'].touched"
                 >
                 <div *ngIf="f['start_time'].invalid && f['start_time'].touched" class="mt-1 text-xs text-red-600">
@@ -125,7 +125,7 @@
                 <input
                     type="datetime-local"
                     formControlName="end_time"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                     [class.border-red-300]="f['end_time'].invalid && f['end_time'].touched"
                 >
                 <div *ngIf="f['end_time'].invalid && f['end_time'].touched" class="mt-1 text-xs text-red-600">
@@ -143,7 +143,7 @@
                 type="url"
                 formControlName="meeting_link"
                 placeholder="https://meet.google.com/xxx"
-                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
                 [class.border-red-300]="f['meeting_link'].invalid && f['meeting_link'].touched"
             >
             <div *ngIf="f['meeting_link'].invalid && f['meeting_link'].touched" class="mt-1 text-xs text-red-600">
@@ -160,7 +160,7 @@
                 formControlName="note"
                 rows="4"
                 maxlength="1000"
-                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                 placeholder="Enter schedule note"
             ></textarea>
             <div class="text-xs text-gray-500 text-right mt-1">
@@ -175,7 +175,7 @@
             </label>
             <select
                 formControlName="status"
-                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
             >
                 <option *ngFor="let status of statusOptions" [value]="status">
                     {{ status | titlecase }}
@@ -184,7 +184,7 @@
         </div>
 
         <!-- Form Actions -->
-        <div class="flex justify-end space-x-3 pt-6 border-t">
+        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
             <button
                 type="button"
                 (click)="cancel()"
@@ -195,7 +195,7 @@
             <button
                 type="submit"
                 [disabled]="scheduleForm.invalid || isSubmitting"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2"
             >
                 <span *ngIf="!isSubmitting">
                     <i class="fas fa-save mr-2"></i>

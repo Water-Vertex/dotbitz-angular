@@ -1,88 +1,209 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { McqService } from '../../../../../services/mcq.service';
+import { Mcq } from '../../../../../models/mcq.model';
+import { Course } from '../../../../../models/course.model';
+import { ToastService } from '../../../../../services/toast.service';
+
+interface McqGroup {
+  courseId: number;
+  courseName: string;
+  mcqs: Mcq[];
+}
 
 @Component({
-  selector: 'app-instructor-mcq-list',
+  selector: 'app-instructor-mcqs-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './mcq-list.html',
+  styleUrls: ['./mcq-list.css']
 })
 export class InstructorMcqsList implements OnInit {
+  mcqs: Mcq[] = [];
+  filteredMcqs: Mcq[] = [];
+  groupedMcqs: McqGroup[] = [];
+  courses: Course[] = [];
+  selectedCourseId: number | string = 'all';
+  searchText = '';
+  loading = true;
 
-  mcqs: any[] = [];
-  loading = false;
-  deleting: number | null = null;
-  selectedCourseId: number | null = null;
-  courses: any[] = [];
-  allMcqs: any[] = []; 
+  // Accordion state - track which courses are expanded
+  expandedCourses: Set<number> = new Set();
 
   constructor(
     private mcqService: McqService,
-    private router: Router,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    console.log('🚀 Instructor MCQ List Component Initialized');
     this.loadMcqs();
+    this.loadCourses();
   }
 
-  loadMcqs(): void {
-  this.loading = true;
-  this.mcqService.getInstructorMcqs().subscribe({
-    next: (res: any) => {
-      this.allMcqs = res.data || [];
-      this.mcqs = [...this.allMcqs];
-
-      // 🔥 Unique courses extract karo
-      const uniqueCoursesMap = new Map();
-
-      this.allMcqs.forEach((m: any) => {
-        if (m.course) {
-          uniqueCoursesMap.set(m.course.id, m.course);
-        }
-      });
-
-      this.courses = Array.from(uniqueCoursesMap.values());
-
-      this.loading = false;
-      this.cdr.detectChanges();
-    },
-    error: () => {
-      this.loading = false;
-    }
-  });
-}
-filterByCourse() {
-  if (!this.selectedCourseId) {
-    this.mcqs = [...this.allMcqs];
-  } else {
-    this.mcqs = this.allMcqs.filter(
-      m => m.course_id === this.selectedCourseId
-    );
-  }
-}
-
-  onEdit(id: number): void {
-    this.router.navigate(['/instructor/mcqs/edit', id]);
-  }
-
-  onDelete(id: number): void {
-    if (!confirm('Are you sure you want to delete this MCQ?')) return;
-
-    this.deleting = id;
-    this.mcqService.deleteInstructorMcq(id).subscribe({
-      next: () => {
-        this.deleting = null;
-        this.mcqs = this.mcqs.filter(m => m.msq_id !== id);
+  // Instructor's assigned courses only
+  loadCourses(): void {
+    this.mcqService.getInstructorCourses().subscribe({
+      next: (data: any) => {
+        const all = Array.isArray(data) ? data : (data?.data ?? []);
+        this.courses = all.filter((c: any) => c.status === 'active');
         this.cdr.detectChanges();
       },
       error: () => {
-        this.deleting = null;
-        alert('Failed to delete MCQ.');
+        this.courses = [];
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  // Instructor's own MCQs
+  loadMcqs(): void {
+    console.log('📥 Loading Instructor MCQs from API...');
+    this.loading = true;
+
+    this.mcqService.getInstructorMcqs().subscribe({
+      next: (data: any) => {
+        console.log('✅ MCQs received:', data);
+        this.mcqs = Array.isArray(data) ? data : (data?.data ?? []);
+        this.applyFilters();
+      },
+      error: (err) => {
+        console.error('❌ Error loading MCQs:', err);
+        this.mcqs = [];
+        this.filteredMcqs = [];
+        this.groupedMcqs = [];
+        this.toastService.error('Error', 'Failed to load MCQs');
+      },
+      complete: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+        console.log('🏁 MCQ loading completed');
+      }
+    });
+  }
+
+  applyFilters(): void {
+    let result = [...this.mcqs];
+
+    // Apply course filter
+    if (this.selectedCourseId !== 'all') {
+      result = result.filter(mcq => mcq.course_id === Number(this.selectedCourseId));
+    }
+
+    // Apply search filter
+    if (this.searchText.trim()) {
+      const search = this.searchText.trim().toLowerCase();
+      result = result.filter(mcq =>
+        mcq.question?.toLowerCase().includes(search) ||
+        mcq.course?.course_name?.toLowerCase().includes(search) ||
+        mcq.status?.toLowerCase().includes(search)
+      );
+    }
+
+    this.filteredMcqs = result;
+    this.groupMcqsByCourse();
+    this.cdr.detectChanges();
+    console.log(`Filtered: ${this.filteredMcqs.length} / ${this.mcqs.length} MCQs`);
+  }
+
+  groupMcqsByCourse(): void {
+    const groups = new Map<number, McqGroup>();
+
+    this.filteredMcqs.forEach(mcq => {
+      const courseId = mcq.course_id;
+      const courseName = mcq.course?.course_name || `Course #${courseId}`;
+
+      if (!groups.has(courseId)) {
+        groups.set(courseId, {
+          courseId: courseId,
+          courseName: courseName,
+          mcqs: []
+        });
+      }
+      groups.get(courseId)!.mcqs.push(mcq);
+    });
+
+    // Convert to array and sort by course name
+    this.groupedMcqs = Array.from(groups.values()).sort((a, b) =>
+      a.courseName.localeCompare(b.courseName)
+    );
+
+    // Auto-expand first course by default if there are any
+    if (this.groupedMcqs.length > 0 && this.expandedCourses.size === 0) {
+      this.expandedCourses.add(this.groupedMcqs[0].courseId);
+    }
+  }
+
+  getOptionsArray(options: any): any[] {
+    if (!options) return [];
+    if (Array.isArray(options)) return options;
+    if (typeof options === 'string') {
+      try {
+        return JSON.parse(options);
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  }
+
+  // Toggle accordion for a specific course
+  toggleCourse(index: number): void {
+    const courseId = this.groupedMcqs[index].courseId;
+    if (this.expandedCourses.has(courseId)) {
+      this.expandedCourses.delete(courseId);
+    } else {
+      this.expandedCourses.add(courseId);
+    }
+    this.cdr.detectChanges();
+  }
+
+  // Check if a course is expanded
+  isExpanded(index: number): boolean {
+    return this.expandedCourses.has(this.groupedMcqs[index].courseId);
+  }
+
+  onCourseChange(): void {
+    this.applyFilters();
+  }
+
+  onSearch(): void {
+    this.applyFilters();
+  }
+
+  clearFilters(): void {
+    this.searchText = '';
+    this.selectedCourseId = 'all';
+    this.applyFilters();
+  }
+
+  refreshData(): void {
+    this.loadCourses();
+    this.loadMcqs();
+  }
+
+  getOptionLetter(index: number): string {
+    return String.fromCharCode(65 + index);
+  }
+
+  deleteMcq(id: number): void {
+    if (!confirm('Are you sure you want to delete this MCQ?')) return;
+
+    this.mcqService.deleteInstructorMcq(id).subscribe({
+      next: () => {
+        this.toastService.success('Success', 'MCQ deleted successfully');
+        this.loadMcqs();
+      },
+      error: () => {
+        this.toastService.error('Error', 'Failed to delete MCQ');
+      }
+    });
+  }
+
+  trackById(index: number, item: Mcq): number {
+    return item.id!;
   }
 }

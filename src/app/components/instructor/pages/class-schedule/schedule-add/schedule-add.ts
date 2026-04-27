@@ -298,7 +298,7 @@ export class ClassScheduleAdd implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/admin/class-schedule/list']);
+    this.router.navigate(['/instructor/class-schedule/list']);
   }
 
   markFormGroupTouched(formGroup: FormGroup) {

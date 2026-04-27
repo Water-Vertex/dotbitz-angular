@@ -60,6 +60,14 @@ export class ClassScheduleService {
   getBatchesByCourse(courseId: number): Observable<any> {
     return this.http.get(`${environment.InstructorApiUrl}/courses/${courseId}/batches`);
   }
+  
+getStudentCourses(): Observable<any> {
+  return this.http.get(`${environment.StudentApiUrl}/student-courses`);
+}
+  getStudentSchedulesByCourse(courseId: number): Observable<any> {
+  return this.http.get(`${environment.StudentApiUrl}/courses/${courseId}/schedules`);
+}
+
 
 
 }

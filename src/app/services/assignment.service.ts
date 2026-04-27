@@ -39,17 +39,28 @@ export class AssignmentService {
   /** =========================
    *  Get All Assignments
    *  ========================= */
-  getAssignments(courseId?: number): Observable<AssignmentApiResponse> {
-    let url = this.apiUrl;
-    if (courseId) url += `?course_id=${courseId}`;
+  getAssignments(courseId?: number, batchId?: number): Observable<AssignmentApiResponse> {
+  let url = this.apiUrl;
+  const params: string[] = [];
 
-    return this.http.get<AssignmentApiResponse>(url, { headers: this.getHeaders() }).pipe(
-      catchError((err) => {
-        console.error('Error fetching assignments:', err);
-        return throwError(() => err);
-      }),
-    );
+  if (courseId) {
+    params.push(`course_id=${courseId}`);
   }
+  if (batchId) {
+    params.push(`batch_id=${batchId}`);
+  }
+
+  if (params.length > 0) {
+    url += `?${params.join('&')}`;
+  }
+
+  return this.http.get<AssignmentApiResponse>(url, { headers: this.getHeaders() }).pipe(
+    catchError((err) => {
+      console.error('Error fetching assignments:', err);
+      return throwError(() => err);
+    }),
+  );
+}
 
   /** =========================
    *  Get Single Assignment
@@ -159,6 +170,9 @@ export class AssignmentService {
         }),
       );
   }
+getAssignmentsByBatch(batchId: number): Observable<any> {
+  return this.http.get(`${this.StudentApiUrl}/batch/${batchId}`);
+}
   /** =========================
    * Guardian: Get Assignments by Course
    * ========================= */
@@ -262,6 +276,61 @@ getInstructorCourses(): Observable<any> {
 getInstructorBatchesByCourse(courseId: number): Observable<any> {
   return this.http.get(
     `${environment.InstructorApiUrl}/courses/${courseId}/batches`,
+    { headers: this.getHeaders() }
+  );
+}
+// Admin methods
+getAssignmentBatchStatus(payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.AdminApiUrl}/assignment-attempts/batch-status`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+getAssignmentAttemptDetail(attemptId: number): Observable<any> {
+  return this.http.get(
+    `${environment.AdminApiUrl}/assignment-attempts/${attemptId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+gradeAssignment(attemptId: number, payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.AdminApiUrl}/assignment-attempts/${attemptId}/grade`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+// Instructor methods
+getInstructorAssignmentBatchStatus(payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignment-attempts/batch-status`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorAssignmentAttemptDetail(attemptId: number): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/assignment-attempts/${attemptId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+gradeInstructorAssignment(attemptId: number, payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignment-attempts/${attemptId}/grade`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+// Batch list by course
+getBatchesByCourse(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.AdminApiUrl}/batches/course/${courseId}`,
     { headers: this.getHeaders() }
   );
 }

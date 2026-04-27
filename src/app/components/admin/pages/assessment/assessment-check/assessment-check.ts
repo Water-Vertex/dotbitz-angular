@@ -56,14 +56,14 @@ export class AssessmentCheck implements OnInit {
             const isMcq = a.assessment_type === 'mcqs';
 
             if (isMcq) {
-              // Auto-mark MCQ
-              const isCorrect = this.autoMarkMcq(a.student_answer, a.answer);
+              // Auto-mark MCQ - FIXED: Compare correctly
+              const isCorrect = this.autoMarkMcq(a.student_answer, a.correct_answer);
+              console.log(`Question ${a.question_id}: Student="${a.student_answer}", Correct="${a.correct_answer}", IsCorrect=${isCorrect}`);
               this.answers[a.question_id] = isCorrect;
               this.autoMarked[a.question_id] = true;
             }
             else if (a.assessment_type === 'q-a') {
               // For Q&A, initialize with existing marks if available
-              // Note: is_correct might store marks (not just 0/1)
               if (a.is_correct !== null && a.is_correct !== undefined && a.is_correct > 0) {
                 this.qnaMarks[a.question_id] = a.is_correct;
               } else {
@@ -87,7 +87,29 @@ export class AssessmentCheck implements OnInit {
 
   autoMarkMcq(studentAnswer: string, correctAnswer: string): boolean {
     if (!studentAnswer || !correctAnswer) return false;
-    return studentAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+
+    // Handle different possible formats
+    const student = studentAnswer.toString().trim().toLowerCase();
+    const correct = correctAnswer.toString().trim().toLowerCase();
+
+    // Check if it's a letter answer (A, B, C, D) or text answer
+    const studentMatch = student.match(/^[a-d]$/);
+    const correctMatch = correct.match(/^[a-d]$/);
+
+    if (studentMatch && correctMatch) {
+      return student === correct;
+    }
+
+    // Check if answer contains the letter option (e.g., "A. Option text")
+    const studentLetter = student.charAt(0);
+    const correctLetter = correct.charAt(0);
+
+    if (studentLetter.match(/^[a-d]$/) && correctLetter.match(/^[a-d]$/)) {
+      return studentLetter === correctLetter;
+    }
+
+    // Direct comparison
+    return student === correct;
   }
 
   updateQnaMarks(questionId: number, marks: number, maxMarks: number): void {
@@ -175,10 +197,10 @@ export class AssessmentCheck implements OnInit {
       remarks: this.adminRemarks,
       answers: this.attemptData.answers.map((a: any) => {
         if (a.assessment_type === 'mcqs') {
-          // For MCQ: is_correct is boolean (0 or 1)
+          // FIX: Send boolean instead of number
           return {
             question_id: a.question_id,
-            is_correct: this.answers[a.question_id] === true ? 1 : 0,
+            is_correct: this.answers[a.question_id] === true, // true/false, not 1/0
           };
         } else {
           // For Q&A: is_correct stores the actual marks obtained
@@ -207,9 +229,9 @@ export class AssessmentCheck implements OnInit {
   }
 
   parseFloatValue(value: any): number {
-  const parsed = parseFloat(value);
-  return isNaN(parsed) ? 0 : parsed;
-}
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? 0 : parsed;
+  }
 
   goBack(): void {
     this.router.navigate(['/admin/assessment-attempts/list']);

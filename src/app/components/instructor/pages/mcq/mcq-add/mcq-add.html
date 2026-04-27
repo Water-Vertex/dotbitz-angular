@@ -8,8 +8,8 @@
     </div>
 
     <a
-      routerLink="/instructor/mcqs"
-      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 cursor-pointer text-sm font-medium">
+      routerLink="/instructor/mcqs/list"
+      class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-transform transform hover:scale-105 cursor-pointer text-sm font-medium">
       <i class="bi bi-arrow-left"></i>
       Back to list
     </a>
@@ -26,8 +26,8 @@
 
       <select
         formControlName="course_id"
-        class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-sm border-gray-300 
-               focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-sm 
+        class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-sm border-gray-300
+               focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 shadow-sm
                transition-colors duration-200"
         [disabled]="coursesLoading || courses.length === 0">
         <option value="">Select Course</option>
@@ -42,7 +42,7 @@
       <div
         *ngFor="let mcq of mcqs.controls; let i = index"
         [formGroupName]="i"
-        class="border rounded-xl p-6 bg-gray-50 space-y-6 shadow-sm">
+        class="border border-gray-200 rounded-xl p-6 bg-gray-50 space-y-6 shadow-sm">
 
         <!-- MCQ Header -->
         <div class="flex justify-between items-center">
@@ -64,8 +64,8 @@
             formControlName="question"
             rows="3"
             placeholder="Write the question here..."
-            class="w-full px-4 py-2 border rounded-lg text-sm border-gray-300 
-                   focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+            class="w-full px-4 py-2 border rounded-lg text-sm border-gray-300
+                   focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
                    shadow-sm transition-colors duration-200"></textarea>
         </div>
 
@@ -76,10 +76,24 @@
             type="text"
             formControlName="answer"
             placeholder="Type correct answer(s), separate multiple answers with commas"
-            class="w-full px-4 py-2 border rounded-lg text-sm border-gray-300 
-                   focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+            class="w-full px-4 py-2 border rounded-lg text-sm border-gray-300
+                   focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
                    shadow-sm transition-colors duration-200">
+                   <p *ngIf="answerErrors[i]" class="mt-1 text-xs text-red-600 flex items-center gap-1">
+    <i class="bi bi-exclamation-circle"></i>
+    Answer must match one of the options above.
+  </p>
         </div>
+
+         <!-- ✅ Marks -->
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-1">
+    Marks <span class="text-red-500">*</span>
+  </label>
+  <input type="number" formControlName="marks" min="1"
+    placeholder="e.g. 2"
+    class="w-full px-4 py-2 border rounded-lg text-sm border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 shadow-sm transition-colors duration-200">
+</div>
 
         <!-- Answer Type -->
         <div class="flex gap-6 text-sm">
@@ -102,7 +116,7 @@
             [formGroupName]="j"
             class="flex items-center gap-3">
 
-            <span class="w-7 h-7 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+            <span class="w-7 h-7 flex items-center justify-center rounded-full bg-orange-100 text-orange-700 text-xs font-semibold">
               {{ j + 1 }}
             </span>
 
@@ -110,15 +124,15 @@
               type="text"
               formControlName="value"
               placeholder="Option text"
-              class="flex-1 px-4 py-2 border rounded-lg text-sm border-gray-300 
-                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+              class="flex-1 px-4 py-2 border rounded-lg text-sm border-gray-300
+                     focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50
                      shadow-sm transition-colors duration-200">
 
             <button
               type="button"
               (click)="removeOption(i,j)"
               [disabled]="optionsAt(i).length <= 2"
-              class="flex items-center gap-1 px-2 py-1 text-red-600 border border-red-200 rounded-md 
+              class="flex items-center gap-1 px-2 py-1 text-red-600 border border-red-200 rounded-md
                      hover:bg-red-100 hover:text-red-700 transition-transform hover:scale-110 cursor-pointer text-sm">
               <i class="bi bi-x-circle"></i> Remove
             </button>
@@ -137,8 +151,8 @@
         <!-- Status -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select formControlName="status" class="px-4 py-2 border rounded-lg text-sm bg-white border-gray-300 shadow-sm 
-                 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200">
+          <select formControlName="status" class="px-4 py-2 border rounded-lg text-sm bg-white border-gray-300 shadow-sm
+                 focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition-colors duration-200">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
@@ -151,22 +165,22 @@
     <button
       type="button"
       (click)="addMcq()"
-      class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 cursor-pointer transition-transform hover:scale-110 text-sm">
+      class="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 cursor-pointer transition-transform hover:scale-110 text-sm">
       <i class="bi bi-plus-circle"></i> Add Another MCQ
     </button>
 
     <!-- Footer -->
-    <div class="flex justify-end gap-3 pt-6 border-t">
+    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
       <a
         routerLink="/instructor/mcqs"
-        class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 cursor-pointer transition-transform hover:scale-105">
+        class="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 cursor-pointer transition-transform hover:scale-105">
         Cancel
       </a>
 
       <button
         type="submit"
         [disabled]="mcqForm.invalid || loading"
-        class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-transform hover:scale-105">
+        class="px-5 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 transition-transform hover:scale-105">
         {{ loading ? 'Saving…' : 'Create MCQs' }}
       </button>
     </div>

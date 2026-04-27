@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { QuillModule } from 'ngx-quill';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -12,11 +11,13 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { CourseApiResponse, Instructor } from '../../../../../models/course.model';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 @Component({
   selector: 'app-course-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, QuillModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, CKEditorModule],
   templateUrl: './course-edit.html',
 })
 export class CourseEdit implements OnInit {
@@ -26,24 +27,15 @@ export class CourseEdit implements OnInit {
   courseId!: number;
   selectedFile: File | null = null;
   isEditMode: boolean = true;
+   public Editor: any = ClassicEditor;
+      public editorConfig = {
+        toolbar: [
+          'heading', '|', 'bold', 'italic', 'underline', 'strikethrough',
+          '|', 'link', 'bulletedList', 'numberedList',
+          '|', 'blockQuote', '|', 'undo', 'redo', '|','codeBlock'
+        ],
+      };
 
-  quillModules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ header: 1 }, { header: 2 }],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      [{ script: 'sub' }, { script: 'super' }],
-      [{ indent: '-1' }, { indent: '+1' }],
-      [{ direction: 'rtl' }],
-      [{ size: ['small', false, 'large', 'huge'] }],
-      [{ color: [] }, { background: [] }],
-      [{ font: [] }],
-      [{ align: [] }],
-      ['clean'],
-      ['link', 'image', 'video'],
-    ],
-  };
 
   constructor(
     private fb: FormBuilder,
@@ -98,7 +90,7 @@ export class CourseEdit implements OnInit {
     }
   }
 
- 
+
 
   loadCourse(): void {
     this.courseService.getCourse(this.courseId).subscribe({

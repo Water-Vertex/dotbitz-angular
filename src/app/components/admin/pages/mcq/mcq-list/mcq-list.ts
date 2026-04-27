@@ -1,125 +1,3 @@
-// import { Component, OnInit } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { RouterModule } from '@angular/router';
-// import { FormsModule } from '@angular/forms';
-// import { McqService } from '../../../../../services/mcq.service';
-// import { Mcq } from '../../../../../models/mcq.model';
-
-// @Component({
-//   selector: 'app-mcqs-list',
-//   standalone: true,
-//   imports: [CommonModule, RouterModule, FormsModule],
-//   templateUrl: './mcqs-list.html',
-//   styleUrls: ['./mcqs-list.css']
-// })
-// export class McqsList implements OnInit {
-//   mcqs: Mcq[] = [];
-//   filteredMcqs: Mcq[] = [];
-//   searchText: string = '';
-//   loading = false;
-
-//   constructor(private mcqService: McqService) {}
-
-//   ngOnInit() {
-//     console.log('🚀 MCQ List Component Initialized');
-//     this.loadMcqs();
-//   }
-
-//   loadMcqs() {
-//     console.log('📥 Loading MCQs from API...');
-//     this.loading = true;
-    
-//     // Set timeout to prevent infinite loading
-//     const timeoutId = setTimeout(() => {
-//       if (this.loading) {
-//         console.error('⏱️ Request timed out after 30 seconds');
-//         this.loading = false;
-//         alert('Request timed out. Please check your server.');
-//       }
-//     }, 30000); // 30 seconds timeout
-    
-//     this.mcqService.getAllMcqs().subscribe({
-//       next: (data) => {
-//         clearTimeout(timeoutId);
-//         console.log('✅ MCQs received:', data);
-//         console.log('📊 Total MCQs:', data.length);
-        
-//         if (Array.isArray(data)) {
-//           this.mcqs = data;
-//           this.filteredMcqs = data;
-//           console.log('✅ MCQs assigned to component');
-//         } else {
-//           console.error('❌ Response is not an array:', data);
-//           this.mcqs = [];
-//           this.filteredMcqs = [];
-//         }
-        
-//         this.loading = false;
-//       },
-//       error: (err) => {
-//         clearTimeout(timeoutId);
-//         console.error('❌ Error loading MCQs:', err);
-//         console.error('Error status:', err.status);
-//         console.error('Error message:', err.message);
-//         console.error('Full error:', err);
-        
-//         this.loading = false;
-//         this.mcqs = [];
-//         this.filteredMcqs = [];
-        
-//         // Better error message
-//         let errorMsg = 'Failed to load MCQs. ';
-//         if (err.status === 0) {
-//           errorMsg += 'Cannot connect to server. Is Laravel running on port 8000?';
-//         } else if (err.status === 401) {
-//           errorMsg += 'Unauthorized. Please login again.';
-//         } else if (err.status === 500) {
-//           errorMsg += 'Server error. Check Laravel logs.';
-//         } else {
-//           errorMsg += `Error: ${err.message}`;
-//         }
-        
-//         alert(errorMsg);
-//       },
-//       complete: () => {
-//         console.log('🏁 MCQ loading completed');
-//       }
-//     });
-//   }
-
-//   onSearch() {
-//     if (!this.searchText.trim()) {
-//       this.filteredMcqs = this.mcqs;
-//       return;
-//     }
-
-//     const search = this.searchText.toLowerCase();
-//     this.filteredMcqs = this.mcqs.filter(mcq => 
-//       mcq.question.toLowerCase().includes(search) ||
-//       mcq.course?.course_name?.toLowerCase().includes(search) ||
-//       mcq.status.toLowerCase().includes(search)
-//     );
-    
-//     console.log(`🔍 Search results: ${this.filteredMcqs.length} / ${this.mcqs.length}`);
-//   }
-
-//   deleteMcq(id: number) {
-//     if (confirm('Are you sure you want to delete this MCQ?')) {
-//       this.mcqService.deleteMcq(id).subscribe({
-//         next: () => {
-//           console.log('✅ MCQ deleted successfully');
-//           this.loadMcqs();
-//           alert('MCQ deleted successfully!');
-//         },
-//         error: (err) => {
-//           console.error('❌ Error deleting MCQ:', err);
-//           alert('Failed to delete MCQ');
-//         }
-//       });
-//     }
-//   }
-// }
-
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -128,23 +6,30 @@ import { McqService } from '../../../../../services/mcq.service';
 import { Mcq } from '../../../../../models/mcq.model';
 import { Course } from '../../../../../models/course.model';
 
+interface McqGroup {
+  courseId: number;
+  courseName: string;
+  mcqs: Mcq[];
+}
 
 @Component({
   selector: 'app-mcqs-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './mcq-list.html',
-  
   styleUrls: ['./mcq-list.css']
 })
 export class McqsList implements OnInit {
-
   mcqs: Mcq[] = [];
   filteredMcqs: Mcq[] = [];
+  groupedMcqs: McqGroup[] = [];
   courses: Course[] = [];
-  selectedCourseId: number | 'all' = 'all';
+  selectedCourseId: number | string = 'all';
   searchText = '';
   loading = true;
+
+  // Accordion state - track which courses are expanded
+  expandedCourses: Set<number> = new Set();
 
   constructor(
     private mcqService: McqService,
@@ -154,24 +39,21 @@ export class McqsList implements OnInit {
   ngOnInit(): void {
     console.log('🚀 MCQ List Component Initialized');
     this.loadMcqs();
-    this.loadCourses(); // 🔥 NEW
-
+    this.loadCourses();
   }
 
   loadCourses(): void {
-  this.mcqService.getAllCourses().subscribe({
-    next: (data) => {
-      this.courses = data;
-      this.cdr.detectChanges();  
-
-    },
-    error: () => {
-      this.courses = [];
-      this.cdr.detectChanges();   
-
-    }
-  });
-}
+    this.mcqService.getAllCourses().subscribe({
+      next: (data) => {
+        this.courses = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.courses = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   loadMcqs(): void {
     console.log('📥 Loading MCQs from API...');
@@ -180,97 +62,128 @@ export class McqsList implements OnInit {
     this.mcqService.getAllMcqs().subscribe({
       next: (data: Mcq[]) => {
         console.log('✅ MCQs received:', data);
-
         this.mcqs = Array.isArray(data) ? data : [];
-        this.filteredMcqs = [...this.mcqs]; // 🔥 IMPORTANT
-
-        console.log('📊 Total MCQs:', this.mcqs.length);
+        this.applyFilters();
       },
       error: (err) => {
         console.error('❌ Error loading MCQs:', err);
         this.mcqs = [];
         this.filteredMcqs = [];
+        this.groupedMcqs = [];
+        this.loading = false;
+        this.cdr.detectChanges();
       },
       complete: () => {
         this.loading = false;
-        this.cdr.detectChanges(); // 🔥 THIS FIXES UI FREEZE
+        this.cdr.detectChanges();
         console.log('🏁 MCQ loading completed');
       }
     });
   }
 
-  onCourseChange(): void {
-  if (!this.selectedCourseId) {
-    // All courses
-    this.filteredMcqs = [...this.mcqs];
-    return;
+  applyFilters(): void {
+    let result = [...this.mcqs];
+
+    // Apply course filter
+    if (this.selectedCourseId !== 'all') {
+      result = result.filter(mcq => mcq.course_id === Number(this.selectedCourseId));
+    }
+
+    // Apply search filter
+    if (this.searchText.trim()) {
+      const search = this.searchText.trim().toLowerCase();
+      result = result.filter(mcq =>
+        mcq.question?.toLowerCase().includes(search) ||
+        mcq.course?.course_name?.toLowerCase().includes(search) ||
+        mcq.status?.toLowerCase().includes(search)
+      );
+    }
+
+    this.filteredMcqs = result;
+    this.groupMcqsByCourse();
+    this.cdr.detectChanges();
+    console.log(`Filtered: ${this.filteredMcqs.length} / ${this.mcqs.length} MCQs`);
   }
 
-  this.filteredMcqs = this.mcqs.filter(
-    mcq => mcq.course_id === Number(this.selectedCourseId)
-  );
-}
+  groupMcqsByCourse(): void {
+    const groups = new Map<number, McqGroup>();
 
-  get groupedMcqs() {
-  const groups: { courseName: string, mcqs: Mcq[] }[] = [];
-  const map = new Map<string, Mcq[]>();
+    this.filteredMcqs.forEach(mcq => {
+      const courseId = mcq.course_id;
+      const courseName = mcq.course?.course_name || `Course #${courseId}`;
 
-  for (const mcq of this.filteredMcqs) {
-    const courseName = mcq.course?.course_name || 'No Course';
-    if (!map.has(courseName)) map.set(courseName, []);
-    map.get(courseName)!.push(mcq);
-  }
+      if (!groups.has(courseId)) {
+        groups.set(courseId, {
+          courseId: courseId,
+          courseName: courseName,
+          mcqs: []
+        });
+      }
+      groups.get(courseId)!.mcqs.push(mcq);
+    });
 
-  for (const [courseName, mcqs] of map.entries()) {
-    groups.push({ courseName, mcqs });
-  }
-
-  return groups;
-}
-
-
-  // onSearch(): void {
-  //   const search = this.searchText.trim().toLowerCase();
-
-  //   if (!search) {
-  //     this.filteredMcqs = [...this.mcqs];
-  //     return;
-  //   }
-
-  //   this.filteredMcqs = this.mcqs.filter(mcq =>
-  //     mcq.question?.toLowerCase().includes(search) ||
-  //     mcq.course?.course_name?.toLowerCase().includes(search) ||
-  //     mcq.status?.toLowerCase().includes(search)
-  //   );
-  // }
-  onSearch(): void {
-  const search = this.searchText.trim().toLowerCase();
-
-  let baseList = this.mcqs;
-
-  if (this.selectedCourseId) {
-    baseList = baseList.filter(
-      mcq => mcq.course_id === Number(this.selectedCourseId)
+    // Convert to array and sort by course name
+    this.groupedMcqs = Array.from(groups.values()).sort((a, b) =>
+      a.courseName.localeCompare(b.courseName)
     );
+
+    // Auto-expand first course by default if there are any
+    if (this.groupedMcqs.length > 0 && this.expandedCourses.size === 0) {
+      this.expandedCourses.add(this.groupedMcqs[0].courseId);
+    }
   }
 
-  if (!search) {
-    this.filteredMcqs = [...baseList];
-    return;
+  getOptionsArray(options: any): any[] {
+    if (!options) return [];
+    if (Array.isArray(options)) return options;
+    if (typeof options === 'string') {
+      try {
+        return JSON.parse(options);
+      } catch {
+        return [];
+      }
+    }
+    return [];
   }
 
-  this.filteredMcqs = baseList.filter(mcq =>
-    mcq.question?.toLowerCase().includes(search) ||
-    mcq.status?.toLowerCase().includes(search)
-  );
-}
+  // Toggle accordion for a specific course
+  toggleCourse(index: number): void {
+    const courseId = this.groupedMcqs[index].courseId;
+    if (this.expandedCourses.has(courseId)) {
+      this.expandedCourses.delete(courseId);
+    } else {
+      this.expandedCourses.add(courseId);
+    }
+    this.cdr.detectChanges();
+  }
 
+  // Check if a course is expanded
+  isExpanded(index: number): boolean {
+    return this.expandedCourses.has(this.groupedMcqs[index].courseId);
+  }
+
+  onCourseChange(): void {
+    this.applyFilters();
+  }
+
+  onSearch(): void {
+    this.applyFilters();
+  }
+
+  clearFilters(): void {
+    this.searchText = '';
+    this.selectedCourseId = 'all';
+    this.applyFilters();
+  }
 
   deleteMcq(id: number): void {
     if (!confirm('Are you sure you want to delete this MCQ?')) return;
 
     this.mcqService.deleteMcq(id).subscribe({
-      next: () => this.loadMcqs(),
+      next: () => {
+        this.loadMcqs();
+        alert('MCQ deleted successfully!');
+      },
       error: () => alert('Failed to delete MCQ')
     });
   }

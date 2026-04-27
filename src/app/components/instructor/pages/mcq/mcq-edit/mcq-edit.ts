@@ -18,6 +18,7 @@ export class InstructorMcqsEdit implements OnInit {
   loading = false;
   coursesLoading = false;
   mcqId!: number;
+  answerError: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -35,12 +36,13 @@ export class InstructorMcqsEdit implements OnInit {
 
   initForm() {
     this.mcqForm = this.fb.group({
-      question: ['', [Validators.required, Validators.minLength(10)]],
-      answer: ['', Validators.required],
+      question:  ['', [Validators.required, Validators.minLength(10)]],
+      answer:    ['', Validators.required],
       course_id: ['', Validators.required],
-      status: ['active', Validators.required],
-      issingle: [true, Validators.required],
-      options: this.fb.array([]),
+      status:    ['active', Validators.required],
+      issingle:  [true, Validators.required],
+      options:   this.fb.array([]),
+      marks:     ['', Validators.required],
     });
   }
 
@@ -48,11 +50,21 @@ export class InstructorMcqsEdit implements OnInit {
     return this.fb.group({ value: [value, Validators.required] });
   }
 
-  get options(): FormArray { return this.mcqForm.get('options') as FormArray; }
+  get options(): FormArray {
+    return this.mcqForm.get('options') as FormArray;
+  }
 
+  validateAnswer(): boolean {
+    const formValue = this.mcqForm.value;
+    const opts = formValue.options.map((o: any) => o.value.trim().toLowerCase());
+    const answers = formValue.answer.split(',').map((a: string) => a.trim().toLowerCase());
+    this.answerError = !answers.every((ans: string) => opts.includes(ans));
+    return !this.answerError;
+  }
+
+  // ✅ Sirf instructor ke assigned courses
   loadCourses() {
     this.coursesLoading = true;
-    // ✅ Sirf instructor ke assigned courses
     this.mcqService.getInstructorCourses().subscribe({
       next: (data: any) => {
         const all = Array.isArray(data) ? data : (data?.data ?? []);
@@ -70,17 +82,17 @@ export class InstructorMcqsEdit implements OnInit {
     this.loading = true;
     this.mcqService.getInstructorMcq(this.mcqId).subscribe({
       next: (mcq: any) => {
-        const data = mcq?.data ?? mcq;
         this.mcqForm.patchValue({
-          question: data.question,
-          answer: data.answer,
-          course_id: data.course_id,
-          status: data.status,
-          issingle: data.issingle
+          question:  mcq.question,
+          answer:    mcq.answer,
+          course_id: mcq.course_id,
+          status:    mcq.status,
+          issingle:  mcq.issingle,
+          marks:     mcq.marks
         });
 
         this.options.clear();
-        data.options.forEach((opt: string) => this.options.push(this.createOption(opt)));
+        mcq.options.forEach((opt: string) => this.options.push(this.createOption(opt)));
 
         this.loading = false;
       },
@@ -101,23 +113,32 @@ export class InstructorMcqsEdit implements OnInit {
   }
 
   onSubmit() {
+    Object.keys(this.mcqForm.controls).forEach(key => {
+      this.mcqForm.get(key)?.markAsTouched();
+    });
+
     if (this.mcqForm.invalid) {
       alert('Please fill all required fields correctly');
       return;
     }
 
+    if (!this.validateAnswer()) {
+      alert('Answer must match one of the options.');
+      return;
+    }
+
     const formValue = this.mcqForm.value;
     const mcqData = {
-      question: formValue.question,
-      options: formValue.options.map((opt: any) => opt.value),
-      answer: formValue.answer,
+      question:  formValue.question,
+      options:   formValue.options.map((opt: any) => opt.value),
+      answer:    formValue.answer,
       course_id: Number(formValue.course_id),
-      status: formValue.status,
-      issingle: Boolean(formValue.issingle)
+      status:    formValue.status,
+      issingle:  Boolean(formValue.issingle),
+      marks:     formValue.marks
     };
 
     this.loading = true;
-    // ✅ Instructor specific endpoint
     this.mcqService.updateInstructorMcq(this.mcqId, mcqData).subscribe({
       next: () => {
         alert('MCQ updated successfully!');

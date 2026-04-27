@@ -3,13 +3,17 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AssignmentService } from '../../../../../services/assignment.service';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-instructor-assignment-add',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink,CKEditorModule],
   templateUrl: './assignment-add.html',
 })
+
+
 export class InstructorAssignmentAdd implements OnInit {
 
   assignmentForm: FormGroup;
@@ -19,6 +23,15 @@ export class InstructorAssignmentAdd implements OnInit {
   batches: any[] = [];
   loadingBatches = false;
   selectedFile: File | null = null;
+
+  public Editor: any = ClassicEditor;
+    public editorConfig = {
+      toolbar: [
+        'heading', '|', 'bold', 'italic', 'underline', 'strikethrough',
+        '|', 'link', 'bulletedList', 'numberedList',
+        '|', 'blockQuote', '|', 'undo', 'redo',
+      ],
+    };
 
   constructor(
     private fb: FormBuilder,

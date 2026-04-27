@@ -1,4 +1,3 @@
-// components/class-schedule/class-schedule-list/class-schedule-list.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -9,10 +8,10 @@ import { ClassScheduleService } from '../../../../../services/classschedule.serv
 import { ToastService } from '../../../../../services/toast.service';
 import { ClassSchedule } from '../../../../../models/classschedule.model';
 
-// Add these interfaces if not already defined in your models
 interface Course {
   id: number;
   course_name?: string;
+  course_code?: string;
   name?: string;
   title?: string;
 }
@@ -31,6 +30,7 @@ interface Instructor {
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './schedule-list.html',
+  styleUrls: ['./schedule-list.css']
 })
 export class ClassScheduleList implements OnInit {
   schedules: ClassSchedule[] = [];
@@ -38,6 +38,7 @@ export class ClassScheduleList implements OnInit {
   courses: Course[] = [];
   instructors: Instructor[] = [];
   courseMap: Map<number, string> = new Map();
+  courseCodeMap: Map<number, string> = new Map();
   instructorMap: Map<number, string> = new Map();
   isLoading = true;
   searchTerm = '';
@@ -45,6 +46,9 @@ export class ClassScheduleList implements OnInit {
 
   // Status options for filter
   statusOptions = ['scheduled', 'ongoing', 'completed', 'cancelled'];
+
+  // Accordion state
+  expandedSchedule: number | null = null;
 
   constructor(
     private scheduleService: ClassScheduleService,
@@ -60,7 +64,6 @@ export class ClassScheduleList implements OnInit {
   loadInitialData(): void {
     this.isLoading = true;
 
-    // Load all data in parallel with error handling for each request
     forkJoin({
       schedules: this.scheduleService.getSchedules().pipe(
         catchError(error => {
@@ -82,15 +85,13 @@ export class ClassScheduleList implements OnInit {
       )
     }).subscribe({
       next: (results: any) => {
-        console.log('API Results:', results); // Debug log
+        console.log('API Results:', results);
 
-        // Process schedules with proper error handling
+        // Process schedules
         try {
           if (results.schedules && results.schedules.data) {
             this.schedules = Array.isArray(results.schedules.data) ? results.schedules.data : [];
           } else if (Array.isArray(results.schedules)) {
-            this.schedules = results.schedules;
-          } else if (results.schedules && Array.isArray(results.schedules)) {
             this.schedules = results.schedules;
           } else {
             this.schedules = [];
@@ -106,17 +107,17 @@ export class ClassScheduleList implements OnInit {
             this.courses = Array.isArray(results.courses.data) ? results.courses.data : [];
           } else if (Array.isArray(results.courses)) {
             this.courses = results.courses;
-          } else if (results.courses && Array.isArray(results.courses)) {
-            this.courses = results.courses;
           } else {
             this.courses = [];
           }
 
-          // Create course map for quick lookup
           this.courseMap.clear();
+          this.courseCodeMap.clear();
           this.courses.forEach((course: Course) => {
             const courseName = course.course_name || course.name || course.title || `Course #${course.id}`;
+            const courseCode = course.course_code || '';
             this.courseMap.set(course.id, courseName);
+            this.courseCodeMap.set(course.id, courseCode);
           });
         } catch (e) {
           console.error('Error processing courses:', e);
@@ -129,17 +130,13 @@ export class ClassScheduleList implements OnInit {
             this.instructors = Array.isArray(results.instructors.data) ? results.instructors.data : [];
           } else if (Array.isArray(results.instructors)) {
             this.instructors = results.instructors;
-          } else if (results.instructors && Array.isArray(results.instructors)) {
-            this.instructors = results.instructors;
           } else {
             this.instructors = [];
           }
 
-          // Create instructor map for quick lookup
           this.instructorMap.clear();
           this.instructors.forEach((instructor: Instructor) => {
             let instructorName = '';
-
             if (instructor.full_name) {
               instructorName = instructor.full_name;
             } else if (instructor.name) {
@@ -149,7 +146,6 @@ export class ClassScheduleList implements OnInit {
             } else {
               instructorName = `Instructor #${instructor.id}`;
             }
-
             this.instructorMap.set(instructor.id, instructorName);
           });
         } catch (e) {
@@ -163,33 +159,9 @@ export class ClassScheduleList implements OnInit {
       },
       error: (error) => {
         console.error('ForkJoin Error:', error);
-        this.toastService.error('Error', 'Failed to load some data. Please refresh the page.');
+        this.toastService.error('Error', 'Failed to load data. Please refresh the page.');
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
-    });
-  }
-
-  loadSchedules(): void {
-    this.scheduleService.getSchedules().pipe(
-      catchError(error => {
-        console.error('Error loading schedules:', error);
-        return of({ data: [] });
-      })
-    ).subscribe({
-      next: (res: any) => {
-        if (res && res.data) {
-          this.schedules = Array.isArray(res.data) ? res.data : [];
-        } else if (Array.isArray(res)) {
-          this.schedules = res;
-        } else {
-          this.schedules = [];
-        }
-        this.applyFilter();
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => {
-        this.toastService.error('Error', 'Failed to load class schedules');
       }
     });
   }
@@ -200,23 +172,18 @@ export class ClassScheduleList implements OnInit {
       return;
     }
 
-    let filtered = this.schedules;
+    let filtered = [...this.schedules];
 
-    // Apply search filter
     if (this.searchTerm && this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase().trim();
       filtered = filtered.filter(schedule => {
         const courseName = this.getCourseName(schedule.course_id)?.toLowerCase() || '';
         const instructorName = this.getInstructorName(schedule.instructor_id)?.toLowerCase() || '';
         const meetingLink = schedule.meeting_link?.toLowerCase() || '';
-
-        return courseName.includes(term) ||
-               instructorName.includes(term) ||
-               meetingLink.includes(term);
+        return courseName.includes(term) || instructorName.includes(term) || meetingLink.includes(term);
       });
     }
 
-    // Apply status filter
     if (this.statusFilter) {
       filtered = filtered.filter(schedule => schedule.status === this.statusFilter);
     }
@@ -244,58 +211,88 @@ export class ClassScheduleList implements OnInit {
     if (!dateString) return 'N/A';
     try {
       const date = new Date(dateString);
-      return date.toLocaleString();
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
     } catch (e) {
       return dateString;
     }
   }
 
-  formatDay(day: string): string {
-    if (!day) return 'N/A';
-    // Capitalize first letter
-    return day.charAt(0).toUpperCase() + day.slice(1);
-  }
-
   getCourseName(courseId: number): string {
     if (!courseId) return 'N/A';
-
-    // Try to get from map first (faster)
     if (this.courseMap.has(courseId)) {
       return this.courseMap.get(courseId) || `Course #${courseId}`;
     }
-
-    // Fallback to array search
-    if (!this.courses || this.courses.length === 0) return `Course #${courseId}`;
-    const course = this.courses.find(c => c.id === courseId);
-
-    if (course) {
-      return course.course_name || course.name || course.title || `Course #${courseId}`;
-    }
-
     return `Course #${courseId}`;
+  }
+
+  getCourseCode(courseId: number): string {
+    if (!courseId) return 'N/A';
+    if (this.courseCodeMap.has(courseId)) {
+      return this.courseCodeMap.get(courseId) || '';
+    }
+    return '';
   }
 
   getInstructorName(instructorId: number): string {
     if (!instructorId) return 'N/A';
-
-    // Try to get from map first (faster)
     if (this.instructorMap.has(instructorId)) {
       return this.instructorMap.get(instructorId) || `Instructor #${instructorId}`;
     }
-
-    // Fallback to array search
-    if (!this.instructors || this.instructors.length === 0) return `Instructor #${instructorId}`;
-    const instructor = this.instructors.find(i => i.id === instructorId);
-
-    if (instructor) {
-      if (instructor.full_name) return instructor.full_name;
-      if (instructor.name) return instructor.name;
-      if (instructor.first_name || instructor.last_name) {
-        return `${instructor.first_name || ''} ${instructor.last_name || ''}`.trim();
-      }
-    }
-
     return `Instructor #${instructorId}`;
+  }
+
+  toggleSchedule(index: number): void {
+    this.expandedSchedule = this.expandedSchedule === index ? null : index;
+  }
+
+  getActiveSchedulesCount(): number {
+    return this.filteredSchedules.filter(s => s.status === 'ongoing' || s.status === 'scheduled').length;
+  }
+
+  getThisWeekSchedulesCount(): number {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7);
+    return this.filteredSchedules.filter(schedule => {
+      const scheduleDate = new Date(schedule.start_time);
+      return scheduleDate >= startOfWeek && scheduleDate <= endOfWeek;
+    }).length;
+  }
+
+  getDayNumber(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.getDate().toString();
+  }
+
+  formatTimeRange(startTime: string, endTime: string): string {
+    if (!startTime || !endTime) return 'N/A';
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    return `${start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })} - ${end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+  }
+
+  formatFullDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
   }
 
   onEdit(id: number): void {
@@ -307,7 +304,7 @@ export class ClassScheduleList implements OnInit {
       this.scheduleService.deleteSchedule(id).subscribe({
         next: (res: any) => {
           this.toastService.success('Success', res.message || 'Class schedule deleted successfully');
-          this.loadSchedules();
+          this.loadInitialData();
         },
         error: (err: any) => {
           this.toastService.error('Error', err.error?.message || 'Failed to delete schedule');
@@ -317,17 +314,12 @@ export class ClassScheduleList implements OnInit {
   }
 
   onView(id: number): void {
-    this.router.navigate(['/admin/class-schedule/view', id]);
+    this.router.navigate(['/instructor/class-schedule/view', id]);
   }
 
-  // Helper method to check if data is loaded
-  get hasData(): boolean {
-    return this.schedules && this.schedules.length > 0;
+  refreshData(): void {
+    this.loadInitialData();
   }
 
-  // Helper method to get day display
-  getDayDisplay(day: string): string {
-    if (!day) return 'N/A';
-    return day.charAt(0).toUpperCase() + day.slice(1);
-  }
+  
 }

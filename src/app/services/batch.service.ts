@@ -87,4 +87,13 @@ export class BatchService {
       { headers: this.getHeaders() }
     );
   }
+
+  getInstructorBatches(search: string = '', perPage: number = 10): Observable<BatchApiResponse> {
+    let url = `${this.instructorApiUrl}?per_page=${perPage}`;
+    if (search) url += `&search=${search}`;
+
+    return this.http
+      .get<BatchApiResponse>(url, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
 }

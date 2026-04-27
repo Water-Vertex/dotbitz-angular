@@ -96,17 +96,7 @@
             [alt]="enrollment.course?.course_name"
           />
 
-          <!-- Status Badge -->
-          <span
-            class="absolute top-3 left-3 text-[11px] font-medium px-2 py-0.5 rounded-sm"
-            [ngClass]="{
-              'bg-green-600 text-white': enrollment.status === 'active' || enrollment.status === 'enrolled',
-              'bg-yellow-500 text-white': enrollment.status === 'pending',
-              'bg-gray-600 text-white': enrollment.status === 'inactive'
-            }"
-          >
-            {{ enrollment.status }}
-          </span>
+
         </div>
 
         <!-- Course Info -->
@@ -130,12 +120,12 @@
 
           <!-- Price and Button -->
           <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-            <div>
+            <!-- <div>
               <span class="text-xs text-gray-400 block">Fee paid</span>
               <span class="font-bold text-gray-900">
                 {{ enrollment.course?.course_fee | currency: '$' : 'symbol' : '1.0-0' }}
               </span>
-            </div>
+            </div> -->
 
             <a
              [routerLink]="['/guardian/course/', enrollment.course_id]"

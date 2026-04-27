@@ -7,6 +7,7 @@ import { BatchService } from '../../../../../services/batch.service';
 import { InstructorService } from '../../../../../services/instructor.service';
 import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
+import { BatchCard } from '../batch-card/batch-card';
 
 @Component({
   selector: 'app-batch-list',
@@ -316,4 +317,43 @@ export class BatchList implements OnInit, OnDestroy {
       day: 'numeric'
     });
   }
+
+// Add these methods to your BatchList class
+
+getBatchesByStatus(status: string): any[] {
+  return this.batches.filter(batch =>
+    (batch.status?.toLowerCase() || 'active') === status.toLowerCase()
+  );
+}
+
+getTotalStudents(): number {
+  return this.batches.reduce((total, batch) => total + (batch.students_count || 0), 0);
+}
+
+getUniqueCoursesCount(): number {
+  const uniqueCourses = new Set(this.batches.map(batch => batch.course_id));
+  return uniqueCourses.size;
+}
+
+getCompletionRate(): number {
+  const completedBatches = this.batches.filter(batch => batch.status === 'completed').length;
+  if (this.batches.length === 0) return 0;
+  return Math.round((completedBatches / this.batches.length) * 100);
+}
+
+calculateDuration(startDate: string, endDate: string): string {
+  if (!startDate || !endDate) return 'N/A';
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Less than a day';
+  if (diffDays === 1) return '1 day';
+  if (diffDays < 30) return `${diffDays} days`;
+  if (diffDays < 365) return `${Math.round(diffDays / 30)} months`;
+  return `${Math.round(diffDays / 365)} years`;
+}
+
+
 }

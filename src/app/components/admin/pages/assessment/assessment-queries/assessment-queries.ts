@@ -60,8 +60,9 @@ export class AssessmentQueries implements OnInit, OnDestroy {
   buildForm(): void {
     this.assignForm = this.fb.group({
       assessment_id: [null, Validators.required],
-      time_to_complete: [{ value: '' }, [Validators.required, Validators.min(1)]], // ✅ disabled/readonly
-      total_marks: [{ value: '', disabled: true }, [Validators.required, Validators.min(1)]], // ✅ disabled/readonly
+      time_to_complete: ['', [Validators.required, Validators.min(1)]],
+      total_marks: [{ value: '', disabled: true }, [Validators.required, Validators.min(1)]],
+       due_date: ['', Validators.required],
       obtain_marks: [''],
       remarks: [''],
     });
@@ -111,11 +112,12 @@ export class AssessmentQueries implements OnInit, OnDestroy {
     this.assessmentTitles = [];
     this.selectedAssessment = null;
 
-    // ✅ Reset form with disabled fields
-    this.assignForm.patchValue({
+    // ✅ Reset form and ensure disabled fields are set
+    this.assignForm.reset({
       assessment_id: null,
       time_to_complete: '',
       total_marks: '',
+      due_date: '',
       obtain_marks: '',
       remarks: '',
     });
@@ -143,38 +145,30 @@ export class AssessmentQueries implements OnInit, OnDestroy {
   }
 
   onAssessmentSelect(event: any): void {
-  const id = +event.target.value;
-  this.selectedAssessment = this.assessmentTitles.find((a) => a.id === id) || null;
+    const id = +event.target.value;
+    this.selectedAssessment = this.assessmentTitles.find((a) => a.id === id) || null;
 
-  if (this.selectedAssessment) {
-    console.log('Selected Assessment:', this.selectedAssessment); // Debug: Check what data is coming
-
-    // ✅ Update both fields
-    this.assignForm.patchValue({
-      assessment_id: id,
-      total_marks: this.selectedAssessment.total_marks ?? this.selectedAssessment.totalMarks ?? '',
-
-    });
-  } else {
-    this.assignForm.patchValue({
-      assessment_id: null,
-      total_marks: '',
-      time_to_complete: '',
-    });
+    if (this.selectedAssessment) {
+      this.assignForm.patchValue({
+        assessment_id: id,
+        total_marks: this.selectedAssessment.total_marks ?? this.selectedAssessment.totalMarks ?? '',
+      });
+    } else {
+      this.assignForm.patchValue({
+        assessment_id: null,
+        total_marks: '',
+      });
+    }
+    this.cdr.detectChanges();
   }
-  this.cdr.detectChanges();
-}
 
   submitAssign(): void {
-    // ✅ Enable disabled fields temporarily to include their values in the submission
-    this.assignForm.get('time_to_complete')?.enable();
+    // ✅ Enable fields to collect data in .value
     this.assignForm.get('total_marks')?.enable();
 
     if (this.assignForm.invalid) {
       this.assignForm.markAllAsTouched();
-      this.toast.error('Validation', 'Please fill all required fields');
-      // ✅ Re-disable fields
-      
+      this.toast.error('Validation', 'Please fill all required fields including Due Date');
       this.assignForm.get('total_marks')?.disable();
       return;
     }
@@ -191,14 +185,7 @@ export class AssessmentQueries implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.selectedAppointment.isAssessmentAssigned = true;
-          const index = this.appointments.findIndex((a) => a.id === this.selectedAppointment.id);
-          if (index !== -1) {
-            this.appointments[index].isAssessmentAssigned = true;
-            const allIndex = this.allAppointments.findIndex(
-              (a) => a.id === this.selectedAppointment.id,
-            );
-            if (allIndex !== -1) this.allAppointments[allIndex].isAssessmentAssigned = true;
-          }
+          this.updateLocalList(this.selectedAppointment.id);
 
           this.toast.success('Success', 'Assessment assigned successfully');
           this.closeAssessmentModal();
@@ -208,12 +195,20 @@ export class AssessmentQueries implements OnInit, OnDestroy {
         error: (err: any) => {
           this.toast.error('Error', err?.error?.message || 'Failed to assign');
           this.isSubmitting = false;
-          // ✅ Re-disable fields on error
-          this.assignForm.get('time_to_complete')?.disable();
           this.assignForm.get('total_marks')?.disable();
           this.cdr.detectChanges();
         },
       });
+  }
+
+  // Helper to update lists without reload
+  private updateLocalList(id: number): void {
+    const update = (list: any[]) => {
+      const item = list.find(a => a.id === id);
+      if (item) item.isAssessmentAssigned = true;
+    };
+    update(this.appointments);
+    update(this.allAppointments);
   }
 
   onSearch(): void {
@@ -237,8 +232,7 @@ export class AssessmentQueries implements OnInit, OnDestroy {
     this.assessmentTitles = [];
     this.assignForm.reset();
 
-    // ✅ Re-disable fields after reset
-    this.assignForm.get('time_to_complete')?.disable();
+    // ✅ Keep fields disabled after reset
     this.assignForm.get('total_marks')?.disable();
 
     this.cdr.detectChanges();

@@ -32,7 +32,7 @@ export class QuizEdit implements OnInit {
   duration: number | null = null;
   status: string = 'draft';
   dueDate: string = '';
-
+  startDate: string = '';
   // Loading states
   loadingCourses = false;
   loadingBatches = false;
@@ -77,6 +77,10 @@ export class QuizEdit implements OnInit {
       }
     });
   }
+formatDate(date: any): string {
+  const d = new Date(date);
+  return d.toISOString().split('T')[0]; // YYYY-MM-DD
+}
 
   loadQuiz(): void {
     this.loadingQuiz = true;
@@ -92,6 +96,8 @@ export class QuizEdit implements OnInit {
         this.dueDate = this.formatDateForInput(quiz.due_date);
         this.selectedCourseId = quiz.course_id;
         this.selectedBatchId = quiz.batch_id;
+        this.startDate = this.formatDate(quiz.start_date);
+
 
         // Selected MCQ IDs - FIXED: Use 'id' instead of 'msq_id'
         this.selectedMcqIds = quiz.mcqs.map((m: any) => m.id || m.msq_id);
@@ -336,6 +342,7 @@ export class QuizEdit implements OnInit {
       course_id: this.selectedCourseId,
       batch_id: this.selectedBatchId,
       due_date: this.dueDate,
+      start_date: this.startDate || null,
       mcq_ids: this.selectedMcqIds,
     };
 

@@ -61,4 +61,7 @@ ngOnInit() {
   getEmail(): string {
     return this.currentUser?.email || 'admin@example.com';
   }
+   navigateToLogout() {
+    this.router.navigate(['/admin/logout']);
+  }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { QuillModule } from 'ngx-quill';
+
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -12,11 +12,13 @@ import { Router } from '@angular/router';
 import { CourseService } from '../../../../../services/course.service';
 import { InstructorService } from '../../../../../services/instructor.service';
 import { ToastService } from '../../../../../services/toast.service';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 @Component({
   selector: 'app-course-add',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, QuillModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CKEditorModule],
   templateUrl: './course-add.html',
 })
 export class CourseAdd implements OnInit {
@@ -27,23 +29,14 @@ export class CourseAdd implements OnInit {
 
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
-  quillModules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ header: 1 }, { header: 2 }],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      [{ script: 'sub' }, { script: 'super' }],
-      [{ indent: '-1' }, { indent: '+1' }],
-      [{ direction: 'rtl' }],
-      [{ size: ['small', false, 'large', 'huge'] }],
-      [{ color: [] }, { background: [] }],
-      [{ font: [] }],
-      [{ align: [] }],
-      ['clean'],
-      ['link', 'image', 'video'],
-    ],
-  };
+  public Editor: any = ClassicEditor;
+    public editorConfig = {
+      toolbar: [
+        'heading', '|', 'bold', 'italic', 'underline', 'strikethrough',
+        '|', 'link', 'bulletedList', 'numberedList',
+        '|', 'blockQuote', '|', 'undo', 'redo',
+      ],
+    };
 
   constructor(
     private fb: FormBuilder,
@@ -74,7 +67,7 @@ export class CourseAdd implements OnInit {
   }
 
 
-  
+
   get course_name() {
     return this.courseForm.get('course_name');
   }

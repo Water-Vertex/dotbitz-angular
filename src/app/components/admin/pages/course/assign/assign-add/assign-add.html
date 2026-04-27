@@ -7,7 +7,7 @@
       <p class="text-gray-500 mt-1 text-sm">Assign a course to one or more instructors</p>
     </div>
     <a routerLink="/admin/course/assign-list"
-      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+      class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium">
       <i class="bi bi-arrow-left"></i> Back to List
     </a>
   </div>
@@ -56,7 +56,7 @@
         Cancel
       </a>
       <button (click)="onSubmit()" [disabled]="submitting"
-        class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed">
+        class="px-5 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 disabled:opacity-60 disabled:cursor-not-allowed">
         {{ submitting ? 'Assigning...' : 'Assign Instructor' }}
       </button>
     </div>

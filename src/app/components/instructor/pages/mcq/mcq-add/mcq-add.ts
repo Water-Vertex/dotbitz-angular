@@ -19,6 +19,7 @@ export class InstructorMcqsAdd implements OnInit {
   courses: Course[] = [];
   loading = false;
   coursesLoading = false;
+  answerErrors: boolean[] = [];  // ✅ Added
 
   constructor(
     private fb: FormBuilder,
@@ -45,6 +46,7 @@ export class InstructorMcqsAdd implements OnInit {
       answer: ['', Validators.required],
       issingle: [true, Validators.required],
       options: this.fb.array([this.createOption(), this.createOption()]),
+      marks: ['', Validators.required],  // ✅ Added
       correctAnswers: this.fb.array([]),
       status: ['active', Validators.required]
     });
@@ -63,7 +65,11 @@ export class InstructorMcqsAdd implements OnInit {
   }
 
   removeOption(i: number, j: number) {
-    if (this.optionsAt(i).length > 2) this.optionsAt(i).removeAt(j);
+    if (this.optionsAt(i).length > 2) {
+      this.optionsAt(i).removeAt(j);
+      const idx = this.correctAnswersAt(i).controls.findIndex(x => x.value === j);
+      if (idx !== -1) this.correctAnswersAt(i).removeAt(idx);
+    }
   }
 
   addMcq() { this.mcqs.push(this.createSingleMcq()); }
@@ -72,9 +78,26 @@ export class InstructorMcqsAdd implements OnInit {
     if (this.mcqs.length > 1) this.mcqs.removeAt(i);
   }
 
+  // ✅ Added — same as admin
+  validateAnswers(): boolean {
+    let valid = true;
+    this.answerErrors = [];
+
+    this.mcqs.controls.forEach((mcqControl, i) => {
+      const mcqValue = mcqControl.value;
+      const opts = mcqValue.options.map((o: any) => o.value.trim().toLowerCase());
+      const answers = mcqValue.answer.split(',').map((a: string) => a.trim().toLowerCase());
+
+      const allMatch = answers.every((ans: string) => opts.includes(ans));
+      this.answerErrors[i] = !allMatch;
+      if (!allMatch) valid = false;
+    });
+
+    return valid;
+  }
+
   loadCourses() {
     this.coursesLoading = true;
-    // ✅ Sirf instructor ke assigned courses
     this.mcqService.getInstructorCourses().subscribe({
       next: (data: any) => {
         const all = Array.isArray(data) ? data : (data?.data ?? []);
@@ -96,6 +119,12 @@ export class InstructorMcqsAdd implements OnInit {
       return;
     }
 
+    // ✅ Added answer validation
+    if (!this.validateAnswers()) {
+      alert('Please fix the answer errors — answers must match one of the options.');
+      return;
+    }
+
     const courseId = Number(this.mcqForm.value.course_id);
 
     const observables = this.mcqs.controls.map(mcqControl => {
@@ -108,7 +137,8 @@ export class InstructorMcqsAdd implements OnInit {
         answer: mcqValue.answer,
         course_id: courseId,
         status: mcqValue.status,
-        issingle: mcqValue.issingle
+        issingle: mcqValue.issingle,
+        marks: mcqValue.marks  // ✅ Added
       });
     });
 

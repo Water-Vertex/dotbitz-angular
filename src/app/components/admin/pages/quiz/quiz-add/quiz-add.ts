@@ -33,6 +33,7 @@ export class QuizAdd implements OnInit {
   duration: number | null = null;
   status: string = 'draft';
   dueDate: string = '';
+  startDate: string = '';
 
   // Loading states
   loadingCourses = false;
@@ -245,6 +246,7 @@ export class QuizAdd implements OnInit {
       course_id: this.selectedCourseId,
       batch_id: this.selectedBatchId,
       due_date: this.dueDate,
+      start_date: this.startDate || null,
       mcq_ids: this.selectedMcqIds,
     };
 

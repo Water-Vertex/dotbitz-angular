@@ -10,7 +10,7 @@ export interface Course {
   course_fee?: string | number;
   course_level?: string;
   age_limit?: string;
-
+  batch_id?:number;
   start_date?: string;
   end_date?: string;
   status?: string;
@@ -28,20 +28,28 @@ export interface Course {
 export interface Assignment {
   id?: number;
 
-  course_id: number; // FK
+  course_id: number;
+  batch_id?: number;// FK
   title: string;
   assignment_file?: string; // uploaded file name
   due_date?: string; // assignment due date
   total_marks?: number; // total marks
   uploaded_at?: string; // timestamp when uploaded
-  batch_id?: number; // FK to batch
+
   created_at?: string;
   updated_at?: string;
-  course?: Course; // relation
+  course?: {
+    id: number;
+    course_name: string;
+  };
+  batch?: {  // ✅ Add this
+    id: number;
+    name: string;
+  };
 
   description?: string;
   start_date?: string;
-  active_status?: string | number;
+  status?: string | number;
 }
 
 // ===== Payload (Create / Update) =====

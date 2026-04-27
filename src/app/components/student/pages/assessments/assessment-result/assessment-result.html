@@ -1,0 +1,335 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Assessment Results</h1>
+          <p class="text-sm text-gray-500 mt-1">View your graded assessments and detailed feedback</p>
+        </div>
+        <button
+          (click)="refreshData()"
+          [disabled]="isLoading"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
+        >
+          <svg class="w-4 h-4" [class.animate-spin]="isLoading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()"
+          placeholder="Search by course or assessment title..."
+          class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="max-w-7xl mx-auto px-4">
+    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+      <div class="inline-block">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
+      </div>
+      <p class="text-gray-500 mt-4">Loading your results...</p>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div *ngIf="!isLoading && filteredResults.length === 0" class="max-w-7xl mx-auto px-4 py-16">
+    <div class="bg-white rounded-xl border border-gray-200 p-16 text-center shadow-sm">
+      <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full mb-6">
+        <svg class="w-12 h-12 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">No Results Found</h3>
+      <p class="text-gray-500">Your marked assessments will appear here once the instructor provides feedback.</p>
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <div *ngIf="!isLoading && filteredResults.length > 0" class="max-w-7xl mx-auto px-4 pb-12">
+    <!-- Summary Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Total Assessments</p>
+            <p class="text-2xl font-bold text-orange-600">{{ filteredResults.length }}</p>
+          </div>
+          <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Average Score</p>
+            <p class="text-2xl font-bold text-green-600">{{ getAverageScore() }}%</p>
+          </div>
+          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Passed</p>
+            <p class="text-2xl font-bold text-blue-600">{{ getPassedCount() }}</p>
+          </div>
+          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Top Score</p>
+            <p class="text-2xl font-bold text-purple-600">{{ getTopScore() }}%</p>
+          </div>
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Course</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Assessment Title</th>
+              <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Total Marks</th>
+              <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Obtained</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Remarks</th>
+              <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let item of filteredResults; let i = index; trackBy: trackById" class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 text-gray-500 font-medium">{{ i + 1 }}</td>
+              <td class="px-6 py-4 font-medium text-gray-900">{{ item.course_name || '---' }}</td>
+              <td class="px-6 py-4 text-gray-600">{{ item.assessment_title || '---' }}</td>
+              <td class="px-6 py-4 text-center text-gray-600">{{ item.total_marks ?? '---' }}</td>
+              <td class="px-6 py-4 text-center">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="getScoreColorClass(item.obtain_marks, item.total_marks)">
+                  {{ item.obtain_marks !== null ? item.obtain_marks : '---' }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-xs font-medium" [ngClass]="{
+                  'text-green-600': item.obtain_marks && item.obtain_marks >= (item.total_marks * 0.6),
+                  'text-yellow-600': item.obtain_marks && item.obtain_marks >= (item.total_marks * 0.4) && item.obtain_marks < (item.total_marks * 0.6),
+                  'text-red-600': item.obtain_marks && item.obtain_marks < (item.total_marks * 0.4),
+                  'text-gray-400': !item.obtain_marks
+                }">
+                  {{ getStatusText(item.obtain_marks, item.total_marks) }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-gray-500 truncate max-w-xs">{{ item.remarks || '---' }}</td>
+              <td class="px-6 py-4 text-center">
+                <button
+                  (click)="onViewDetail(item)"
+                  class="px-4 py-2 bg-orange-600 text-white rounded-lg text-xs font-medium hover:bg-orange-700 transition-colors shadow-sm inline-flex items-center gap-1"
+                >
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  View Details
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-4 text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <span class="text-sm text-gray-600">Showing {{ filteredResults.length }} {{ filteredResults.length === 1 ? 'result' : 'results' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div *ngIf="showDetailModal && selectedResult" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" (click)="closeModal()">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col" (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white">{{ selectedResult.assessment_title }}</h2>
+          <p class="text-orange-100 text-sm mt-0.5">{{ selectedResult.course_name }}</p>
+        </div>
+        <button (click)="closeModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <div class="flex flex-wrap gap-6 items-center">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-semibold text-gray-500 uppercase">Total Marks</span>
+          <span class="text-lg font-bold text-gray-800">{{ selectedResult.total_marks }}</span>
+        </div>
+        <div class="w-px h-6 bg-gray-300"></div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-semibold text-gray-500 uppercase">Obtained</span>
+          <span class="text-lg font-bold" [ngClass]="{
+            'text-green-600': (selectedResult.obtain_marks ?? 0) >= (selectedResult.total_marks * 0.6),
+            'text-yellow-600': (selectedResult.obtain_marks ?? 0) >= (selectedResult.total_marks * 0.4) && (selectedResult.obtain_marks ?? 0) < (selectedResult.total_marks * 0.6),
+            'text-red-600': (selectedResult.obtain_marks ?? 0) < (selectedResult.total_marks * 0.4)
+          }">
+            {{ selectedResult.obtain_marks ?? 0 }}
+          </span>
+        </div>
+        <div class="w-px h-6 bg-gray-300"></div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-semibold text-gray-500 uppercase">Percentage</span>
+          <span class="text-lg font-bold text-orange-600">
+            {{ ((selectedResult.obtain_marks ?? 0) / (selectedResult.total_marks || 1) * 100).toFixed(1) }}%
+          </span>
+        </div>
+        <div *ngIf="selectedResult.remarks" class="flex-1">
+          <span class="text-xs font-semibold text-gray-500 uppercase">Remarks</span>
+          <p class="text-sm text-gray-700 mt-0.5">{{ selectedResult.remarks }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Answers Section -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <div *ngIf="isDetailLoading" class="text-center py-12">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-600 mx-auto"></div>
+        <p class="text-gray-500 mt-3">Loading detailed answers...</p>
+      </div>
+
+      <div *ngIf="!isDetailLoading && (!selectedResult.answers || selectedResult.answers.length === 0)" class="text-center py-12">
+        <p class="text-gray-500">No answer details found for this assessment.</p>
+      </div>
+
+      <div *ngIf="!isDetailLoading && selectedResult.answers && selectedResult.answers.length > 0" class="space-y-4">
+        <div *ngFor="let ans of selectedResult.answers; let qi = index" class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+          <!-- Question Header -->
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-gray-500">Q{{ qi + 1 }}</span>
+                <span class="text-xs text-gray-400">({{ ans.assessment_type === 'mcqs' ? 'MCQ' : 'Q&A' }})</span>
+              </div>
+              <div class="flex items-center gap-3">
+                 <span class="text-[11px] font-semibold text-gray-500">
+                    Marks:
+                    <span [ngClass]="{
+                      'text-green-700 font-bold': ans.is_correct,
+                      'text-red-600 font-bold': !ans.is_correct && ans.student_answer,
+                      'text-gray-500': !ans.student_answer
+                    }">
+                      {{ ans.is_correct ? ans.marks : 0 }}
+                    </span>
+                    / {{ ans.marks }}
+                  </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium" [ngClass]="{
+                  'bg-green-100 text-green-700': ans.is_correct === 1,
+                  'bg-red-100 text-red-700': ans.is_correct === 0 && ans.student_answer,
+                  'bg-gray-100 text-gray-500': !ans.student_answer
+                }">
+                  <span *ngIf="ans.is_correct === 1">✓ Correct</span>
+                  <span *ngIf="ans.is_correct === 0 && ans.student_answer">✗ Incorrect</span>
+                  <span *ngIf="!ans.student_answer">Not Attempted</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-4">
+            <p class="text-sm font-semibold text-gray-900">{{ ans.question }}</p>
+
+            <!-- MCQ Options -->
+            <div *ngIf="ans.assessment_type === 'mcqs' && ans.options" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div *ngFor="let opt of formatOptions(ans.options); let optIndex = index" class="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm" [ngClass]="{
+                'border-green-400 bg-green-50 text-green-800': opt === ans.correct_answer,
+                'border-red-400 bg-red-50 text-red-700': opt === ans.student_answer && opt !== ans.correct_answer,
+                'border-gray-200 bg-white text-gray-700': opt !== ans.correct_answer && opt !== ans.student_answer
+              }">
+                <span class="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 text-xs font-medium">{{ getOptionLetter(optIndex) }}</span>
+                <span>{{ opt }}</span>
+                <span *ngIf="opt === ans.correct_answer" class="ml-auto text-green-600 text-xs">✓ Correct Answer</span>
+                <span *ngIf="opt === ans.student_answer && opt !== ans.correct_answer" class="ml-auto text-red-600 text-xs">✗ Your Answer</span>
+              </div>
+            </div>
+
+            <!-- Answer Display for MCQ -->
+            <div *ngIf="ans.assessment_type === 'mcqs'" class="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-4 text-sm">
+              <div><span class="text-gray-500">Your Answer:</span> <span class="font-medium" [ngClass]="ans.student_answer === ans.correct_answer ? 'text-green-700' : 'text-red-600'">{{ ans.student_answer || '(Not answered)' }}</span></div>
+              <div><span class="text-gray-500">Correct Answer:</span> <span class="font-medium text-green-700">{{ ans.correct_answer }}</span></div>
+            </div>
+
+            <!-- Q&A Answer Display -->
+            <div *ngIf="ans.assessment_type !== 'mcqs'" class="space-y-3">
+              <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                <p class="text-xs font-semibold text-blue-700 uppercase mb-1">Your Answer</p>
+                <p class="text-sm text-gray-800">{{ ans.student_answer || '(No answer given)' }}</p>
+              </div>
+              <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                <p class="text-xs font-semibold text-green-700 uppercase mb-1">Correct Answer</p>
+                <p class="text-sm text-gray-800">{{ ans.correct_answer || '---' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+      <button (click)="closeModal()" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

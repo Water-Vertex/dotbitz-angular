@@ -10,6 +10,7 @@ export class AssignAssessmentService {
   private apiUrl = environment.AdminApiUrl + '/assign-assessments';
   private studentApiUrl = environment.StudentApiUrl + '/my-assessments';
   private guardianApiUrl = environment.GuardianApiUrl + '/assessments';
+  private guestApiUrl = environment.GuestApiUrl + '/guest-assessments';
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
@@ -95,5 +96,27 @@ export class AssignAssessmentService {
       console.error(`Error ${action}:`, error);
       return throwError(() => error);
     };
+  }
+
+
+
+// --- GUEST SIDE METHOD ---
+
+private getGuestHeaders(): HttpHeaders {
+    const email = localStorage.getItem('guest_email') || '';
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-Guest-Email': email  // Bas ye email jayega auth ki jagah
+    });
+  }
+  getGuestAssessments(): Observable<any> {
+    // Ab ye bilkul student side ki tarah clean GET call hai
+    return this.http.get<any>(this.guestApiUrl, { headers: this.getGuestHeaders() }).pipe(
+      catchError((error) => {
+        console.error('Error fetching guest assessments:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

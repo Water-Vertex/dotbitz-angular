@@ -13,6 +13,7 @@ import { AssignmentService } from '../../../../../../services/assignment.service
 export class MyCourseDetail implements OnInit {
   course: any = null;
   courseId!: number;
+  batchId!:number;
   loading = true;
   activeTab: 'instructor' | 'curriculum' | 'assignment' | 'quiz' = 'instructor';
 
@@ -37,6 +38,7 @@ export class MyCourseDetail implements OnInit {
   selectedSubmitFile: File | null = null;
   submittingAssignment = false;
   submitFileError: string = '';
+  expandedIndices: number[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -61,6 +63,7 @@ export class MyCourseDetail implements OnInit {
     this.courseService.getStudentCourseDetail(this.courseId).subscribe({
       next: (res: any) => {
         this.course = res.data;
+        this.batchId = res.data?.batch_id;
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -75,24 +78,62 @@ export class MyCourseDetail implements OnInit {
   setTab(tab: string): void {
     this.activeTab = tab as 'instructor' | 'curriculum' | 'assignment' | 'quiz';
     if (tab === 'assignment' && !this.assignmentsLoaded) {
+          console.log('Current course ID:', this.courseId);
+    console.log('Current course object:', this.course);
+    if (!this.assignmentsLoaded) {
       this.loadAssignments();
+    }
     }
     if (tab === 'quiz' && !this.quizzesLoaded) {
       this.loadQuizzes();
     }
   }
 
+// loadAssignments(): void {
+//   this.assignmentsLoading = true;
+//   this.assignmentService.getAssignmentsByCourse(this.courseId).subscribe({
+//     next: (res: any) => {
+//       this.assignments = res.data || [];
+//       this.assignmentsLoaded = true;
+//       this.assignmentsLoading = false;
+//       this.checkAllAssignmentAttempts();
+//       this.cdr.detectChanges();
+//     },
+//     error: () => { this.assignmentsLoading = false; }
+//   });
+// }
+
+toggleCurriculum(index: number) {
+    const position = this.expandedIndices.indexOf(index);
+    if (position === -1) {
+      this.expandedIndices.push(index);
+    } else {
+      this.expandedIndices.splice(position, 1);
+    }
+  }
 loadAssignments(): void {
   this.assignmentsLoading = true;
-  this.assignmentService.getAssignmentsByCourse(this.courseId).subscribe({
+
+  console.log('Fetching assignments for batch_id:', this.batchId);
+
+  this.assignmentService.getAssignmentsByBatch(this.batchId).subscribe({
     next: (res: any) => {
+      console.log('Assignments API response:', res);
       this.assignments = res.data || [];
       this.assignmentsLoaded = true;
       this.assignmentsLoading = false;
-      this.checkAllAssignmentAttempts();
       this.cdr.detectChanges();
+
+      if (this.assignments.length > 0) {
+        this.checkAllAssignmentAttempts();
+      }
     },
-    error: () => { this.assignmentsLoading = false; }
+    error: (err) => {
+      console.error('Error loading assignments:', err);
+      this.assignmentsLoading = false;
+      this.assignmentsLoaded = true;
+      this.cdr.detectChanges();
+    }
   });
 }
 checkAllAssignmentAttempts(): void {
@@ -231,10 +272,13 @@ confirmSubmitAssignment(): void {
   const batchId = this.course?.batch_id;
 
   if (!batchId) {
+    console.error('❌ batch_id not found in course:', this.course);
+
     this.quizzesLoading = false;
     this.quizzesLoaded = true;
     return;
   }
+  console.log('📡 Fetching quizzes for batch_id:', batchId);
 
   this.courseService.getQuizzesByBatch(batchId).subscribe({
     next: (res: any) => {
@@ -243,8 +287,13 @@ confirmSubmitAssignment(): void {
       // ✅ Pehle quizzes set karo phir attempts check karo
       this.checkAllAttempts();
     },
-    error: () => {
+     error: (err) => {
+      console.error('❌ Quiz API error status:', err.status);
+      console.error('❌ Quiz API error body:', err.error);
+      console.error('❌ Full error:', err);
       this.quizzesLoading = false;
+      this.quizzesLoaded = true;
+      this.cdr.detectChanges();
     }
   });
 }
@@ -301,7 +350,7 @@ checkAllAttempts(): void {
         if (res.attempted) {
           this.quizAttempts = {
             ...this.quizAttempts,
-            [quiz.id]: res.attempt.status  
+            [quiz.id]: res.attempt.status
           };
         }
         completed++;
@@ -343,11 +392,22 @@ checkAllAttempts(): void {
     this.pendingQuiz = null;
   }
 
+  // isOverdue(dueDate: string): boolean {
+  //   if (!dueDate) return false;
+  //   return new Date(dueDate) < new Date();
+  // }
+
   isOverdue(dueDate: string): boolean {
-    if (!dueDate) return false;
-    return new Date(dueDate) < new Date();
+  if (!dueDate) return false;
+
+  const due = new Date(dueDate);
+
+  if (!dueDate.includes('T') && !dueDate.includes(' ')) {
+    due.setHours(23, 59, 59, 999);
   }
 
+  return due < new Date();
+}
   getBenefits(): string[] {
     if (!this.course?.benefits) return [];
     return typeof this.course.benefits === 'string'

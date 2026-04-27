@@ -198,4 +198,78 @@ saveQuizProgress(attemptId: number, answers: any[]): Observable<any> {
     { headers: this.getHeaders() }
   );
 }
+getMyResultCourses(): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/results/courses`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getQuizResults(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/results/quiz/${courseId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getAssignmentResults(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/results/assignment/${courseId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getCheckedQuizDetail(attemptId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quiz-attempts/result/${attemptId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+ //  GUARDIAN RESULTS  ✅ NEW
+  // ─────────────────────────────────────────────
+
+  /** Guardian: get enrolled courses for a specific student */
+  getGuardianStudentResultCourses(studentId: number): Observable<any> {
+    return this.http.get(
+      `${environment.GuardianApiUrl}/results/courses/${studentId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  /** Guardian: get quiz results for a specific student + course */
+  getGuardianQuizResults(studentId: number, courseId: number): Observable<any> {
+    return this.http.get(
+      `${environment.GuardianApiUrl}/results/quiz/${studentId}/${courseId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  /** Guardian: get assignment results for a specific student + course */
+  getGuardianAssignmentResults(studentId: number, courseId: number): Observable<any> {
+    return this.http.get(
+      `${environment.GuardianApiUrl}/results/assignment/${studentId}/${courseId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  /** Guardian: get checked quiz detail (reuses same student endpoint — same data) */
+  getGuardianCheckedQuizDetail(attemptId: number): Observable<any> {
+    return this.http.get(
+      `${environment.StudentApiUrl}/quiz-attempts/result/${attemptId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  checkStudentAssessmentCompleted(studentId: number, courseId: number): Observable<any> {
+    return this.http.get(`${environment.StudentApiUrl}/check-assessment/${studentId}/${courseId}`, { headers: this.getHeaders() });
+  }
+
+  enrollStudentInCourse(courseId: number): Observable<any> {
+    return this.http.post(`${environment.StudentApiUrl}/enroll-course`, { course_id: courseId }, { headers: this.getHeaders() });
+  }
+
+    getGuardianStudents(): Observable<any> {
+      return this.http.get(`${environment.GuardianApiUrl}/students`, { headers: this.getHeaders() });
+    }
 }

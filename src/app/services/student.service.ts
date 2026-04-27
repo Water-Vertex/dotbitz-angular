@@ -13,6 +13,7 @@ import { environment } from '../../environments/environment';
 export class StudentService {
 
  private AdminApiUrl = environment.AdminApiUrl + '/students';
+ private InstructorApiUrl = environment.InstructorApiUrl + '/students';
  private StudentApiUrl = environment.StudentApiUrl;
 
 
@@ -121,4 +122,17 @@ export class StudentService {
       catchError(err => throwError(() => err))
     );
   }
+
+  //InstructorStudentList
+
+getInstructorStudents(search: string = ''): Observable<{ data: Student[] }> {
+    let params = new HttpParams();
+    if (search) params = params.set('search', search);
+
+    return this.http
+      .get<{ data: Student[] }>(`${this.InstructorApiUrl}`, { headers: this.getHeaders(), params })
+      .pipe(catchError(err => throwError(() => err)));
+  }
 }
+
+

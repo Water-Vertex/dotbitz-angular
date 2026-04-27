@@ -22,7 +22,7 @@ export class QuizService {
   }
 
   // List — with optional course filter
-  getQuizzes(courseId?: number): Observable<any> {
+  getQuizzes(courseId?: number, batchId?: number): Observable<any> {
     let url = this.apiUrl;
     if (courseId) url += `?course_id=${courseId}`;
     return this.http.get(url, { headers: this.getHeaders() });
@@ -170,4 +170,27 @@ checkInstructorQuiz(attemptId: number, payload: any): Observable<any> {
     { headers: this.getHeaders() }
   );
 }
+
+getQuizBatchStatus(payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.AdminApiUrl}/quiz-attempts/batch-status`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorQuizBatchStatus(payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.InstructorApiUrl}/quiz-attempts/batch-status`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+getInstructorCourses(): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/courses`,
+    { headers: this.getHeaders() }
+  );
+}
+
 }

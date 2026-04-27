@@ -48,6 +48,11 @@ constructor(
 
   isOverdue(dueDate: string): boolean {
     if (!dueDate) return false;
-    return new Date(dueDate) < new Date();
+
+  const due = new Date(dueDate);
+  if (!dueDate.includes('T') && !dueDate.includes(' ')) {
+    due.setHours(23, 59, 59, 999);
+  }
+    return due < new Date();
   }
 }

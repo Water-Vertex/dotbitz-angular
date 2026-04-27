@@ -224,10 +224,6 @@ InstructorLogin(credentials: LoginRequest) {
     this.clearStorage();
     this.currentUserSubject.next(null);
 
-    // Navigate to login page
-    setTimeout(() => {
-      this.router.navigate(['/login']);
-    }, 100);
   }
 
   isLoggedIn(): boolean {

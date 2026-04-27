@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardService } from '../../../../services/dashboard.service';
@@ -7,7 +7,7 @@ import { DashboardStats, DashboardResponse } from '../../../../models/dashboard.
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
@@ -17,7 +17,19 @@ export class Dashboard implements OnInit {
     total_students: 0,
     total_instructors: 0,
     total_guardians: 0,
-    total_assessments_queries: 0
+    total_assessments: 0,
+    total_courses: 0,
+    total_batches: 0,
+    total_quizzes: 0,
+    total_assignments: 0,
+    total_assessments_queries: 0,
+    completed_courses: 0,
+    in_progress_courses: 0,
+    completed_assessments: 0,
+    pending_assessments: 0,
+    submitted_assignments: 0,
+    pending_assignments: 0,
+    average_completion_rate: 0,
   };
 
   // UI state
@@ -59,7 +71,7 @@ export class Dashboard implements OnInit {
   chartData: any;
   tableData: any[] = [];
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadDashboardStats();
@@ -78,10 +90,12 @@ export class Dashboard implements OnInit {
           console.log('Dashboard stats loaded:', this.stats);
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Failed to load dashboard statistics. Please try again later.';
         this.loading = false;
+        this.cdr.detectChanges();
         console.error('Error loading dashboard stats:', err);
       }
     });

@@ -22,6 +22,7 @@ export interface ClassSchedule {
 export interface Course {
   id: number;
   course_name: string;
+  course_code: string;
   name?: string; // Add alias for flexibility
   title?: string; // Add alias for flexibility
   // add other course fields as needed

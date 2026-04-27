@@ -5,16 +5,17 @@
         <h1 class="text-2xl font-bold text-gray-900">Student Assessments</h1>
         <p class="text-sm text-gray-500 mt-1">Track assigned evaluations and results</p>
       </div>
-      <button (click)="refreshData()" [disabled]="isLoading"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50">
-        <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
-        <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
-      </button>
+  <button (click)="refreshData()" [disabled]="isLoading"
+  class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+  <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
+  <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+</button>
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-4 py-6">
-    <div class="flex items-center gap-4">
+ <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="flex items-center gap-4 flex-wrap">
+      <!-- Student Select -->
       <div class="relative w-80">
         <select
           #studentSelect
@@ -27,6 +28,25 @@
           </option>
           <option *ngFor="let student of students" [value]="student.id">
             {{ student.first_name }} {{ student.last_name }}
+          </option>
+        </select>
+        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ✅ Course Filter - New Dropdown -->
+      <div class="relative w-64" *ngIf="selectedStudentId && uniqueCourses.length > 0">
+        <select
+          #courseFilter
+          (change)="onCourseFilterChange(courseFilter.value)"
+          class="w-full appearance-none bg-white border border-gray-300 rounded-md px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#073a89] focus:ring-1 focus:ring-[#073a89]"
+        >
+          <option value="">All Courses</option>
+          <option *ngFor="let course of uniqueCourses" [value]="course">
+            {{ course }}
           </option>
         </select>
         <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
@@ -78,37 +98,56 @@
     <div class="overflow-hidden border border-gray-200 rounded-md bg-white">
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="px-6 py-4 text-left font-semibold text-gray-900">Course</th>
-              <th class="px-6 py-4 text-left font-semibold text-gray-900">Assessment Title</th>
-              <th class="px-4 py-4 text-left font-semibold text-gray-900">Duration</th>
-              <th class="px-4 py-4 text-center font-semibold text-gray-900">Total</th>
-              <th class="px-4 py-4 text-center font-semibold text-gray-900">Obtained</th>
-              <th class="px-6 py-4 text-left font-semibold text-gray-900">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr *ngFor="let item of filteredAssessments; trackBy: trackById" class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 text-gray-900 font-medium">{{ item.appointment?.course?.course_name }}</td>
-              <td class="px-6 py-4 text-gray-600">{{ item.assessment?.assessment_title }}</td>
-              <td class="px-4 py-4 text-gray-500">{{ item.time_to_complete }} min</td>
-              <td class="px-4 py-4 text-center font-medium">{{ item.total_marks }}</td>
-              <td class="px-4 py-4 text-center">
-                <span [ngClass]="item.obtain_marks ? 'font-bold text-[#073a89]' : 'text-gray-400'">
-                  {{ item.obtain_marks ?? '---' }}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium border"
-                  [ngClass]="(item.status === 'Completed' || item.status === 'marked') 
-                              ? 'bg-green-50 text-green-700 border-green-100' 
-                              : 'bg-yellow-50 text-yellow-700 border-yellow-100'">
-                  {{ item.status }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
+      <thead class="bg-gray-50 border-b border-gray-200">
+  <tr>
+    <th class="px-6 py-4 text-left font-semibold text-gray-900">Course</th>
+    <th class="px-6 py-4 text-left font-semibold text-gray-900">Assessment Title</th>
+    <th class="px-4 py-4 text-left font-semibold text-gray-900">Duration</th>
+    <th class="px-4 py-4 text-center font-semibold text-gray-900">Total marks</th>
+    <th class="px-4 py-4 text-center font-semibold text-gray-900">Obtained</th>
+    <th class="px-4 py-4 text-left font-semibold text-gray-900">Remarks</th>  <!-- ✅ NEW -->
+    <th class="px-4 py-4 text-left font-semibold text-gray-900">Due Date</th>
+    <th class="px-6 py-4 text-left font-semibold text-gray-900">Status</th>
+  </tr>
+</thead>
+<tbody class="divide-y divide-gray-200">
+  <tr *ngFor="let item of filteredAssessments; trackBy: trackById" class="hover:bg-gray-50 transition-colors">
+    <!-- ✅ FIXED: Course name -->
+    <td class="px-6 py-4 text-gray-900 font-medium">{{ item.assessment_query?.course?.course_name }}</td>
+    
+    <td class="px-6 py-4 text-black-600">{{ item.assessment?.assessment_title }}</td>
+    <td class="px-4 py-4 text-black-500">{{ item.time_to_complete }} min</td>
+    <td class="px-4 py-4 text-center font-medium">{{ item.total_marks }}</td>
+    <td class="px-4 py-4 text-center">
+      <span [ngClass]="item.obtained_marks ? 'font-bold text-[#073a89]' : 'text-black-400'">
+        {{ item.obtain_marks ?? '---' }}
+      </span>
+    </td>
+    
+    <!-- ✅ NEW: Remarks -->
+    <td class="px-4 py-4">
+      <span class="text-sm text-black-600">
+        {{ item.remarks ?? '---' }}
+      </span>
+    </td>
+    
+    <td class="px-4 py-4">
+      <span *ngIf="item.due_date" class="text-sm text-black-700">
+        {{ item.due_date | date:'dd MMM yyyy' }}
+      </span>
+      <span *ngIf="!item.due_date" class="text-sm text-black-400">---</span>
+    </td>
+    
+    <td class="px-6 py-4">
+      <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium border"
+        [ngClass]="(item.status === 'Completed' || item.status === 'marked') 
+                    ? 'bg-green-50 text-green-700 border-green-100' 
+                    : 'bg-yellow-50 text-yellow-700 border-yellow-100'">
+        {{ item.status }}
+      </span>
+    </td>
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex justify-between">

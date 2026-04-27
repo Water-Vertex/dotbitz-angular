@@ -4,31 +4,29 @@
   <p class="text-gray-500 mt-4">Loading course...</p>
 </div>
 
-<div *ngIf="!loading && course" class="bg-white">
-  <!-- Simple Breadcrumb -->
-  <div class="border-b border-gray-200">
-    <div class="container mx-auto px-4 py-3">
+<div *ngIf="!loading && course" class="bg-white min-h-screen">
+  <!-- Breadcrumb -->
+  <div class="border-b border-gray-100 bg-gray-50/30">
+    <div class="max-w-7xl mx-auto px-6 py-3">
       <div class="flex items-center text-sm text-gray-500">
-        <a routerLink="/student/my-courses" class="hover:text-[#073a89]">My Courses</a>
-        <span class="mx-2">›</span>
+        <a routerLink="/student/my-courses" class="hover:text-[#073a89] transition-colors">My Courses</a>
+        <span class="mx-2 text-gray-300">/</span>
         <span class="text-gray-900">{{ course.course_name }}</span>
       </div>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="container mx-auto px-4 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <!-- Hero Section - Course Info + Image in one row -->
+  <div class="border-b border-gray-100 bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="flex flex-col md:flex-row gap-8">
 
-      <!-- Left Column - Course Info -->
-      <div class="lg:col-span-2">
-        <!-- Title & Badge -->
-        <div class="mb-6">
-
+        <!-- Left Side - Course Details -->
+        <div class="flex-1">
           <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ course.course_name }}</h1>
 
-          <!-- Quick Stats -->
-          <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
             <span class="flex items-center">
               <i class="fas fa-signal mr-2 text-gray-400"></i>
               {{ course.course_level }}
@@ -43,413 +41,245 @@
             </span>
             <span class="flex items-center">
               <i class="fas fa-child mr-2 text-gray-400"></i>
-              Age {{ course.age_limit }}+
+              Age {{ course.age_limit }}
             </span>
           </div>
-        </div>
-
-        <!-- Thumbnail (Mobile) -->
-        <div class="lg:hidden mb-6">
-          <img
-            *ngIf="course.thumbnail_image"
-            [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
-            class="w-full rounded-lg border border-gray-200"
-            [alt]="course.course_name"
-          />
-        </div>
-
-        <!-- Submit Assignment Modal -->
-<div *ngIf="showSubmitModal"
-  class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-    <div class="text-center mb-4">
-      <div class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center mx-auto mb-3">
-        <i class="fas fa-upload text-2xl text-[#073a89]"></i>
-      </div>
-      <h3 class="text-lg font-bold text-gray-900">Submit Assignment</h3>
-      <p class="text-sm text-gray-500 mt-1">Upload your completed assignment file</p>
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700 mb-2">
-        Select File <span class="text-red-500">*</span>
-      </label>
-      <input type="file" (change)="onSubmitFileSelected($event)"
-        accept=".pdf,.doc,.docx,.ppt,.pptx"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50">
-      <p class="text-xs text-gray-500 mt-1">Allowed: PDF, DOC, DOCX, PPT (Max: 10MB)</p>
-      <p *ngIf="submitFileError" class="text-xs text-red-600 mt-1">{{ submitFileError }}</p>
-      <p *ngIf="selectedSubmitFile" class="text-xs text-green-600 mt-1">
-        <i class="fas fa-check-circle mr-1"></i>
-        {{ selectedSubmitFile.name }}
-      </p>
-    </div>
-
-    <div class="flex gap-3">
-      <button (click)="cancelSubmitModal()" [disabled]="submittingAssignment"
-        class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 disabled:opacity-50">
-        Cancel
-      </button>
-      <button (click)="confirmSubmitAssignment()" [disabled]="submittingAssignment"
-        class="flex-1 px-4 py-3 bg-[#073a89] text-white rounded-xl text-sm font-medium hover:bg-[#052b63] disabled:opacity-60 flex items-center justify-center gap-2">
-        <span *ngIf="submittingAssignment" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-        {{ submittingAssignment ? 'Submitting...' : 'Submit' }}
-      </button>
-    </div>
-  </div>
-</div>
-<!-- Start Quiz Confirm Modal -->
-<div *ngIf="showStartConfirm"
-  class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-    <div class="text-center mb-4">
-      <div class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center mx-auto mb-3">
-        <i class="fas fa-exclamation-triangle text-2xl text-[#073a89]"></i>
-      </div>
-      <h3 class="text-lg font-bold text-gray-900">Before You Start</h3>
-    </div>
-    <div class="text-sm text-gray-600 space-y-2 mb-6">
-      <p>⏱️ Once you start, the <strong>timer will begin</strong> and cannot be paused.</p>
-      <p>🚫 You <strong>cannot go back</strong> or attempt this quiz again after submission.</p>
-      <p>⚡ If time runs out, your quiz will be <strong>auto-submitted</strong>.</p>
-      <p class="text-[#073a89] font-medium mt-3">Are you sure you want to start now?</p>
-    </div>
-    <div class="flex gap-3">
-      <button (click)="cancelStart()"
-        class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">
-        Cancel
-      </button>
-      <button (click)="confirmStart()"
-        class="flex-1 px-4 py-3 bg-[#073a89] text-white rounded-xl text-sm font-medium hover:bg-[#052b63]">
-        Yes, Start Quiz
-      </button>
-    </div>
-  </div>
-</div>
-        <!-- Tabs Navigation -->
-        <div class="border-b border-gray-200 mb-6">
-          <div class="flex gap-6 overflow-x-auto">
-            <button (click)="setTab('instructor')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'instructor' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
-              Instructor
-            </button>
-            <button (click)="setTab('curriculum')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'curriculum' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
-              Curriculum
-            </button>
-            <button (click)="setTab('assignment')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'assignment' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
-              Assignments
-            </button>
-            <button (click)="setTab('quiz')"
-              [class]="'pb-3 text-sm font-medium transition-colors whitespace-nowrap ' +
-                (activeTab === 'quiz' ? 'text-[#073a89] border-b-2 border-[#073a89]' : 'text-gray-500 hover:text-gray-900')">
-              Quizzes
-            </button>
+           
           </div>
         </div>
 
-        <!-- Tab Content -->
-        <div class="min-h-[200px]">
-          <!-- Instructor Tab -->
-          <div *ngIf="activeTab === 'instructor'">
-            <div *ngIf="course.instructor; else noInstructor">
-              <div class="flex items-start gap-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
-                <div class="w-16 h-16 bg-[#073a89]/10 rounded-full flex items-center justify-center text-[#073a89] font-semibold text-xl shrink-0">
-                  {{ course.instructor.first_name?.charAt(0) }}{{ course.instructor.last_name?.charAt(0) }}
+        <!-- Right Side - Course Image -->
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Section - Full Width -->
+  <div class="border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex gap-8">
+        <button (click)="setTab('curriculum')"
+          [class]="'py-4 text-base font-medium transition-all relative ' +
+            (activeTab === 'curriculum' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+          Curriculum
+          <div *ngIf="activeTab === 'curriculum'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+        </button>
+        <button (click)="setTab('assignment')"
+          [class]="'py-4 text-base font-medium transition-all relative ' +
+            (activeTab === 'assignment' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+          Assignments
+          <div *ngIf="activeTab === 'assignment'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+        </button>
+        <button (click)="setTab('quiz')"
+          [class]="'py-4 text-base font-medium transition-all relative ' +
+            (activeTab === 'quiz' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+          Quizzes
+          <div *ngIf="activeTab === 'quiz'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content - Full Width -->
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Curriculum Tab -->
+    <div *ngIf="activeTab === 'curriculum'">
+      <div *ngIf="course.curriculums && course.curriculums.length > 0; else noCurriculum">
+        <div class="space-y-3">
+          <div *ngFor="let item of course.curriculums; let i = index"
+            class="border border-gray-200 rounded-xl overflow-hidden bg-white hover:border-gray-300 transition-all">
+            <div (click)="toggleCurriculum(i)"
+              class="py-4 px-6 bg-white hover:bg-gray-50 cursor-pointer transition-colors flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold">
+                  {{ i + 1 }}
                 </div>
-                <div>
-                  <h3 class="font-semibold text-gray-900">{{ course.instructor.first_name }} {{ course.instructor.last_name }}</h3>
-                  <p class="text-sm text-gray-500 mb-2">{{ course.instructor.title }}</p>
-                  <p class="text-sm text-gray-600">{{ course.instructor.description }}</p>
+                <span class="font-medium text-gray-900">{{ item.title }}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span *ngIf="item.duration" class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Week {{ item.duration }}</span>
+                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" [class.rotate-180]="expandedIndices.includes(i)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+            <div *ngIf="expandedIndices.includes(i)" class="px-6 pb-5 pt-3 border-t border-gray-100 bg-gray-50/20">
+              <div class="text-gray-600 text-sm leading-relaxed" [innerHTML]="item.description || 'No description available.'"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noCurriculum>
+        <div class="text-center py-16">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          <p class="text-gray-500">No curriculum added yet.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Assignments Tab -->
+    <div *ngIf="activeTab === 'assignment'">
+      <div *ngIf="assignmentsLoading" class="flex justify-center py-16">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+      </div>
+
+      <div *ngIf="!assignmentsLoading && assignments.length === 0" class="text-center py-16">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <p class="text-gray-500">No assignments for this course yet.</p>
+      </div>
+
+      <div *ngIf="!assignmentsLoading && assignments.length > 0" class="space-y-4">
+        <div *ngFor="let assignment of assignments; let i = index" class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-sm transition-shadow">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                {{ i + 1 }}
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-900 mb-2">{{ assignment.title }}</h4>
+                <div class="flex flex-wrap gap-4 text-xs text-gray-500 mb-4">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Due {{ assignment.due_date | date: 'MMM d, yyyy' }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    {{ assignment.total_marks || 0 }} marks
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                  <a *ngIf="assignment.assignment_file"
+                    [href]="getBaseUrl() + '/assets/assignments/' + assignment.assignment_file"
+                    target="_blank" download
+                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-[#073a89] border border-[#073a89]/20 rounded-lg hover:bg-orange-500/5 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download Assignment
+                  </a>
+
+                  <ng-container *ngIf="getAssignmentAttempt(assignment.id) as attempt">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg"
+                      [ngClass]="attempt.is_late ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700'">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      {{ attempt.is_late ? 'Submitted (Late)' : 'Submitted' }}
+                    </span>
+                    <a *ngIf="attempt.doc_file"
+                      [href]="getBaseUrl() + '/assets/assignment_attempts/' + attempt.doc_file"
+                      target="_blank" download
+                      class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                      </svg>
+                      My Submission
+                    </a>
+                  </ng-container>
+
+                  <button *ngIf="!getAssignmentAttempt(assignment.id)"
+                    (click)="onSubmitAssignment(assignment.id)"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-orange-500 rounded-lg hover:bg-[#052b63] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    Submit Assignment
+                  </button>
                 </div>
               </div>
             </div>
-            <ng-template #noInstructor>
-              <div class="text-center py-12 text-gray-400">
-                <i class="fas fa-chalkboard-teacher text-4xl mb-3"></i>
-                <p class="text-sm">No instructor assigned yet.</p>
-              </div>
-            </ng-template>
           </div>
+        </div>
+      </div>
+    </div>
 
-          <!-- Curriculum Tab -->
-          <div *ngIf="activeTab === 'curriculum'">
-            <div *ngIf="course.curriculums && course.curriculums.length > 0; else noCurriculum">
-              <div class="space-y-3">
-                <div *ngFor="let item of course.curriculums; let i = index"
-                  class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                    {{ i + 1 }}
-                  </div>
-                  <div>
-                    <h4 class="font-medium text-gray-900">{{ item.title }}</h4>
-                    <p class="text-sm text-gray-500 mt-1" *ngIf="item.description">{{ item.description }}</p>
-                  </div>
+    <!-- Quizzes Tab -->
+    <div *ngIf="activeTab === 'quiz'">
+      <div *ngIf="quizzesLoading" class="flex justify-center py-16">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+      </div>
+
+      <div *ngIf="!quizzesLoading && quizzes.length === 0" class="text-center py-16">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="text-gray-500">No quizzes available yet.</p>
+      </div>
+
+      <div *ngIf="!quizzesLoading && quizzes.length > 0" class="space-y-4">
+        <div *ngFor="let quiz of quizzes; let i = index" class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-sm transition-shadow">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                {{ i + 1 }}
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">{{ quiz.name }}</h4>
+                <div class="flex flex-wrap gap-3 text-xs text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ quiz.mcqs?.length || 0 }} Questions
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    {{ quiz.marks }} Marks
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ quiz.duration }} mins
+                  </span>
+                  <span class="flex items-center gap-1" [class]="isOverdue(quiz.due_date) ? 'text-red-600' : 'text-gray-500'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Due {{ quiz.due_date | date: 'MMM d, yyyy' }}
+                  </span>
                 </div>
               </div>
             </div>
-            <ng-template #noCurriculum>
-              <div class="text-center py-12 text-gray-400">
-                <i class="fas fa-list-ol text-4xl mb-3"></i>
-                <p class="text-sm">No curriculum added yet.</p>
-              </div>
-            </ng-template>
-          </div>
 
-       <!-- Assignment Tab -->
-<div *ngIf="activeTab === 'assignment'">
-  <div *ngIf="assignmentsLoading" class="flex justify-center py-12">
-    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
-  </div>
-
-  <div *ngIf="!assignmentsLoading && assignments.length === 0" class="text-center py-12 text-gray-400">
-    <i class="fas fa-tasks text-4xl mb-3"></i>
-    <p class="text-sm">No assignments for this course yet.</p>
-  </div>
-
-  <div *ngIf="!assignmentsLoading && assignments.length > 0" class="space-y-4">
-    <div *ngFor="let assignment of assignments; let i = index"
-      class="p-5 bg-gray-50 rounded-lg border border-gray-200">
-
-      <div class="flex flex-col gap-4">
-
-        <!-- Assignment Info -->
-        <div class="flex items-start gap-3">
-          <div class="w-10 h-10 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
-            {{ i + 1 }}
-          </div>
-          <div class="flex-1">
-            <h4 class="font-medium text-gray-900">{{ assignment.title }}</h4>
-            <div class="flex flex-wrap items-center gap-3 mt-1 text-xs">
-              <span [class]="isOverdue(assignment.due_date) ? 'text-red-600' : 'text-gray-500'">
-                <i class="far fa-calendar mr-1"></i>
-                Due {{ assignment.due_date | date: 'MMM d, yyyy' }}
+            <div>
+              <span *ngIf="getAttemptStatus(quiz.id) === 'completed'" class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-green-50 text-green-700 rounded-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Completed
               </span>
-              <span *ngIf="isOverdue(assignment.due_date) && !getAssignmentAttempt(assignment.id)"
-                class="text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded text-[10px] font-medium">
-                Late Submission Allowed
+              <span *ngIf="getAttemptStatus(quiz.id) === 'time_up'" class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-50 text-red-600 rounded-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Time Up
               </span>
-        <span class="text-gray-500">
-  <i class="far fa-star mr-1"></i>
-  {{ assignment.total_marks || 0 }} marks
-</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Buttons Row -->
-        <div class="flex flex-wrap items-center gap-3 ml-13">
-
-          <!-- Download Assignment File -->
-         <a *ngIf="assignment.assignment_file"
-  [href]="getBaseUrl() + '/assets/assignments/' + assignment.assignment_file"
-  target="_blank"
-  download
-  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#073a89] border border-[#073a89]/30 bg-[#073a89]/5 rounded-lg hover:bg-[#073a89]/10 transition-colors">
-  <i class="fas fa-download"></i>
-  Download Assignment
-</a>
-          <span *ngIf="!assignment.assignment_file" class="text-sm text-gray-400">
-            <i class="fas fa-file-slash mr-1"></i> No file
-          </span>
-
-          <!-- Attempt submitted -->
-          <ng-container *ngIf="getAssignmentAttempt(assignment.id) as attempt">
-            <!-- Attempted badge -->
-            <span class="px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
-              [ngClass]="attempt.is_late
-                ? 'bg-orange-100 text-orange-700'
-                : 'bg-green-100 text-green-700'">
-              <i [class]="attempt.is_late ? 'fas fa-clock' : 'fas fa-check-circle'"></i>
-              {{ attempt.is_late ? 'Submitted (Late)' : 'Submitted' }}
-            </span>
-
-            <!-- Download your submitted file -->
-<a *ngIf="attempt.doc_file"
-  [href]="getBaseUrl() + '/assets/assignment_attempts/' + attempt.doc_file"
-  target="_blank"
-  download
-  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 border border-gray-300 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-  <i class="fas fa-file-download"></i>
-  Download My Submission
-</a>
-          </ng-container>
-
-          <!-- Submit button — agar attempt nahi hua -->
-          <button *ngIf="!getAssignmentAttempt(assignment.id)"
-            (click)="onSubmitAssignment(assignment.id)"
-            class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-white bg-[#073a89] rounded-lg hover:bg-[#052b63] transition-colors">
-            <i class="fas fa-upload"></i>
-            Submit Assignment
-            <span *ngIf="isOverdue(assignment.due_date)"
-              class="ml-1 text-xs bg-orange-400 px-1.5 py-0.5 rounded-full">Late</span>
-          </button>
-
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Quiz Tab -->
-<div *ngIf="activeTab === 'quiz'">
-
-  <div *ngIf="quizzesLoading" class="flex justify-center py-12">
-    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
-  </div>
-
-  <div *ngIf="!quizzesLoading && quizzes.length === 0" class="text-center py-12 text-gray-400">
-    <i class="fas fa-question-circle text-4xl mb-3"></i>
-    <p class="text-sm">No quizzes available yet.</p>
-  </div>
-
-  <div *ngIf="!quizzesLoading && quizzes.length > 0" class="space-y-4">
-    <div *ngFor="let quiz of quizzes; let i = index"
-      class="p-5 bg-gray-50 rounded-lg border border-gray-200">
-
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-start gap-3">
-          <div class="w-10 h-10 rounded-full bg-[#073a89] text-white flex items-center justify-center font-bold text-sm shrink-0">
-            {{ i + 1 }}
-          </div>
-          <div>
-            <h4 class="font-medium text-gray-900">{{ quiz.name }}</h4>
-            <div class="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
-              <span><i class="fas fa-question-circle mr-1"></i>{{ quiz.mcqs?.length || 0 }} Questions</span>
-              <span><i class="fas fa-star mr-1"></i>{{ quiz.marks }} Marks</span>
-              <span><i class="fas fa-clock mr-1"></i>{{ quiz.duration }} mins</span>
-              <span [class]="isOverdue(quiz.due_date) ? 'text-red-600' : 'text-gray-500'">
-                <i class="far fa-calendar mr-1"></i>
-                Due {{ quiz.due_date | date: 'MMM d, yyyy h:mm a' }}
+              <button *ngIf="getAttemptStatus(quiz.id) === 'pending'"
+                (click)="onStartQuiz(quiz)"
+                class="px-5 py-2 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                Resume Quiz
+              </button>
+              <button *ngIf="!getAttemptStatus(quiz.id) && !isOverdue(quiz.due_date)"
+                (click)="onStartQuiz(quiz)"
+                class="px-5 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-[#052b63] transition-colors">
+                Start Quiz
+              </button>
+              <span *ngIf="!getAttemptStatus(quiz.id) && isOverdue(quiz.due_date)" class="px-4 py-2 text-sm text-gray-400">
+                Expired
               </span>
-              <span *ngIf="isOverdue(quiz.due_date)"
-                class="text-red-600 bg-red-100 px-1.5 py-0.5 rounded text-[10px] font-medium">
-                Overdue
-              </span>
-            </div>
-          </div>
-        </div>
-
-       <!-- Action Button -->
-<!-- Action Button -->
-<div class="shrink-0">
-
-  <!-- Already Attempted (completed) -->
-  <span *ngIf="getAttemptStatus(quiz.id) === 'completed'"
-    class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium flex items-center gap-2">
-    <i class="fas fa-check-circle"></i> Attempted
-  </span>
-
-  <!-- Time Up -->
-  <span *ngIf="getAttemptStatus(quiz.id) === 'time_up'"
-    class="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-medium flex items-center gap-2">
-    <i class="fas fa-clock"></i> Time Up
-  </span>
-
-  <!-- In Progress — Resume button -->
-  <button *ngIf="getAttemptStatus(quiz.id) === 'pending'"
-    (click)="onStartQuiz(quiz)"
-    class="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors flex items-center gap-2">
-    <i class="fas fa-play-circle"></i> Resume Quiz
-  </button>
-
-  <!-- ✅ 1 week se zyada overdue — expired -->
-  <span *ngIf="!getAttemptStatus(quiz.id) && isMoreThanWeekOverdue(quiz.due_date)"
-    class="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium flex items-center gap-2">
-    <i class="fas fa-ban"></i> Expired
-  </span>
-
-  <!-- ✅ Overdue but within 1 week — start with warning -->
-  <button
-    *ngIf="!getAttemptStatus(quiz.id) && isOverdue(quiz.due_date) && !isMoreThanWeekOverdue(quiz.due_date)"
-    (click)="onStartQuiz(quiz)"
-    class="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-2">
-    <i class="fas fa-exclamation-triangle"></i> Start (Overdue -5%)
-  </button>
-
-  <!-- ✅ Normal — start quiz -->
-  <button
-    *ngIf="!getAttemptStatus(quiz.id) && !isOverdue(quiz.due_date)"
-    (click)="onStartQuiz(quiz)"
-    class="px-4 py-2 bg-[#073a89] text-white rounded-lg text-sm font-medium hover:bg-[#052b63] transition-colors flex items-center gap-2">
-    <i class="fas fa-play"></i> Start Quiz
-  </button>
-
-</div>
-      </div>
-    </div>
-  </div>
-</div>
-        <!-- Description -->
-        <div class="mb-8">
-          <h2 class="text-lg font-semibold text-gray-900 mb-3">About this course</h2>
-          <div class="prose prose-sm max-w-none text-gray-600" [innerHTML]="course.course_description">
-          </div>
-        </div>
-
-        <!-- What you'll learn -->
-        <div *ngIf="getBenefits().length > 0" class="mb-8">
-          <h2 class="text-lg font-semibold text-gray-900 mb-3">What you'll learn</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div *ngFor="let benefit of getBenefits()" class="flex items-start gap-2">
-              <i class="fas fa-check text-green-500 text-sm mt-1"></i>
-              <span class="text-sm text-gray-600">{{ benefit }}</span>
-            </div>
-          </div>
-        </div>
-
-
-      </div>
-
-      <!-- Right Column - Sidebar -->
-      <div class="lg:col-span-1">
-        <div class="lg:sticky lg:top-24">
-          <!-- Course Card -->
-          <div class="border border-gray-200 rounded-lg overflow-hidden bg-white">
-            <!-- Thumbnail (Desktop) -->
-            <div class="hidden lg:block bg-gray-50">
-              <img
-                *ngIf="course.thumbnail_image"
-                [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
-                class="w-full aspect-video object-cover"
-                [alt]="course.course_name"
-              />
-              <div *ngIf="!course.thumbnail_image" class="w-full aspect-video bg-gray-100 flex items-center justify-center">
-                <i class="fas fa-image text-3xl text-gray-300"></i>
-              </div>
-            </div>
-
-            <!-- Price & CTA -->
-            <div class="p-6">
-
-              <!-- Course Includes -->
-              <div class="mt-6 pt-6 border-t border-gray-200">
-                <h3 class="text-sm font-semibold text-gray-900 mb-3">This course includes:</h3>
-                <ul class="space-y-2">
-                  <li class="flex items-center text-sm text-gray-600">
-                    <i class="fas fa-video w-5 text-gray-400"></i>
-                    <span>{{ course.lessons_count || '24' }} lessons</span>
-                  </li>
-                  <li class="flex items-center text-sm text-gray-600">
-                    <i class="fas fa-clock w-5 text-gray-400"></i>
-                    <span>{{ course.course_duration }} weeks access</span>
-                  </li>
-                  <li class="flex items-center text-sm text-gray-600">
-                    <i class="fas fa-mobile-alt w-5 text-gray-400"></i>
-                    <span>Mobile & TV access</span>
-                  </li>
-                  <li class="flex items-center text-sm text-gray-600">
-                    <i class="fas fa-trophy w-5 text-gray-400"></i>
-                    <span>Certificate of completion</span>
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -459,14 +289,89 @@
 </div>
 
 <!-- Not Found -->
-<div *ngIf="!loading && !course" class="min-h-[60vh] flex items-center justify-center">
+<div *ngIf="!loading && !course" class="min-h-[60vh] flex items-center justify-center px-4">
   <div class="text-center">
-    <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+    <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
     <h2 class="text-xl font-semibold text-gray-900 mb-2">Course not found</h2>
     <p class="text-gray-500 mb-6">The course you're looking for doesn't exist or has been removed.</p>
     <a routerLink="/student/my-courses"
-            class="px-6 py-2 bg-[#073a89] text-white rounded hover:bg-[#052b63] transition-colors">
+      class="inline-flex items-center gap-2 px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-[#052b63] transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
       Back to My Courses
     </a>
   </div>
 </div>
+
+<!-- Submit Assignment Modal -->
+        <div *ngIf="showSubmitModal"
+          class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div class="text-center mb-4">
+              <div class="w-16 h-16 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-upload text-2xl text-[#073a89]"></i>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900">Submit Assignment</h3>
+              <p class="text-sm text-gray-500 mt-1">Upload your completed assignment file</p>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Select File <span class="text-red-500">*</span>
+              </label>
+              <input type="file" (change)="onSubmitFileSelected($event)"
+                accept=".pdf,.doc,.docx,.ppt,.pptx"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50">
+              <p class="text-xs text-gray-500 mt-1">Allowed: PDF, DOC, DOCX, PPT (Max: 10MB)</p>
+              <p *ngIf="submitFileError" class="text-xs text-red-600 mt-1">{{ submitFileError }}</p>
+              <p *ngIf="selectedSubmitFile" class="text-xs text-green-600 mt-1">
+                <i class="fas fa-check-circle mr-1"></i>
+                {{ selectedSubmitFile.name }}
+              </p>
+            </div>
+
+            <div class="flex gap-3">
+              <button (click)="cancelSubmitModal()" [disabled]="submittingAssignment"
+                class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 disabled:opacity-50">
+                Cancel
+              </button>
+              <button (click)="confirmSubmitAssignment()" [disabled]="submittingAssignment"
+                class="flex-1 px-4 py-3 bg-orange-500 text-white rounded-xl text-sm font-medium hover:bg-[#052b63] disabled:opacity-60 flex items-center justify-center gap-2">
+                <span *ngIf="submittingAssignment" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                {{ submittingAssignment ? 'Submitting...' : 'Submit' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Start Quiz Confirm Modal -->
+        <div *ngIf="showStartConfirm"
+          class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div class="text-center mb-4">
+              <div class="w-16 h-16 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-exclamation-triangle text-2xl text-[#073a89]"></i>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900">Before You Start</h3>
+            </div>
+            <div class="text-sm text-gray-600 space-y-2 mb-6">
+              <p>⏱️ Once you start, the <strong>timer will begin</strong> and cannot be paused.</p>
+              <p>🚫 You <strong>cannot go back</strong> or attempt this quiz again after submission.</p>
+              <p>⚡ If time runs out, your quiz will be <strong>auto-submitted</strong>.</p>
+              <p class="text-[#073a89] font-medium mt-3">Are you sure you want to start now?</p>
+            </div>
+            <div class="flex gap-3">
+              <button (click)="cancelStart()"
+                class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50">
+                Cancel
+              </button>
+              <button (click)="confirmStart()"
+                class="flex-1 px-4 py-3 bg-orange-500 text-white rounded-xl text-sm font-medium hover:bg-[#052b63]">
+                Yes, Start Quiz
+              </button>
+            </div>
+          </div>
+        </div>
