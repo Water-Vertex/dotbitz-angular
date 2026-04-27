@@ -183,26 +183,19 @@
             Q{{ qi + 1 }}
             <span class="ml-1 font-normal text-gray-400 capitalize">({{ ans.assessment_type }})</span>
           </span>
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] font-semibold text-gray-500">
-              Marks:
-              <span [ngClass]="{
-                'text-green-700 font-bold': ans.is_correct,
-                'text-red-600 font-bold': !ans.is_correct && ans.student_answer,
-                'text-gray-500': !ans.student_answer
-              }">{{ ans.is_correct ? ans.marks : 0 }}</span>
-              / {{ ans.marks }}
-            </span>
-            <span *ngIf="ans.is_correct" class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-200 text-green-700 rounded-full text-[10px] font-bold">
-              <i class="fas fa-check text-[9px]"></i> Correct
-            </span>
-            <span *ngIf="!ans.is_correct && ans.student_answer" class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-200 text-red-700 rounded-full text-[10px] font-bold">
-              <i class="fas fa-times text-[9px]"></i> Incorrect
-            </span>
-            <span *ngIf="!ans.student_answer" class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-200 text-gray-500 rounded-full text-[10px] font-bold">
-              Skipped
-            </span>
-          </div>
+         <div class="flex items-center gap-2">
+  <span class="text-[11px] font-semibold text-gray-500">
+    Marks:
+    <span [ngClass]="{
+      'text-green-700 font-bold': ans.assessment_type === 'mcq' || ans.assessment_type === 'mcqs' ? (ans.is_correct == 1) : (getAnswerObtainedMarks(ans) == ans.marks),
+      'text-red-600 font-bold': ans.assessment_type === 'mcq' || ans.assessment_type === 'mcqs' ? (ans.is_correct == 0 && ans.student_answer) : (getAnswerObtainedMarks(ans) > 0 && getAnswerObtainedMarks(ans) < ans.marks),
+      'text-gray-500': !ans.student_answer
+    }">
+      {{ getAnswerObtainedMarks(ans) }}
+    </span>
+    / {{ ans.marks }}
+  </span>
+</div>
         </div>
         <div class="px-4 py-3 space-y-3">
           <p class="text-[13px] font-semibold text-gray-800">{{ ans.question }}</p>

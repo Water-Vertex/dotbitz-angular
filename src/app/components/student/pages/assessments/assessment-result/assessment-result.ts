@@ -73,44 +73,94 @@ export class StudentAssessmentResult implements OnInit {
     return item.attempt_id;
   }
 
+  // onViewDetail(item: any): void {
+  //   this.selectedResult = { ...item, answers: item.answers || [] };
+  //   this.showDetailModal = true;
+  //   this.cdr.detectChanges();
+
+  //   if (!item.answers || item.answers.length === 0) {
+  //     this.isDetailLoading = true;
+  //     this.cdr.detectChanges();
+
+  //     this.attemptService.viewAttempt(item.assign_assessment_id).subscribe({
+  //       next: (res: any) => {
+  //         if (res.success && res.data) {
+  //           this.selectedResult = {
+  //             ...this.selectedResult!,
+  //             answers: res.data.answers || [],
+  //             obtain_marks: res.data.obtain_marks,
+  //             total_marks: res.data.total_marks,
+  //             remarks: res.data.remarks,
+  //             assessment_title: res.data.assessment_title,
+  //             course_name: res.data.course_name,
+  //           };
+
+  //           const idx = this.results.findIndex(r => r.attempt_id === item.attempt_id);
+  //           if (idx !== -1) {
+  //             this.results[idx] = { ...this.results[idx], ...this.selectedResult };
+  //             this.filteredResults = [...this.results];
+  //           }
+  //         }
+  //         this.isDetailLoading = false;
+  //         this.cdr.detectChanges();
+  //       },
+  //       error: () => {
+  //         this.isDetailLoading = false;
+  //         this.cdr.detectChanges();
+  //       }
+  //     });
+  //   }
+  // }
   onViewDetail(item: any): void {
-    this.selectedResult = { ...item, answers: item.answers || [] };
-    this.showDetailModal = true;
+  this.selectedResult = { ...item, answers: item.answers || [] };
+  this.showDetailModal = true;
+  this.cdr.detectChanges();
+
+  if (!item.answers || item.answers.length === 0) {
+    this.isDetailLoading = true;
     this.cdr.detectChanges();
 
-    if (!item.answers || item.answers.length === 0) {
-      this.isDetailLoading = true;
-      this.cdr.detectChanges();
-
-      this.attemptService.viewAttempt(item.assign_assessment_id).subscribe({
-        next: (res: any) => {
-          if (res.success && res.data) {
-            this.selectedResult = {
-              ...this.selectedResult!,
-              answers: res.data.answers || [],
-              obtain_marks: res.data.obtain_marks,
-              total_marks: res.data.total_marks,
-              remarks: res.data.remarks,
-              assessment_title: res.data.assessment_title,
-              course_name: res.data.course_name,
-            };
-
-            const idx = this.results.findIndex(r => r.attempt_id === item.attempt_id);
-            if (idx !== -1) {
-              this.results[idx] = { ...this.results[idx], ...this.selectedResult };
-              this.filteredResults = [...this.results];
+    this.attemptService.viewAttempt(item.assign_assessment_id).subscribe({
+      next: (res: any) => {
+        if (res.success && res.data) {
+          // Calculate Q&A obtained marks
+          let obtainedQna = 0;
+          let totalQna = 0;
+          res.data.answers.forEach((ans: any) => {
+            if (ans.assessment_type === 'q-a') {
+              totalQna += Number(ans.marks) || 0;
+              obtainedQna += parseFloat(ans.is_correct?.toString() || '0');
             }
+          });
+          
+          this.selectedResult = {
+            ...this.selectedResult!,
+            answers: res.data.answers || [],
+            obtain_marks: res.data.obtain_marks,
+            total_marks: res.data.total_marks,
+            remarks: res.data.remarks,
+            assessment_title: res.data.assessment_title,
+            course_name: res.data.course_name,
+            obtained_qna_marks: obtainedQna,
+            total_qna_marks: totalQna
+          };
+
+          const idx = this.results.findIndex(r => r.attempt_id === item.attempt_id);
+          if (idx !== -1) {
+            this.results[idx] = { ...this.results[idx], ...this.selectedResult };
+            this.filteredResults = [...this.results];
           }
-          this.isDetailLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.isDetailLoading = false;
-          this.cdr.detectChanges();
         }
-      });
-    }
+        this.isDetailLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isDetailLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
+}
 
   closeModal(): void {
     this.showDetailModal = false;
@@ -174,4 +224,11 @@ export class StudentAssessmentResult implements OnInit {
   getOptionLetter(index: number): string {
     return String.fromCharCode(65 + index);
   }
+  getAnswerObtainedMarks(ans: any): number {
+  if (ans.assessment_type === 'mcqs') {
+    return ans.is_correct == 1 ? Number(ans.marks) : 0;
+  } else {
+    return parseFloat(ans.is_correct?.toString() || '0');
+  }
+}
 }

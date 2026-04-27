@@ -131,6 +131,7 @@ import { StudentResult } from './components/guardian/pages/results/student-resul
 import { StudentClassScheduleList } from './components/student/pages/class-schedule/schedule-list/schedule-list';
 import { GuardianConfirmation } from './components/guardian/pages/payment/confirmation/confirmation';
 import { GuardianList } from './components/admin/pages/guardians/guardian-list/guardian-list';
+import { GuardianClassSchedule } from './components/guardian/pages/class-schedule/class-schedule';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -253,6 +254,7 @@ export const routes: Routes = [
       { path: 'guardian/dashboard', component: GuardianDashboard },
       { path: 'guardian/profile', component: ProfileShow },
       { path: 'guardian/profile/edit', component: ProfileEdit },
+      { path: 'guardian/class-schedule', component: GuardianClassSchedule },
       { path: 'guardian/courses/list', component: GuardianCourseList },
       { path: 'guardian/course/detail/:id', component: GuardianCourseDetail},
       { path: 'guardian/checkout/:id', component: GuardianCheckout },

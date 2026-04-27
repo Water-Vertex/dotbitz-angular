@@ -68,6 +68,8 @@ getStudentCourses(): Observable<any> {
   return this.http.get(`${environment.StudentApiUrl}/courses/${courseId}/schedules`);
 }
 
-
+getGuardianStudentSchedules(studentId: number): Observable<any> {
+  return this.http.get(`${environment.GuardianApiUrl}/student/${studentId}/schedules`);
+}
 
 }

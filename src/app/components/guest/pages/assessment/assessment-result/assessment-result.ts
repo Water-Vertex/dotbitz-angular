@@ -128,4 +128,21 @@ onViewDetail(item: any): void {
     this.selectedResult = null;
     this.cdr.detectChanges();
   }
+
+
+  // Add this method in the component
+getAnswerObtainedMarks(ans: any): number {
+  if (ans.assessment_type === 'mcq' || ans.assessment_type === 'mcqs') {
+    return ans.is_correct == 1 ? Number(ans.marks) : 0;
+  } else {
+    // Q&A: obtained_marks se read karo
+    let marks = 0;
+    if (ans.obtained_marks !== null && ans.obtained_marks !== undefined) {
+      marks = parseFloat(ans.obtained_marks);
+    } else if (ans.is_correct !== null && ans.is_correct !== undefined && ans.is_correct > 0) {
+      marks = parseFloat(ans.is_correct);
+    }
+    return parseFloat(marks.toFixed(2));
+  }
+}
 }

@@ -269,9 +269,9 @@
                       'text-red-600 font-bold': !ans.is_correct && ans.student_answer,
                       'text-gray-500': !ans.student_answer
                     }">
-                      {{ ans.is_correct ? ans.marks : 0 }}
-                    </span>
-                    / {{ ans.marks }}
+                    {{ getAnswerObtainedMarks(ans) }}
+</span>
+/ {{ ans.marks }}
                   </span>
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium" [ngClass]="{
                   'bg-green-100 text-green-700': ans.is_correct === 1,

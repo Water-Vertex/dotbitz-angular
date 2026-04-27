@@ -122,8 +122,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs text-gray-500 font-medium">Obtained Marks</p>
-              <p class="text-2xl font-bold text-purple-600">{{ totalObtainedMarks }} / {{ totalPossibleMarks }}</p>
-            </div>
+           <p class="text-2xl font-bold text-purple-600">{{ totalObtainedMarks | number:'1.1-2' }} / {{ totalPossibleMarks }}</p> </div>
             <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -243,9 +242,9 @@
               <div class="mt-4 pt-3 border-t border-gray-100 flex justify-end">
                 <div class="flex items-center gap-3">
                   <span class="text-sm text-gray-500">Marks Obtained:</span>
-                  <span class="text-xl font-bold" [ngClass]="getMarksColorClass(ans)">
-                    {{ getObtainedMarks(ans) }} / {{ getTotalMarks(ans) }}
-                  </span>
+                 <span class="text-xl font-bold" [ngClass]="getMarksColorClass(ans)">
+  {{ getObtainedMarks(ans) | number:'1.1-2' }} / {{ getTotalMarks(ans) }}
+</span>
                 </div>
               </div>
             </div>
