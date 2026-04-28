@@ -68,6 +68,10 @@ getStudentCourses(): Observable<any> {
   return this.http.get(`${environment.StudentApiUrl}/courses/${courseId}/schedules`);
 }
 
-
+getMySchedules(batchId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/class-schedules/batch/${batchId}`
+  );
+}
 
 }
