@@ -6,6 +6,7 @@ import { AnnouncementService } from '../../../../../services/announcement.servic
 import { Announcement } from '../../../../../models/announcement.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-announcement-list',
@@ -25,8 +26,12 @@ export class AnnouncementList implements OnInit {
 
   constructor(
     private announcementService: AnnouncementService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,public auth:AuthService
   ) {}
+
+  can(permission: string): boolean {
+        return this.auth.hasPermission(permission);
+    }
 
   ngOnInit(): void {
     this.loadAnnouncements();

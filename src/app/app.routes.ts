@@ -3,6 +3,7 @@ import { Login } from './components/auth/login/login';
 import { AdminLayout } from './components/admin/layouts/admin-layout/admin-layout';
 import { Dashboard } from './components/admin/pages//dashboard/dashboard';
 import { authGuard } from './guards/auth-guard';
+import { permissionGuard } from './guards/permission-guard';  // ✅ ADD THIS LINE
 import { FaqList } from './components/admin/pages/faq/faq-list/faq-list';
 import { FaqAdd } from './components/admin/pages/faq/faq-add/faq-add';
 import { FaqEdit } from './components/admin/pages/faq/faq-edit/faq-edit';
@@ -132,10 +133,11 @@ import { StudentClassScheduleList } from './components/student/pages/class-sched
 import { GuardianConfirmation } from './components/guardian/pages/payment/confirmation/confirmation';
 import { GuardianList } from './components/admin/pages/guardians/guardian-list/guardian-list';
 import { GuardianClassSchedule } from './components/guardian/pages/class-schedule/class-schedule';
+import { RolesPermissionsComponent } from './components/admin/pages/roles-permissions/roles-permissions';
+
 
 export const routes: Routes = [
   { path: 'login', component: Login },
-
 
   {
     path: '',
@@ -146,101 +148,105 @@ export const routes: Routes = [
       { path: 'admin/logout', component: Logout },
       { path: 'admin/dashboard', component: Dashboard },
 
-      // FAQ routes
-      { path: 'admin/faq/list', component: FaqList },
-      { path: 'admin/faq/add', component: FaqAdd },
-      { path: 'admin/faq/edit/:id', component: FaqEdit },
+      // ✅ FAQ routes with permissions
+      { path: 'admin/faq/list', component: FaqList, canActivate: [permissionGuard], data: { permission: 'view_faqs' } },
+      { path: 'admin/faq/add', component: FaqAdd, canActivate: [permissionGuard], data: { permission: 'create_faqs' } },
+      { path: 'admin/faq/edit/:id', component: FaqEdit, canActivate: [permissionGuard], data: { permission: 'edit_faqs' } },
 
-      // Instructor routes
-      { path: 'admin/instructor/list', component: InstructorList },
-      { path: 'admin/instructor/add', component: InstructorAdd },
-      { path: 'admin/instructor/edit/:id', component: InstructorEdit },
+      // ✅ Instructor routes with permissions
+      { path: 'admin/instructor/list', component: InstructorList, canActivate: [permissionGuard], data: { permission: 'view_instructors' } },
+      { path: 'admin/instructor/add', component: InstructorAdd, canActivate: [permissionGuard], data: { permission: 'create_instructors' } },
+      { path: 'admin/instructor/edit/:id', component: InstructorEdit, canActivate: [permissionGuard], data: { permission: 'edit_instructors' } },
 
-      // Course routes
-      { path: 'admin/course/list', component: CourseList },
-      { path: 'admin/course/add', component: CourseAdd },
-      { path: 'admin/course/edit/:id', component: CourseEdit },
+      // ✅ Course routes with permissions
+      { path: 'admin/course/list', component: CourseList, canActivate: [permissionGuard], data: { permission: 'view_courses' } },
+      { path: 'admin/course/add', component: CourseAdd, canActivate: [permissionGuard], data: { permission: 'create_courses' } },
+      { path: 'admin/course/edit/:id', component: CourseEdit, canActivate: [permissionGuard], data: { permission: 'edit_courses' } },
 
-      //Assign Course routes
-      { path: 'admin/course/assign-list', component: AssignCourseList },
-      { path: 'admin/course/assign-add', component: AssignCourseAdd },
-      { path: 'admin/course/assign-edit/:id', component: AssignCourseEdit },
+      // ✅ Assign Course routes
+      { path: 'admin/course/assign-list', component: AssignCourseList, canActivate: [permissionGuard], data: { permission: 'view_courses' } },
+      { path: 'admin/course/assign-add', component: AssignCourseAdd, canActivate: [permissionGuard], data: { permission: 'create_courses' } },
+      { path: 'admin/course/assign-edit/:id', component: AssignCourseEdit, canActivate: [permissionGuard], data: { permission: 'edit_courses' } },
 
-       //  Course Curriculum routes
-      { path: 'admin/course/curriculum/list', component: CourseCurriculumList },
-      { path: 'admin/course/curriculum/add', component: CourseCurriculumAdd },
-      { path: 'admin/course/curriculum/edit/:id', component: CourseCurriculumEdit },
+      // ✅ Course Curriculum routes
+      { path: 'admin/course/curriculum/list', component: CourseCurriculumList, canActivate: [permissionGuard], data: { permission: 'view_courses' } },
+      { path: 'admin/course/curriculum/add', component: CourseCurriculumAdd, canActivate: [permissionGuard], data: { permission: 'create_courses' } },
+      { path: 'admin/course/curriculum/edit/:id', component: CourseCurriculumEdit, canActivate: [permissionGuard], data: { permission: 'edit_courses' } },
 
-       // Policy routes
-      { path: 'admin/policy/list', component: PolicyList },
-      { path: 'admin/policy/add', component: PolicyAdd },
-      { path: 'admin/policy/edit/:id', component: PolicyEdit },
+      // ✅ Policy routes with permissions
+      { path: 'admin/policy/list', component: PolicyList, canActivate: [permissionGuard], data: { permission: 'view_policies' } },
+      { path: 'admin/policy/add', component: PolicyAdd, canActivate: [permissionGuard], data: { permission: 'create_policies' } },
+      { path: 'admin/policy/edit/:id', component: PolicyEdit, canActivate: [permissionGuard], data: { permission: 'edit_policies' } },
 
-       // Student routes
-      { path: 'admin/student/list', component: StudentList },
-      { path: 'admin/student/add', component: StudentAdd },
-      { path: 'admin/student/edit/:id', component: StudentEdit },
+      // ✅ Student routes with permissions
+      { path: 'admin/student/list', component: StudentList, canActivate: [permissionGuard], data: { permission: 'view_students' } },
+      { path: 'admin/student/add', component: StudentAdd, canActivate: [permissionGuard], data: { permission: 'create_students' } },
+      { path: 'admin/student/edit/:id', component: StudentEdit, canActivate: [permissionGuard], data: { permission: 'edit_students' } },
 
-      { path: 'admin/guardian/list', component: GuardianList },
+      // ✅ Guardian routes
+      { path: 'admin/guardian/list', component: GuardianList, canActivate: [permissionGuard], data: { permission: 'view_guardians' } },
 
-      // Assignment routes
-      { path: 'admin/assignment/list', component: AssignmentList },
-      { path: 'admin/assignment/add', component: AssignmentAdd },
-      { path: 'admin/assignment/edit/:id', component: AssignmentEdit },
-      { path: 'admin/assignment/attempts', component: AdminAssignmentAttempts },
+      // ✅ Assignment routes
+      { path: 'admin/assignment/list', component: AssignmentList, canActivate: [permissionGuard], data: { permission: 'view_assignments' } },
+      { path: 'admin/assignment/add', component: AssignmentAdd, canActivate: [permissionGuard], data: { permission: 'create_assignments' } },
+      { path: 'admin/assignment/edit/:id', component: AssignmentEdit, canActivate: [permissionGuard], data: { permission: 'edit_assignments' } },
+      { path: 'admin/assignment/attempts', component: AdminAssignmentAttempts, canActivate: [permissionGuard], data: { permission: 'view_assignments' } },
 
-      // Coupon routes
-      { path: 'admin/coupon/list', component: CouponList },
-      { path: 'admin/coupon/add', component: CouponAdd },
-      { path: 'admin/coupon/edit/:id', component: CouponEdit },
+      // ✅ Coupon routes
+      { path: 'admin/coupon/list', component: CouponList, canActivate: [permissionGuard], data: { permission: 'view_coupons' } },
+      { path: 'admin/coupon/add', component: CouponAdd, canActivate: [permissionGuard], data: { permission: 'create_coupons' } },
+      { path: 'admin/coupon/edit/:id', component: CouponEdit, canActivate: [permissionGuard], data: { permission: 'edit_coupons' } },
 
-      // MCQs routes
-      { path: 'admin/mcqs/list', component: McqsList },
-      { path: 'admin/mcqs/add', component: McqsAdd },
-      { path: 'admin/mcqs/edit/:id', component: McqsEdit },
+      // ✅ MCQ routes
+      { path: 'admin/mcqs/list', component: McqsList, canActivate: [permissionGuard], data: { permission: 'view_mcqs' } },
+      { path: 'admin/mcqs/add', component: McqsAdd, canActivate: [permissionGuard], data: { permission: 'create_mcqs' } },
+      { path: 'admin/mcqs/edit/:id', component: McqsEdit, canActivate: [permissionGuard], data: { permission: 'edit_mcqs' } },
 
+      // ✅ Quiz routes
+      { path: 'admin/quiz/list', component: QuizList, canActivate: [permissionGuard], data: { permission: 'view_quizzes' } },
+      { path: 'admin/quiz/add', component: QuizAdd, canActivate: [permissionGuard], data: { permission: 'create_quizzes' } },
+      { path: 'admin/quiz/edit/:id', component: QuizEdit, canActivate: [permissionGuard], data: { permission: 'edit_quizzes' } },
 
-      // Quizes routes
-      { path: 'admin/quiz/list', component: QuizList },
-      { path: 'admin/quiz/add', component: QuizAdd },
-      { path: 'admin/quiz/edit/:id', component: QuizEdit },
+      // ✅ Assessment routes
+      { path: 'admin/assessments/list', component: AssessmentList, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assessments/add', component: AssessmentAdd, canActivate: [permissionGuard], data: { permission: 'create_assessments' } },
+      { path: 'admin/assessments/edit/:id', component: AssessmentEdit, canActivate: [permissionGuard], data: { permission: 'edit_assessments' } },
+      { path: 'admin/assessments/queries', component: AssessmentQueries, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assigned-assessments/list', component: AssignAssessmentList, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assessment-attempts/list', component: AttemptedAssessment, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assessment/check/:id', component: AssessmentCheck, canActivate: [permissionGuard], data: { permission: 'edit_assessments' } },
+      { path: 'admin/assessment/view/:id', component: AssessmentView, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
 
-      // MCQs routes
-      { path: 'admin/assessments/list', component: AssessmentList },
-      { path: 'admin/assessments/add', component: AssessmentAdd },
-      { path: 'admin/assessments/edit/:id', component: AssessmentEdit },
-      { path: 'admin/assessments/queries', component: AssessmentQueries },
-      { path: 'admin/assigned-assessments/list', component: AssignAssessmentList },
-      { path: 'admin/assessment-attempts/list', component: AttemptedAssessment },
-      { path: 'admin/assessment/check/:id', component: AssessmentCheck },
-      { path: 'admin/assessment/view/:id',component: AssessmentView},
+      // ✅ Batch routes
+      { path: 'admin/batches/list', component: BatchList, canActivate: [permissionGuard], data: { permission: 'view_batches' } },
+      { path: 'admin/batches/add', component: BatchAdd, canActivate: [permissionGuard], data: { permission: 'create_batches' } },
+      { path: 'admin/batches/edit/:id', component: BatchEdit, canActivate: [permissionGuard], data: { permission: 'edit_batches' } },
 
+      // ✅ Announcement routes
+      { path: 'admin/announcement/list', component: AnnouncementList, canActivate: [permissionGuard], data: { permission: 'view_announcements' } },
+      { path: 'admin/announcement/add', component: AnnouncementAdd, canActivate: [permissionGuard], data: { permission: 'create_announcements' } },
+      { path: 'admin/announcement/edit/:id', component: AnnouncementEdit, canActivate: [permissionGuard], data: { permission: 'edit_announcements' } },
 
-      // Batch routes
-      { path: 'admin/batches/list', component: BatchList },
-      { path: 'admin/batches/add', component: BatchAdd },
-      { path: 'admin/batches/edit/:id', component: BatchEdit },
+      // ✅ Class Schedule routes
+      { path: 'admin/class-schedule/list', component: AdminClassScheduleList, canActivate: [permissionGuard], data: { permission: 'view_class_schedules' } },
+      { path: 'admin/class-schedule/add', component: AdminClassScheduleAdd, canActivate: [permissionGuard], data: { permission: 'create_class_schedules' } },
+      { path: 'admin/class-schedule/edit/:id', component: AdminClassScheduleEdit, canActivate: [permissionGuard], data: { permission: 'edit_class_schedules' } },
 
-      // Announcement routes
-      { path: 'admin/announcement/list', component: AnnouncementList },
-      { path: 'admin/announcement/add', component: AnnouncementAdd },
-      { path: 'admin/announcement/edit/:id', component: AnnouncementEdit },
+      // ✅ Quiz attempts
+      { path: 'admin/quiz/attempts', component: AdminQuizAttempts, canActivate: [permissionGuard], data: { permission: 'view_quizzes' } },
+      { path: 'admin/quiz/check/:attemptId', component: AdminQuizCheck, canActivate: [permissionGuard], data: { permission: 'edit_quizzes' } },
+      { path: 'admin/quiz/view/:attemptId', component: AdminQuizView, canActivate: [permissionGuard], data: { permission: 'view_quizzes' } },
 
-      // Class Schedule routes
-      { path: 'admin/class-schedule/list', component: AdminClassScheduleList },
-      { path: 'admin/class-schedule/add', component: AdminClassScheduleAdd },
-      { path: 'admin/class-schedule/edit/:id', component: AdminClassScheduleEdit },
+      // ✅ Grade routes
+      { path: 'admin/grade', component: AdminGrade, canActivate: [permissionGuard], data: { permission: 'view_reports' } },
 
-      { path: 'admin/quiz/attempts', component: AdminQuizAttempts },
-      { path: 'admin/quiz/check/:attemptId', component: AdminQuizCheck },
-      { path: 'admin/quiz/view/:attemptId', component: AdminQuizView },
-
-
-      { path: 'admin/grade', component: AdminGrade },
+      // ✅ ROLES & PERMISSIONS - SIRF ADMIN
+      { path: 'admin/roles-permissions', component: RolesPermissionsComponent, canActivate: [permissionGuard], data: { permission: 'manage_roles' } },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
+
 
   // Guardian Routes
 

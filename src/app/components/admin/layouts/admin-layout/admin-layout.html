@@ -109,7 +109,7 @@
         }
     }
 
-    /* Add to your existing CSS */
+    /* Submenu styles */
     .submenu {
         max-height: 0;
         overflow: hidden;
@@ -117,7 +117,7 @@
     }
 
     .submenu.active {
-        max-height: 300px; /* Adjust based on your content */
+        max-height: 300px;
     }
 
     .menu-toggle-btn .fa-chevron-down {
@@ -139,16 +139,11 @@
 
 <!-- Mobile User Dropdown -->
 <div class="mobile-user-dropdown bg-white rounded-xl shadow-2xl border border-gray-100 py-2" id="mobileUserDropdown">
-    <!-- User Info -->
     <div class="px-5 py-4 border-b border-gray-100">
         <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
         <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
     </div>
-
-
-
     <div class="border-t border-gray-100 my-1"></div>
-
     <a (click)="navigateToLogout()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
         <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
         <span>Sign Out</span>
@@ -156,16 +151,14 @@
 </div>
 
 <div class="flex h-screen bg-gray-50">
-    <!-- Desktop Sidebar (Material Design Light Theme) -->
+    <!-- Desktop Sidebar -->
     <div class="desktop-sidebar bg-[#063989] text-white shadow-lg flex flex-col border-r border-gray-200">
-        <!-- Header -->
         <div class="p-2">
             <div class="flex items-center space-x-3">
                 <img src="../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="150">
             </div>
         </div>
 
-        <!-- Navigation -->
         <nav class="flex-1 mt-4 overflow-y-auto no-scrollbar">
             <div class="px-4 space-y-1">
                 <!-- Main Navigation Section -->
@@ -173,30 +166,37 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Main Menu
                     </h3>
-                    <a routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
+                    
+                    <!-- Dashboard -->
+                    <a *ngIf="can('view_dashboard')" routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                         Dashboard
                     </a>
-                    <a routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
+                    
+                    <!-- Instructors -->
+                    <a *ngIf="can('view_instructors')" routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
                         Instructors
                     </a>
-                    <a routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
+                    
+                    <!-- Students -->
+                    <a *ngIf="can('view_students')" routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-users mr-3 w-5 text-center"></i>
                         Students
                     </a>
 
-                    <a routerLink="/admin/guardian/list" data-nav-item data-href="/admin/guardian/list"
+                    <!-- Guardians -->
+                    <a *ngIf="can('view_guardians')" routerLink="/admin/guardian/list" data-nav-item data-href="/admin/guardian/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-users mr-3 w-5 text-center"></i>
                         Guardians
                     </a>
 
-                    <!-- Courses Menu Item with Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
+                    <!-- Courses Menu with Submenu -->
+                    <div *ngIf="can('view_courses')" class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
                                 <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
@@ -205,24 +205,23 @@
                             <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
-                        <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/course/add" data-nav-item data-href="/admin/course/add"
+                            <a *ngIf="can('create_courses')" routerLink="/admin/course/add" data-nav-item data-href="/admin/course/add"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-plus mr-3 w-5 text-center"></i>
                                 Add New Course
                             </a>
-                            <a routerLink="/admin/course/list" data-nav-item data-href="/admin/course/list"
+                            <a *ngIf="can('view_courses')" routerLink="/admin/course/list" data-nav-item data-href="/admin/course/list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-list mr-3 w-5 text-center"></i>
                                 Course List
                             </a>
-                            <a routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
+                            <a *ngIf="can('view_courses')" routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-book-open mr-3 w-5 text-center"></i>
                                 Course Curriculum
                             </a>
-                            <a routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
+                            <a *ngIf="can('view_courses')" routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-plus mr-3 w-5 text-center"></i>
                                 Assigned Courses
@@ -230,12 +229,15 @@
                         </div>
                     </div>
 
-                    <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
+                    <!-- Batches -->
+                    <a *ngIf="can('view_batches')" routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-users mr-3 w-5 text-center"></i>
                         Batches
                     </a>
-                    <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
+                    
+                    <!-- Class Schedule -->
+                    <a *ngIf="can('view_class_schedules')" routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i>
                         Class Schedule
@@ -247,30 +249,31 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Content
                     </h3>
-                    <a routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
+                    
+                    <!-- MCQs -->
+                    <a *ngIf="can('view_mcqs')" routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-quote-left mr-3 w-5 text-center"></i>
                         MCQs
                     </a>
 
-                    <!-- Manage Quiz Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
+                    <!-- Quiz Submenu -->
+                    <div *ngIf="can('view_quizzes')" class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
                                 <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
-                               Quiz
+                                Quiz
                             </div>
                             <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
-                        <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
+                            <a *ngIf="can('view_quizzes')" routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
                                 Quiz List
                             </a>
-                            <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
+                            <a *ngIf="can('view_quizzes')" routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-tasks mr-3 w-5 text-center"></i>
                                 Attempted Quizzes
@@ -278,35 +281,35 @@
                         </div>
                     </div>
 
-                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
+                    <!-- Policies -->
+                    <a *ngIf="can('view_policies')" routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-file mr-3 w-5 text-center"></i>
                         Policies
                     </a>
 
-                    <!-- Manage Assessments Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
+                    <!-- Assessments Submenu -->
+                    <div *ngIf="can('view_assessments')" class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
                                 <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
-                                 Assessments
+                                Assessments
                             </div>
                             <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
-                        <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
+                            <a *ngIf="can('view_assessments')" routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
                                 Assessments Queries
                             </a>
-                            <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
+                            <a *ngIf="can('view_assessments')" routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
                                 Assessments List
                             </a>
-                            <a routerLink="/admin/assessment-attempts/list" data-nav-item data-href="/admin/assessment-attempts/list"
+                            <a *ngIf="can('view_assessments')" routerLink="/admin/assessment-attempts/list" data-nav-item data-href="/admin/assessment-attempts/list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
                                 Attempted Assessments
@@ -314,36 +317,39 @@
                         </div>
                     </div>
 
-                   <!-- Manage Assignments Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
+                    <!-- Assignments Submenu -->
+                    <div *ngIf="can('view_assignments')" class="courses-menu-item" data-has-submenu="true">
                         <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
                             <div class="flex items-center">
                                 <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                                 Assignments
+                                Assignments
                             </div>
                             <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
                         </button>
 
-                        <!-- Submenu -->
                         <div class="submenu mt-1 space-y-1 hidden">
-                           <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                            <a *ngIf="can('view_assignments')" routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
                                 Assignments List
                             </a>
-                            <a routerLink="/admin/assignment/attempts" data-nav-item data-href="/admin/assignment/attempts"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                            <a *ngIf="can('view_assignments')" routerLink="/admin/assignment/attempts" data-nav-item data-href="/admin/assignment/attempts"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                               Attempted Assignments
+                                Attempted Assignments
                             </a>
                         </div>
                     </div>
-                    <a routerLink="/admin/grade" data-nav-item data-href="/admin/grade"
+
+                    <!-- Grades Book -->
+                    <a *ngIf="can('view_reports')" routerLink="/admin/grade" data-nav-item data-href="/admin/grade"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
                         Grades Book
                     </a>
-                    <a routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
+                    
+                    <!-- FAQs -->
+                    <a *ngIf="can('view_faqs')" routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-question-circle mr-3 w-5 text-center"></i>
                         FAQs
@@ -355,17 +361,28 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Configuration
                     </h3>
-                    <a routerLink="/admin/announcement/list" data-nav-item data-href="/admin/announcement/list"
+                    
+                    <!-- Announcements -->
+                    <a *ngIf="can('view_announcements')" routerLink="/admin/announcement/list" data-nav-item data-href="/admin/announcement/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-microphone mr-3 w-5 text-center"></i>
                         Announcements
                     </a>
-                    <a routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
+                    
+                    <!-- Coupons -->
+                    <a *ngIf="can('view_coupons')" routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-tags mr-3 w-5 text-center"></i>
                         Coupons
                     </a>
                 </div>
+
+                <!-- Roles & Permissions - SIRF ADMIN -->
+                <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                    <i class="fas fa-shield-alt mr-3 w-5 text-center"></i>
+                    Roles & Permissions
+                </a>
             </div>
         </nav>
 
@@ -386,9 +403,8 @@
         </div>
     </div>
 
-    <!-- Mobile Sidebar -->
+    <!-- Mobile Sidebar (same permission checks) -->
     <div class="sidebar-mobile bg-[#063989] text-gray-800 shadow-xl flex flex-col border-r border-gray-200">
-        <!-- Mobile Header with Close Button -->
         <div class="p-2 flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <img src="../../../../../assets/images/logo/dotbitz-logo.png" alt="DotBitz Logo" width="150">
@@ -398,213 +414,90 @@
             </button>
         </div>
 
-        <!-- Mobile Navigation -->
         <nav class="flex-1 mt-4 overflow-y-auto">
             <div class="px-4 space-y-1">
-                <!-- Main Navigation Section -->
+                <!-- Main Navigation Section - Mobile -->
                 <div class="mb-6">
-                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                        Main Menu
-                    </h3>
-                    <a routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
-                        Dashboard
+                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Main Menu</h3>
+                    
+                    <a *ngIf="can('view_dashboard')" routerLink="/admin/dashboard" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-chart-bar mr-3 w-5 text-center"></i> Dashboard
                     </a>
-                    <a routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
-                        Instructors
+                    
+                    <a *ngIf="can('view_instructors')" routerLink="/admin/instructor/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i> Instructors
                     </a>
-                    <a routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-users mr-3 w-5 text-center"></i>
-                        Students
+                    
+                    <a *ngIf="can('view_students')" routerLink="/admin/student/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i> Students
                     </a>
 
-                     <a routerLink="/admin/guardian/list" data-nav-item data-href="/admin/guardian/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-users mr-3 w-5 text-center"></i>
-                        Guardians
+                    <a *ngIf="can('view_guardians')" routerLink="/admin/guardian/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i> Guardians
                     </a>
 
-                    <!-- Courses Menu Item with Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
-                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
-                            <div class="flex items-center">
-                                <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
-                                Courses
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
-                        </button>
-
-                        <!-- Submenu -->
-                        <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/course/add" data-nav-item data-href="/admin/course/add"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                                Add New Course
-                            </a>
-                            <a routerLink="/admin/course/list" data-nav-item data-href="/admin/course/list"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-list mr-3 w-5 text-center"></i>
-                                Course List
-                            </a>
-                            <a routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-book-open mr-3 w-5 text-center"></i>
-                                Course Curriculum
-                            </a>
-                            <a routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-plus mr-3 w-5 text-center"></i>
-                                Assigned Courses
-                            </a>
-                        </div>
-                    </div>
-
-                    <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-users mr-3 w-5 text-center"></i>
-                        Batches
+                    <a *ngIf="can('view_batches')" routerLink="/admin/batches/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-users mr-3 w-5 text-center"></i> Batches
                     </a>
-                    <a routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i>
-                        Class Schedule
+                    
+                    <a *ngIf="can('view_class_schedules')" routerLink="/admin/class-schedule/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i> Class Schedule
                     </a>
                 </div>
 
-                <!-- Content Section -->
+                <!-- Content Section - Mobile -->
                 <div class="mb-6">
-                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                        Content
-                    </h3>
-                    <a routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-quote-left mr-3 w-5 text-center"></i>
-                        MCQs
+                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Content</h3>
+                    
+                    <a *ngIf="can('view_mcqs')" routerLink="/admin/mcqs/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-quote-left mr-3 w-5 text-center"></i> MCQs
                     </a>
-
-                    <!-- Manage Quiz Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
-                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
-                            <div class="flex items-center">
-                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
-                                 Quiz
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
-                        </button>
-
-                        <!-- Submenu -->
-                        <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
-                                Quiz List
-                            </a>
-                            <a routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-tasks mr-3 w-5 text-center"></i>
-                                Attempted Quizzes
-                            </a>
-                        </div>
-                    </div>
-
-                    <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-file mr-3 w-5 text-center"></i>
-                        Policies
+                    
+                    <a *ngIf="can('view_quizzes')" routerLink="/admin/quiz/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i> Quiz List
                     </a>
-
-                    <!-- Manage Assessments Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
-                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
-                            <div class="flex items-center">
-                                <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
-                                 Assessments
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
-                        </button>
-
-                        <!-- Submenu -->
-                        <div class="submenu mt-1 space-y-1 hidden">
-                            <a routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                                Assessments Queries
-                            </a>
-                            <a routerLink="/admin/assessments/list" data-nav-item data-href="/admin/assessments/list"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                                Assessments List
-                            </a>
-                            <a routerLink="/admin/assessment-attempts/list" data-nav-item data-href="/admin/assessment-attempts/list"
-                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
-                                Attempted Assessments
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Manage Assignments Submenu -->
-                    <div class="courses-menu-item" data-has-submenu="true">
-                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
-                            <div class="flex items-center">
-                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                                 Assignments
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
-                        </button>
-
-                        <!-- Submenu -->
-                        <div class="submenu mt-1 space-y-1 hidden">
-                           <a routerLink="/admin/assignment/list" data-nav-item data-href="/admin/assignment/list"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                                Assignments List
-                            </a>
-                            <a routerLink="/admin/assignment/attempts" data-nav-item data-href="/admin/assignment/attempts"
-                              class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                                <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                                Attempted Assignments
-                            </a>
-                        </div>
-                    </div>
-
-
-                    <a routerLink="/admin/grade" data-nav-item data-href="/admin/grade"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
-                        Gradex Book
+                    
+                    <a *ngIf="can('view_policies')" routerLink="/admin/policy/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file mr-3 w-5 text-center"></i> Policies
                     </a>
-                    <a routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-question-circle mr-3 w-5 text-center"></i>
-                        FAQs
+                    
+                    <a *ngIf="can('view_assessments')" routerLink="/admin/assessments/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i> Assessments List
+                    </a>
+                    
+                    <a *ngIf="can('view_assignments')" routerLink="/admin/assignment/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i> Assignments List
+                    </a>
+                    
+                    <a *ngIf="can('view_reports')" routerLink="/admin/grade" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i> Grades Book
+                    </a>
+                    
+                    <a *ngIf="can('view_faqs')" routerLink="/admin/faq/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-question-circle mr-3 w-5 text-center"></i> FAQs
                     </a>
                 </div>
 
-                <!-- Settings Section -->
+                <!-- Settings Section - Mobile -->
                 <div class="mb-6">
-                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                        Configuration
-                    </h3>
-                    <a routerLink="/admin/announcement/list" data-nav-item data-href="/admin/announcement/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-microphone mr-3 w-5 text-center"></i>
-                        Announcements
+                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Configuration</h3>
+                    
+                    <a *ngIf="can('view_announcements')" routerLink="/admin/announcement/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-microphone mr-3 w-5 text-center"></i> Announcements
                     </a>
-                    <a routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
-                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-tags mr-3 w-5 text-center"></i>
-                        Coupons
+                    
+                    <a *ngIf="can('view_coupons')" routerLink="/admin/coupon/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-tags mr-3 w-5 text-center"></i> Coupons
                     </a>
                 </div>
+
+                <!-- Roles & Permissions - Mobile -->
+                <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+                    <i class="fas fa-shield-alt mr-3 w-5 text-center"></i> Roles & Permissions
+                </a>
             </div>
         </nav>
 
-        <!-- User Section at Bottom -->
         <div class="p-4 border-t border-gray-200 bg-gray-50">
             <div class="flex items-center space-x-3">
                 <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center shadow-sm">
@@ -618,19 +511,15 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Top Navigation -->
+        <!-- Top Navigation Bar -->
         <header class="bg-white border-b border-gray-200 shadow-sm">
             <div class="flex justify-between items-center px-4 lg:px-6 py-4">
-                <!-- Left side: Mobile menu button and breadcrumb -->
                 <div class="flex items-center space-x-4">
-                    <!-- Mobile Menu Button (hidden on desktop) -->
                     <button class="mobile-menu-btn hidden text-gray-600 hover:text-blue-600 text-lg p-2 rounded-lg hover:bg-gray-100 transition-colors" id="mobileMenuBtn">
                         <i class="fas fa-bars"></i>
                     </button>
-
-                    <!-- Breadcrumb and Title -->
                     <div class="flex items-center space-x-2 text-sm text-gray-600 breadcrumb-text">
                         <span class="desktop-only">Admin Console</span>
                         <i class="fas fa-chevron-right text-xs desktop-only text-gray-300"></i>
@@ -638,23 +527,10 @@
                     </div>
                 </div>
 
-                <!-- Right side actions -->
                 <div class="flex items-center space-x-2 lg:space-x-4 header-right">
-                    <!-- Mobile Search Button -->
                     <button class="mobile-search-btn hidden text-gray-600 hover:text-blue-600 p-2 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-search"></i>
                     </button>
-
-                    <!-- Notifications -->
-                    <!-- <button class="notifications-btn relative p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-bell"></i>
-                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
-                    </button> -->
-
-                    <!-- Help -->
-                    <!-- <button class="help-btn p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-question-circle"></i>
-                    </button> -->
 
                     <!-- Desktop User Menu -->
                     <div class="relative desktop-user-menu">
@@ -669,15 +545,12 @@
                             <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                         </button>
 
-                        <!-- Desktop Dropdown Menu -->
-                         <div class="user-dropdown absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50" style="display: none;">
-                            <!-- User Info -->
+                        <div class="user-dropdown absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50" style="display: none;">
                             <div class="px-5 py-4 border-b border-gray-100">
                                 <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
                                 <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
                             </div>
                             <div class="border-t border-gray-100 my-1"></div>
-
                             <a (click)="navigateToLogout()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
                                 <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
                                 <span>Sign Out</span>
