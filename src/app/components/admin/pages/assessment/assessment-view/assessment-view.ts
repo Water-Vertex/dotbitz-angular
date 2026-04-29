@@ -67,7 +67,7 @@
 //               } else {
 //                 this.wrongCount++;
 //               }
-//             } 
+//             }
 // else if (a.assessment_type === 'q-a') {
 //   this.totalQnaMarks += Number(a.marks) || 0;
 //   const obtainedMarks = parseFloat(a.is_correct?.toString() || '0');
@@ -207,7 +207,7 @@
 
 
 
-  
+
 // }
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -277,16 +277,16 @@ fetchAttempt(): void {
               } else {
                 this.wrongCount++;
               }
-            } 
+            }
             else if (a.assessment_type === 'q-a') {
               this.totalQnaMarks += Number(a.marks) || 0;
-              
+
               // ✅ FIX: obtained_marks se marks lo
               let obtainedMarks = 0;
               if (a.obtained_marks !== null && a.obtained_marks !== undefined) {
                 obtainedMarks = parseFloat(a.obtained_marks);
               }
-              
+
               this.obtainedQnaMarks += obtainedMarks;
               console.log(`Q&A Question ${a.question_id}: Obtained Marks = ${obtainedMarks}`);
 

@@ -123,10 +123,10 @@ export class InstructorAnnouncementAdd implements OnInit {
     }
 
     const payload = { ...this.form };
-    
+
     // ✅ Status always 'sent'
     payload.status = 'sent';
-    
+
     payload.course_id = Number(payload.course_id);
     payload.batch_id = Number(payload.batch_id);
 

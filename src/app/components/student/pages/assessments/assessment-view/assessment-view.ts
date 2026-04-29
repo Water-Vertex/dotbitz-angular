@@ -276,16 +276,16 @@ export class StudentAssessmentView implements OnInit, OnDestroy {
                 } else {
                   this.wrongCount++;
                 }
-              } 
+              }
               else if (a.assessment_type === 'q-a') {
                 this.totalQnaMarks += Number(a.marks) || 0;
-                
+
                 // ✅ FIXED: Use obtained_marks instead of is_correct
                 let obtainedMarks = 0;
                 if (a.obtained_marks !== null && a.obtained_marks !== undefined) {
                   obtainedMarks = parseFloat(a.obtained_marks);
                 }
-                
+
                 this.obtainedQnaMarks += obtainedMarks;
                 console.log(`Q&A Question ${a.question_id}: Obtained Marks = ${obtainedMarks}`);
 

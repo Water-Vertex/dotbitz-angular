@@ -9,6 +9,7 @@ import { ClassScheduleService } from '../../../../../services/classschedule.serv
 import { ToastService } from '../../../../../services/toast.service';
 import { ClassSchedule } from '../../../../../models/classschedule.model';
 import { AuthService } from '../../../../../services/auth.service';
+import { GoogleCalendarService } from '../../../../../services/google-calendar.service';
 
 // Add these interfaces if not already defined in your models
 interface Course {
@@ -52,8 +53,10 @@ export class AdminClassScheduleList implements OnInit {
     private scheduleService: ClassScheduleService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef,
+   
    public auth: AuthService,  
+    private googleCalendar: GoogleCalendarService,
+    private cdr: ChangeDetectorRef
   ) {}
 
  
@@ -426,4 +429,51 @@ formatFullDate(dateString: string): string {
     hour12: true
   });
 }
+
+
+addToCalendar(schedule: any): void {
+  const title = `${schedule.course?.course_name || 'Class'} — ${
+    schedule.day
+      ? schedule.day.charAt(0).toUpperCase() + schedule.day.slice(1)
+      : 'Class'
+  }`;
+
+  this.googleCalendar.addToGoogleCalendar({
+    title,
+    startTime:   schedule.start_time,
+    endTime:     schedule.end_time,
+    location:    schedule.meeting_link || '',
+    description: [
+      `Course: ${schedule.course?.course_name || '-'}`,
+      `Batch: ${schedule.batch?.name || '-'}`,
+      `Instructor: ${schedule.instructor?.first_name || ''} ${schedule.instructor?.last_name || ''}`,
+      `Day: ${schedule.day || '-'}`,
+      schedule.note ? `Note: ${schedule.note}` : '',
+    ].filter(Boolean).join('\n'),
+    day: schedule.day,
+  });
 }
+
+addAllToCalendar(): void {
+  const calSchedules = this.schedules.map(s => ({
+    title: `${s.course?.course_name || 'Class'} — ${
+      s.day ? s.day.charAt(0).toUpperCase() + s.day.slice(1) : 'Class'
+    }`,
+    startTime:   s.start_time,
+    endTime:     s.end_time,
+    location:    s.meeting_link || '',
+    description: [
+      `Course: ${s.course?.course_name || '-'}`,
+      `Batch: ${s.batch?.name || '-'}`,
+      `Day: ${s.day || '-'}`,
+      s.note ? `Note: ${s.note}` : '',
+    ].filter(Boolean).join('\n'),
+    day: s.day,
+  }));
+
+  this.googleCalendar.addMultipleToGoogleCalendar(calSchedules);
+}
+}
+
+
+

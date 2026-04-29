@@ -66,13 +66,13 @@ fetchAttempt(): void {
             else if (a.assessment_type === 'q-a') {
               // Q&A: Pehle obtained_marks dekho, agar nahi to is_correct dekho
               let existingMarks = 0;
-              
+
               if (a.obtained_marks !== null && a.obtained_marks !== undefined) {
                 existingMarks = a.obtained_marks;
               } else if (a.is_correct !== null && a.is_correct !== undefined && a.is_correct > 0) {
                 existingMarks = a.is_correct;
               }
-              
+
               this.qnaMarks[a.question_id] = parseFloat(existingMarks.toString());
               console.log(`Q&A Question ${a.question_id}: Existing Marks = ${existingMarks}`);
             }

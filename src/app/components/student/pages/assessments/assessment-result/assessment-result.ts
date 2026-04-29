@@ -132,7 +132,7 @@ export class StudentAssessmentResult implements OnInit {
               obtainedQna += parseFloat(ans.is_correct?.toString() || '0');
             }
           });
-          
+
           this.selectedResult = {
             ...this.selectedResult!,
             answers: res.data.answers || [],
