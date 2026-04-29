@@ -60,12 +60,20 @@ export class ClassScheduleService {
   getBatchesByCourse(courseId: number): Observable<any> {
     return this.http.get(`${environment.InstructorApiUrl}/courses/${courseId}/batches`);
   }
-  
+
 getStudentCourses(): Observable<any> {
   return this.http.get(`${environment.StudentApiUrl}/student-courses`);
 }
   getStudentSchedulesByCourse(courseId: number): Observable<any> {
   return this.http.get(`${environment.StudentApiUrl}/courses/${courseId}/schedules`);
+}
+getMySchedules(batchId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/class-schedules/batch/${batchId}`
+  );
+}
+getGuardianStudentSchedules(studentId: number): Observable<any> {
+  return this.http.get(`${environment.GuardianApiUrl}/student/${studentId}/schedules`);
 }
 
 

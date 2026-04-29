@@ -116,7 +116,7 @@ export class InstructorAnnouncementAdd implements OnInit {
   }
 
   // ---------------- Submit Announcement ----------------
-  submit(): void {
+ submit(): void {
     if (!this.form.title || !this.form.message || !this.form.course_id || !this.form.batch_id) {
       this.errorMsg = 'Title, message, course, and batch are required.';
       return;
@@ -124,11 +124,12 @@ export class InstructorAnnouncementAdd implements OnInit {
 
     const payload = { ...this.form };
 
-    // Convert IDs to numbers
+    // ✅ Status always 'sent'
+    payload.status = 'sent';
+
     payload.course_id = Number(payload.course_id);
     payload.batch_id = Number(payload.batch_id);
 
-    // Remove undefined fields safely
     Object.keys(payload).forEach((key) => {
       const k = key as keyof typeof payload;
       if (payload[k] === undefined) {
@@ -145,13 +146,13 @@ export class InstructorAnnouncementAdd implements OnInit {
     this.announcementService.createInstructorAnnouncement(payload).subscribe({
       next: (res: any) => {
         this.submitting = false;
-        this.successMsg = res.message || 'Announcement created successfully.';
+        this.successMsg = res.message || 'Announcement sent successfully.';
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/instructor/announcement/list']), 1500);
       },
       error: (err) => {
         this.submitting = false;
-        this.errorMsg = err.error?.message || 'Failed to create announcement.';
+        this.errorMsg = err.error?.message || 'Failed to send announcement.';
         console.log('Backend error response:', err);
         this.cdr.detectChanges();
       },

@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AssessmentAttemptService } from '../../../../../services/assessmentattempt.service';
- 
+
 @Component({
   selector: 'app-assessment-result',
   standalone: true,
@@ -18,20 +18,20 @@ export class GuestAssessmentResult implements OnInit {
   searchTerm = '';
   showDetailModal = false;
   selectedResult: any = null;
- 
+
   constructor(
     private attemptService: AssessmentAttemptService,
     private cdr: ChangeDetectorRef
   ) {}
- 
+
   ngOnInit(): void {
     this.loadResults();
   }
- 
+
   loadResults(): void {
     this.isLoading = true;
     this.cdr.detectChanges();
- 
+
     this.attemptService.getGuestMyResults().subscribe({
       next: (res: any) => {
         if (res && res.success) {
@@ -51,11 +51,11 @@ export class GuestAssessmentResult implements OnInit {
       },
     });
   }
- 
+
   refreshData(): void {
     this.loadResults();
   }
- 
+
   onSearch(): void {
     const term = this.searchTerm.toLowerCase().trim();
     if (!term) {
@@ -69,22 +69,22 @@ export class GuestAssessmentResult implements OnInit {
     }
     this.cdr.detectChanges();
   }
- 
+
   trackById(index: number, item: any): number {
     return item.attempt_id;
   }
- 
+
 onViewDetail(item: any): void {
   const assignAssessmentId = item.assign_assessment_id;
- 
+
   if (!assignAssessmentId) {
     console.error('Assign Assessment ID missing!');
     return;
   }
- 
- 
+
+
   this.showDetailModal = true;
-  this.isDetailLoading = true;  
+  this.isDetailLoading = true;
   this.selectedResult = {
     attempt_id: item.attempt_id,
     assign_assessment_id: item.assign_assessment_id,
@@ -95,9 +95,9 @@ onViewDetail(item: any): void {
     remarks: item.remarks,
     answers: []  // Empty initially
   };
-  this.cdr.detectChanges();  
- 
- 
+  this.cdr.detectChanges();
+
+
   this.attemptService.guestViewAttempt(assignAssessmentId).subscribe({
     next: (res: any) => {
       if (res && res.success && res.data) {
@@ -110,22 +110,39 @@ onViewDetail(item: any): void {
           answers: res.data.answers || []
         };
       }
-   
+
       this.isDetailLoading = false;
       this.cdr.detectChanges();
     },
     error: (err) => {
       console.error('API Error:', err);
-     
+
       this.isDetailLoading = false;
       this.cdr.detectChanges();
     }
   });
 }
- 
+
   closeModal(): void {
     this.showDetailModal = false;
     this.selectedResult = null;
     this.cdr.detectChanges();
   }
+
+
+  // Add this method in the component
+getAnswerObtainedMarks(ans: any): number {
+  if (ans.assessment_type === 'mcq' || ans.assessment_type === 'mcqs') {
+    return ans.is_correct == 1 ? Number(ans.marks) : 0;
+  } else {
+    // Q&A: obtained_marks se read karo
+    let marks = 0;
+    if (ans.obtained_marks !== null && ans.obtained_marks !== undefined) {
+      marks = parseFloat(ans.obtained_marks);
+    } else if (ans.is_correct !== null && ans.is_correct !== undefined && ans.is_correct > 0) {
+      marks = parseFloat(ans.is_correct);
+    }
+    return parseFloat(marks.toFixed(2));
+  }
+}
 }

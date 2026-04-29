@@ -131,6 +131,11 @@ import { StudentResult } from './components/guardian/pages/results/student-resul
 import { StudentClassScheduleList } from './components/student/pages/class-schedule/schedule-list/schedule-list';
 import { GuardianConfirmation } from './components/guardian/pages/payment/confirmation/confirmation';
 import { GuardianList } from './components/admin/pages/guardians/guardian-list/guardian-list';
+import { AdminBillList } from './components/admin/pages/bills/bill-list/bill-list';
+import { AdminBillDetail } from './components/admin/pages/bills/bill-details/bill-details';
+import { GuardianMyBills } from './components/guardian/pages/bills/my-bills/my-bills';
+import { StudentMyBills } from './components/student/pages/bills/my-bills/my-bills';
+import { GuardianScheduleList } from './components/guardian/pages/class-schedule/schedule-list/schedule-list';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -237,6 +242,9 @@ export const routes: Routes = [
 
       { path: 'admin/grade', component: AdminGrade },
 
+      { path: 'admin/bills',         component: AdminBillList },
+      { path: 'admin/bills/:orderId', component: AdminBillDetail },
+
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
@@ -261,6 +269,9 @@ export const routes: Routes = [
       { path: 'guardian/student-assessments', component: GuardianAssessmentList },
       { path: 'guardian/student-results', component: StudentResult },
       { path: 'guardian/payment/confirmation',  component: GuardianConfirmation  },
+      { path: 'guardian/class-schedule', component: GuardianScheduleList },
+
+      { path: 'guardian/my-bills',   component: GuardianMyBills },
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
@@ -291,7 +302,8 @@ export const routes: Routes = [
       { path: 'student/assessment/attempt/:assignAssessmentId', component: AttemptAssessment },
       { path: 'student/assessment/view/:id', component: StudentAssessmentView },
       { path: 'student/assessment-result', component: StudentAssessmentResult },
-      { path: 'student/my-results', component: MyResult }
+      { path: 'student/my-results', component: MyResult },
+      { path: 'student/my-bills',    component: StudentMyBills }
 
     ]
   },
