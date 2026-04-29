@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AssignCourseService } from '../../../../../../services/assigncourse.service';
 import { CourseService } from '../../../../../../services/course.service';
+import { AuthService } from '../../../../../../services/auth.service';
 
 @Component({
   selector: 'app-assign-list',
@@ -23,8 +24,14 @@ export class AssignCourseList implements OnInit {
     private assignCourseService: AssignCourseService,
     private courseService: CourseService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService, 
   ) {}
+
+ 
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
 
   ngOnInit(): void {
     this.loadCourses();

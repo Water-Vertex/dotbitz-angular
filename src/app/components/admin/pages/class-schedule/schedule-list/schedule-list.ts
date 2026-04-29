@@ -8,6 +8,7 @@ import { catchError } from 'rxjs/operators';
 import { ClassScheduleService } from '../../../../../services/classschedule.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { ClassSchedule } from '../../../../../models/classschedule.model';
+import { AuthService } from '../../../../../services/auth.service';
 import { GoogleCalendarService } from '../../../../../services/google-calendar.service';
 
 // Add these interfaces if not already defined in your models
@@ -52,10 +53,16 @@ export class AdminClassScheduleList implements OnInit {
     private scheduleService: ClassScheduleService,
     private toastService: ToastService,
     private router: Router,
+   
+   public auth: AuthService,  
     private googleCalendar: GoogleCalendarService,
     private cdr: ChangeDetectorRef
   ) {}
 
+ 
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   ngOnInit(): void {
     this.loadInitialData();
   }

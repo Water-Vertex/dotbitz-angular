@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { QuizService } from '../../../../../services/quiz.service';
 import { CourseService } from '../../../../../services/course.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 interface QuizGroup {
   courseId: number;
@@ -40,8 +41,14 @@ export class QuizList implements OnInit {
     private quizService: QuizService,
     private courseService: CourseService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService,  
   ) {}
+
+  
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
 
   ngOnInit(): void {
     this.loadCourses();

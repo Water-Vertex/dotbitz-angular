@@ -6,6 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil, filter } from '
 import { AssignmentService } from '../../../../../services/assignment.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Assignment } from '../../../../../models/assignment.model';
+import { AuthService } from '../../../../../services/auth.service';
 
 interface AssignmentGroup {
   courseId: number;
@@ -51,6 +52,7 @@ export class AssignmentList implements OnInit, OnDestroy {
     private toastService: ToastService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    public auth: AuthService,
   ) {
     this.router.events
       .pipe(
@@ -254,5 +256,9 @@ export class AssignmentList implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
   }
 }

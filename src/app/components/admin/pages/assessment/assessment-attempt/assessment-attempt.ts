@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AssessmentAttemptService } from '../../../../../services/assessmentattempt.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-attempted-assessment',
@@ -17,9 +18,13 @@ export class AttemptedAssessment implements OnInit {
   constructor(
     private assessmentAttemptService: AssessmentAttemptService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService, 
   ) {}
 
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   ngOnInit(): void {
     this.loadAttempts();
   }

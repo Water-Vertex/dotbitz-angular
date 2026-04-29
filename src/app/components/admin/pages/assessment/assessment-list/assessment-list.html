@@ -7,6 +7,7 @@
     </div>
     <div class="flex space-x-2">
       <button
+       *ngIf="can('view_assessments')"
         (click)="refreshData()"
         [disabled]="isLoading"
         class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
@@ -14,7 +15,7 @@
         <i class="fas fa-sync-alt mr-2" [class.animate-spin]="isLoading"></i>
         {{ isLoading ? 'Refreshing...' : 'Refresh' }}
       </button>
-      <a
+      <a   *ngIf="can('create_assessments')"
         routerLink="/admin/assessments/add"
         class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium"
       >
@@ -49,7 +50,7 @@
     </div>
     <h3 class="text-lg font-medium text-gray-900 mb-2">No Assessments Found</h3>
     <p class="text-gray-600 mb-4">Start by adding your first assessment</p>
-    <a
+    <a   *ngIf="can('create_assessments')"
       routerLink="/admin/assessments/add"
       class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium"
     >
@@ -66,18 +67,22 @@
         <div class="flex justify-between items-start mb-3">
           <span class="text-sm font-medium text-gray-900">#{{ assessment.id }}</span>
           <div class="flex space-x-2">
-            <a
-              [routerLink]="['/admin/assessments/edit', assessment.id]"
-              class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
-            >
-              Edit
-            </a>
-            <button
-              (click)="deleteAssessment(assessment.id)"
-              class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
-            >
-              Delete
-            </button>
+           <a
+    *ngIf="can('edit_assessments')"
+    [routerLink]="['/admin/assessments/edit', assessment.id]"
+    class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+  >
+    Edit
+  </a>
+  
+  <!-- Delete Button - Sirf delete_assessments permission ho to dikhe -->
+  <button
+    *ngIf="can('delete_assessments')"
+    (click)="deleteAssessment(assessment.id)"
+    class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+  >
+    Delete
+  </button>
           </div>
         </div>
 
@@ -127,18 +132,22 @@
             <td class="px-6 py-4 text-sm text-gray-600">{{ assessment.due_date | date }}</td>
             <td class="px-6 py-4 text-sm whitespace-nowrap">
               <div class="flex space-x-2">
-                <a
-                  [routerLink]="['/admin/assessments/edit', assessment.id]"
-                  class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
-                >
-                  Edit
-                </a>
-                <button
-                  (click)="deleteAssessment(assessment.id)"
-                  class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
-                >
-                  Delete
-                </button>
+               <a
+    *ngIf="can('edit_assessments')"
+    [routerLink]="['/admin/assessments/edit', assessment.id]"
+    class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+  >
+    Edit
+  </a>
+  
+  <!-- Delete Button - Sirf delete_assessments permission ho to dikhe -->
+  <button
+    *ngIf="can('delete_assessments')"
+    (click)="deleteAssessment(assessment.id)"
+    class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+  >
+    Delete
+  </button>
               </div>
             </td>
           </tr>

@@ -18,7 +18,7 @@
             </svg>
             <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
           </button>
-          <a
+          <a  *ngIf="can('create_courses')" 
             routerLink="/admin/course/add"
             class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
           >
@@ -213,8 +213,14 @@
             <div class="flex gap-2">
 
 
-              <a [routerLink]="['/admin/course/edit', course?.id]" class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium">Edit</a>
-                <button (click)="deleteCourse(course.id)" class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium">Delete</button>
+              <a    
+               *ngIf="can('edit_courses')" 
+              [routerLink]="['/admin/course/edit', course?.id]" 
+              class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium">
+              Edit
+            
+            </a>
+              <button   *ngIf="can('delete_courses')" (click)="deleteCourse(course.id)" class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium">Delete</button>
             </div>
           </div>
         </div>

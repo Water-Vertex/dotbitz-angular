@@ -5,6 +5,7 @@ import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil, filter } from 'rxjs';
 import { PolicyService } from '../../../../../services/policy.service';
 import { ToastService } from '../../../../../services/toast.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-policy-list',
@@ -26,7 +27,9 @@ export class PolicyList implements OnInit, OnDestroy {
     private policyService: PolicyService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService,
+    
   ) {
     // Listen for navigation events to reload data when returning to this page
     this.router.events.pipe(
@@ -58,7 +61,10 @@ export class PolicyList implements OnInit, OnDestroy {
       this.loadPolicies();
     });
   }
-
+can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
+ 
   loadPolicies(): void {
     console.log('Loading Policies...');
     this.isLoading = true;
