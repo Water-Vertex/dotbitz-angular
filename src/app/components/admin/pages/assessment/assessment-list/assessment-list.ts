@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { AssessmentService } from '../../../../../services/assessment.service';
 import { ToastService } from '../../../../../services/toast.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-assessment-list',
@@ -25,8 +26,14 @@ export class AssessmentList implements OnInit, OnDestroy {
     private assessmentService: AssessmentService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService,  
   ) {}
+
+  
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
 
   ngOnInit(): void {
     this.loadAssessments();

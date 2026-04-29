@@ -6,6 +6,7 @@
       <p class="text-gray-600 mt-1">Manage your class schedules</p>
     </div>
     <a
+     *ngIf="can('create_class_schedules')"
       routerLink="/admin/class-schedule/add"
       class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center space-x-2 text-sm font-medium"
     >
@@ -123,7 +124,7 @@
   </div>
   <p class="text-gray-500 text-lg">No class schedules found</p>
   <p class="text-gray-400 text-sm mt-1">Get started by creating your first schedule</p>
-  <a
+  <a  *ngIf="can('create_class_schedules')"
     routerLink="/admin/class-schedule/add"
     class="inline-block mt-6 px-6 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-semibold transition-all duration-200"
   >
@@ -232,11 +233,13 @@
       <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end space-x-3">
 
         <button
-          (click)="onEdit(schedule.id!)"
-          class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
-        >
-          Edit Schedule
-        </button>
+    *ngIf="can('edit_class_schedules')"
+    (click)="onEdit(schedule.id!)"
+    class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+  >
+    Edit Schedule
+  </button>
+
 
         <a
           *ngIf="schedule.meeting_link"

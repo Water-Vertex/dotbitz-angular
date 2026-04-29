@@ -6,6 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil, filter } from '
 import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Course } from '../../../../../models/course.model';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-course-list',
@@ -32,7 +33,8 @@ export class CourseList implements OnInit, OnDestroy {
     private courseService: CourseService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth :AuthService
   ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -96,7 +98,9 @@ export class CourseList implements OnInit, OnDestroy {
       }
     });
   }
-
+can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   applyFilters(): void {
     let result = [...this.courses];
 

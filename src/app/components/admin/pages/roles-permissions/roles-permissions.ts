@@ -30,7 +30,8 @@ export class RolesPermissionsComponent implements OnInit {
         'students', 'instructors', 'guardians', 'courses', 'batches',
         'assignments', 'assessments', 'quizzes', 'mcqs',
         'announcements', 'faqs', 'policies', 'contacts', 'appointments',
-        'class_schedules', 'orders', 'coupons'
+        'class_schedules', 'orders', 'coupons','course_instructors', 
+    'course_curricula','assessment_queries','assessment_attempts','reports','roles'
     ];
 
     constructor(

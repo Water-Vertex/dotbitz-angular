@@ -216,12 +216,12 @@
                                 <i class="fas fa-list mr-3 w-5 text-center"></i>
                                 Course List
                             </a>
-                            <a *ngIf="can('view_courses')" routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
+                            <a *ngIf="can('view_course_curricula')" routerLink="/admin/course/curriculum/list" data-nav-item data-href="/admin/course/curriculum/list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-book-open mr-3 w-5 text-center"></i>
                                 Course Curriculum
                             </a>
-                            <a *ngIf="can('view_courses')" routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
+                            <a *ngIf="can('view_course_instructors')" routerLink="/admin/course/assign-list" data-nav-item data-href="/admin/course/assign-list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-plus mr-3 w-5 text-center"></i>
                                 Assigned Courses
@@ -299,7 +299,7 @@
                         </button>
 
                         <div class="submenu mt-1 space-y-1 hidden">
-                            <a *ngIf="can('view_assessments')" routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
+                            <a *ngIf="can('view_assessment_queries')" routerLink="/admin/assessments/queries" data-nav-item data-href="/admin/assessments/queries"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
                                 Assessments Queries
@@ -309,7 +309,7 @@
                                 <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
                                 Assessments List
                             </a>
-                            <a *ngIf="can('view_assessments')" routerLink="/admin/assessment-attempts/list" data-nav-item data-href="/admin/assessment-attempts/list"
+                            <a *ngIf="can('view_assessment_attempts')" routerLink="/admin/assessment-attempts/list" data-nav-item data-href="/admin/assessment-attempts/list"
                                class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                                 <i class="fas fa-check-circle mr-3 w-5 text-center"></i>
                                 Attempted Assessments
@@ -376,7 +376,9 @@
                         Coupons
                     </a>
                 </div>
-
+   <a *ngIf="isAdmin()" routerLink="/admin/roles/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+        <i class="fas fa-user-tag mr-3 w-5 text-center"></i> Roles
+    </a>
                 <!-- Roles & Permissions - SIRF ADMIN -->
                 <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
@@ -490,7 +492,9 @@
                         <i class="fas fa-tags mr-3 w-5 text-center"></i> Coupons
                     </a>
                 </div>
-
+   <a *ngIf="isAdmin()" routerLink="/admin/roles/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
+        <i class="fas fa-user-tag mr-3 w-5 text-center"></i> Roles
+    </a>
                 <!-- Roles & Permissions - Mobile -->
                 <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                     <i class="fas fa-shield-alt mr-3 w-5 text-center"></i> Roles & Permissions

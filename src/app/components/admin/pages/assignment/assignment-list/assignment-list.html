@@ -18,15 +18,16 @@
             </svg>
             <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
           </button>
-          <a
-            routerLink="/admin/assignment/add"
-            class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>Add Assignment</span>
-          </a>
+         <a
+    *ngIf="can('create_assignments')"
+    routerLink="/admin/assignment/add"
+    class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+    </svg>
+    <span>Add Assignment</span>
+  </a>
         </div>
       </div>
     </div>
@@ -237,8 +238,10 @@
               <!-- Actions -->
               <div class="flex gap-1 ml-4">
 
-                <a [routerLink]="['/admin/assignment/edit', assignment?.id]" class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium">Edit</a>
-                <button (click)="deleteAssignment(assignment.id!)" class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium">Delete</button>
+                <a 
+                 *ngIf="can('edit_assignments')"
+                [routerLink]="['/admin/assignment/edit', assignment?.id]" class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium">Edit</a>
+                <button     *ngIf="can('delete_assignments')"  (click)="deleteAssignment(assignment.id!)" class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium">Delete</button>
               </div>
             </div>
           </div>

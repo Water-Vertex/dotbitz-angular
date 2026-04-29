@@ -4,6 +4,7 @@ import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { Subject, filter, takeUntil } from 'rxjs';
 import { CouponService } from '../../../../../services/coupon.service';
 import { ToastService } from '../../../../../services/toast.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-coupon-list',
@@ -23,7 +24,8 @@ export class CouponList implements OnInit, OnDestroy {
     private couponService: CouponService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService,
   ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -34,7 +36,9 @@ export class CouponList implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadCoupons();
   }
-
+ can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   loadCoupons(): void {
     this.isLoading = true;
     this.cdr.detectChanges();

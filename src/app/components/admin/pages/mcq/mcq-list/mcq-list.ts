@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { McqService } from '../../../../../services/mcq.service';
 import { Mcq } from '../../../../../models/mcq.model';
 import { Course } from '../../../../../models/course.model';
+import { AuthService } from '../../../../../services/auth.service';
 
 interface McqGroup {
   courseId: number;
@@ -33,8 +34,13 @@ export class McqsList implements OnInit {
 
   constructor(
     private mcqService: McqService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+     public auth: AuthService, 
   ) {}
+
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
 
   ngOnInit(): void {
     console.log('🚀 MCQ List Component Initialized');

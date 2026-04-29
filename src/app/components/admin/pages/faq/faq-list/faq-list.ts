@@ -5,6 +5,7 @@ import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil, filter } from 'rxjs';
 import { FaqService } from '../../../../../services/faq.services';
 import { ToastService } from '../../../../../services/toast.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-faq-list',
@@ -26,7 +27,8 @@ export class FaqList implements OnInit, OnDestroy {
     private faqService: FaqService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService,
   ) {
     // Listen for navigation events to reload data when returning to this page
     this.router.events.pipe(
@@ -92,7 +94,9 @@ export class FaqList implements OnInit, OnDestroy {
       }
     });
   }
-
+can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   // Add a manual refresh method
   refreshData(): void {
     console.log('Manual refresh triggered');

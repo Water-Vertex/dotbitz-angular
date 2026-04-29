@@ -8,6 +8,7 @@ import { InstructorService } from '../../../../../services/instructor.service';
 import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { BatchCard } from '../batch-card/batch-card';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-batch-list',
@@ -35,7 +36,8 @@ export class BatchList implements OnInit, OnDestroy {
     private courseService: CourseService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+     public auth: AuthService,
   ) {
     // Listen for navigation events to reload data when returning to this page
     this.router.events.pipe(
@@ -51,7 +53,9 @@ export class BatchList implements OnInit, OnDestroy {
       }
     });
   }
-
+ can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   ngOnInit(): void {
     console.log('Batch List Component initialized');
 

@@ -134,6 +134,9 @@ import { GuardianConfirmation } from './components/guardian/pages/payment/confir
 import { GuardianList } from './components/admin/pages/guardians/guardian-list/guardian-list';
 import { GuardianClassSchedule } from './components/guardian/pages/class-schedule/class-schedule';
 import { RolesPermissionsComponent } from './components/admin/pages/roles-permissions/roles-permissions';
+import { RoleList } from './components/admin/pages/roles/role-list/role-list';
+import { RoleAdd } from './components/admin/pages/roles/role-add/role-add';
+import { RoleEdit } from './components/admin/pages/roles/role-edit/role-edit';
 
 
 export const routes: Routes = [
@@ -239,7 +242,10 @@ export const routes: Routes = [
 
       // ✅ Grade routes
       { path: 'admin/grade', component: AdminGrade, canActivate: [permissionGuard], data: { permission: 'view_reports' } },
-
+// Roles routes
+{ path: 'admin/roles/list', component: RoleList },
+{ path: 'admin/roles/add', component: RoleAdd },
+{ path: 'admin/roles/edit/:id', component: RoleEdit },
       // ✅ ROLES & PERMISSIONS - SIRF ADMIN
       { path: 'admin/roles-permissions', component: RolesPermissionsComponent, canActivate: [permissionGuard], data: { permission: 'manage_roles' } },
 

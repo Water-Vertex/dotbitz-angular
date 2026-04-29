@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { GradeHistoryService } from '../../../../../services/grade.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-admin-grade',
@@ -41,9 +42,14 @@ export class AdminGrade implements OnInit {
 
   constructor(
     private gradeService: GradeHistoryService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService, 
   ) {}
 
+  
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   ngOnInit(): void {
     this.loadCourses();
   }

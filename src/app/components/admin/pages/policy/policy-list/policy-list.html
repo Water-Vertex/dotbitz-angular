@@ -16,6 +16,7 @@
                     <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
                 </button>
                 <a
+                 *ngIf="can('create_policies')"
                     routerLink="/admin/policy/add"
                     class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium"
                 >
@@ -68,18 +69,22 @@
                     <div class="flex justify-between items-start mb-3">
                         <span class="text-sm font-medium text-gray-500">#{{policy.id}}</span>
                         <div class="flex space-x-2">
-                            <a
-                                routerLink="/admin/policy/edit/{{policy.id}}"
-                                class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
-                            >
-                                Edit
-                            </a>
-                            <button
-                                (click)="deletePolicy(policy.id)"
-                                class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
-                            >
-                                Delete
-                            </button>
+                              <a
+    *ngIf="can('edit_policies')"
+    routerLink="/admin/policy/edit/{{policy.id}}"
+    class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+  >
+    Edit
+  </a>
+  
+  <!-- Delete Button - Sirf delete_policies permission ho to dikhe -->
+  <button
+    *ngIf="can('delete_policies')"
+    (click)="deletePolicy(policy.id)"
+    class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+  >
+    Delete
+  </button>
                         </div>
                     </div>
                     <div class="space-y-3">
@@ -108,18 +113,22 @@
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{policy.title}}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <div class="flex space-x-2">
-                                    <a
-                                        routerLink="/admin/policy/edit/{{policy.id}}"
-                                        class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
-                                    >
-                                        Edit
-                                    </a>
-                                    <button
-                                        (click)="deletePolicy(policy.id)"
-                                        class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
-                                    >
-                                        Delete
-                                    </button>
+                                      <a
+    *ngIf="can('edit_policies')"
+    routerLink="/admin/policy/edit/{{policy.id}}"
+    class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+  >
+    Edit
+  </a>
+  
+ 
+  <button
+    *ngIf="can('delete_policies')"
+    (click)="deletePolicy(policy.id)"
+    class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+  >
+    Delete
+  </button>
                                 </div>
                             </td>
                         </tr>
