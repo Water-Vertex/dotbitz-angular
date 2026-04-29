@@ -135,6 +135,8 @@ import { AdminBillList }   from './components/admin/pages/bills/bill-list/bill-l
 import { AdminBillDetail } from './components/admin/pages/bills/bill-detail/bill-detail';
 import { StudentMyBills }  from './components/student/pages/bills/my-bills/my-bills';
 import { GuardianMyBills } from './components/guardian/pages/bills/my-bills/my-bills';
+import { AdminSettings } from './components/admin/pages/settings/settings-add/settings-add';
+import { SeoSettings } from './components/admin/pages/seo-settings/seo-settings-add/seo-settings-add';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -242,6 +244,9 @@ export const routes: Routes = [
       { path: 'admin/bills/:orderId', component: AdminBillDetail },
 
       { path: 'admin/grade', component: AdminGrade },
+      { path: 'admin/settings', component: AdminSettings },
+      
+      { path: 'admin/seo-settings', component: SeoSettings },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
