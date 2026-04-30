@@ -137,6 +137,7 @@ import { StudentMyBills }  from './components/student/pages/bills/my-bills/my-bi
 import { GuardianMyBills } from './components/guardian/pages/bills/my-bills/my-bills';
 import { AdminSettings } from './components/admin/pages/settings/settings-add/settings-add';
 import { SeoSettings } from './components/admin/pages/seo-settings/seo-settings-add/seo-settings-add';
+import { SitemapComponent } from './components/admin/pages/sitemap/sitemap/sitemap';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -248,6 +249,7 @@ export const routes: Routes = [
       
       { path: 'admin/seo-settings', component: SeoSettings },
 
+      { path: 'admin/sitemap', component: SitemapComponent },
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
