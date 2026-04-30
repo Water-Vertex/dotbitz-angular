@@ -133,6 +133,15 @@ getInstructorStudents(search: string = ''): Observable<{ data: Student[] }> {
       .get<{ data: Student[] }>(`${this.InstructorApiUrl}`, { headers: this.getHeaders(), params })
       .pipe(catchError(err => throwError(() => err)));
   }
+
+resetPassword(data: { new_password: string; confirm_password: string }): Observable<any> {
+  return this.http.post(`${this.StudentApiUrl}/reset-password`, data, { 
+    headers: this.getHeaders() 
+  }).pipe(
+    catchError(err => throwError(() => err))
+  );
+}
+
 }
 
 

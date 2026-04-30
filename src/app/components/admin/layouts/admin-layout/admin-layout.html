@@ -143,6 +143,11 @@
         <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
         <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
     </div>
+    <!-- Change Password Button -->
+<a (click)="navigateToPasswordReset()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+    <i class="fas fa-key mr-3 text-gray-400 w-5"></i>
+    <span>Change Password</span>
+</a>
     <div class="border-t border-gray-100 my-1"></div>
     <a (click)="navigateToLogout()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
         <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>
@@ -554,6 +559,11 @@
                                 <p class="text-sm font-semibold text-gray-900">{{ getFullName() }}</p>
                                 <p class="text-xs text-gray-500 mt-1">{{ getEmail() }}</p>
                             </div>
+                            <!-- Change Password Button -->
+<a (click)="navigateToPasswordReset()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+    <i class="fas fa-key mr-3 text-gray-400 w-5"></i>
+    <span>Change Password</span>
+</a>
                             <div class="border-t border-gray-100 my-1"></div>
                             <a (click)="navigateToLogout()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
                                 <i class="fas fa-sign-out-alt mr-3 text-gray-400 w-5"></i>

@@ -152,4 +152,10 @@ export class AdminLayout {
   isAdmin(): boolean {
     return this.authService.isAdmin();
   }
+  navigateToPasswordReset(): void {
+  // Routing mein jo path diya tha wahi use karein
+  this.router.navigate(['/admin/password-reset']);
+
+  
+  }
 }

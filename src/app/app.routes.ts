@@ -137,6 +137,10 @@ import { RolesPermissionsComponent } from './components/admin/pages/roles-permis
 import { RoleList } from './components/admin/pages/roles/role-list/role-list';
 import { RoleAdd } from './components/admin/pages/roles/role-add/role-add';
 import { RoleEdit } from './components/admin/pages/roles/role-edit/role-edit';
+import {  StudentPasswordReset } from './components/student/pages/profile/password/password-reset/password-reset';
+import { GuardianPasswordReset } from './components/guardian/pages/profile/password/password-reset/password-reset';
+import { InstructorPasswordReset } from './components/instructor/pages/profile/password/password-reset/password-reset';
+import { AdminPasswordReset } from './components/admin/pages/profile/password/password-reset/password-reset';
 
 
 export const routes: Routes = [
@@ -150,6 +154,10 @@ export const routes: Routes = [
 
       { path: 'admin/logout', component: Logout },
       { path: 'admin/dashboard', component: Dashboard },
+
+// ✅ Add Password Reset Route here
+          { path: 'admin/password-reset', component: AdminPasswordReset },
+
 
       // ✅ FAQ routes with permissions
       { path: 'admin/faq/list', component: FaqList, canActivate: [permissionGuard], data: { permission: 'view_faqs' } },
@@ -266,6 +274,8 @@ export const routes: Routes = [
       { path: 'guardian/dashboard', component: GuardianDashboard },
       { path: 'guardian/profile', component: ProfileShow },
       { path: 'guardian/profile/edit', component: ProfileEdit },
+
+      { path: 'guardian/password-reset', component: GuardianPasswordReset },
       { path: 'guardian/class-schedule', component: GuardianClassSchedule },
       { path: 'guardian/courses/list', component: GuardianCourseList },
       { path: 'guardian/course/detail/:id', component: GuardianCourseDetail},
@@ -282,6 +292,7 @@ export const routes: Routes = [
 
   // Student Routes
   { path: 'student/login', component: StudentLogin },
+    
   {
     path: '',
     canActivate: [authGuard],
@@ -305,8 +316,9 @@ export const routes: Routes = [
       { path: 'student/assessment/attempt/:assignAssessmentId', component: AttemptAssessment },
       { path: 'student/assessment/view/:id', component: StudentAssessmentView },
       { path: 'student/assessment-result', component: StudentAssessmentResult },
-      { path: 'student/my-results', component: MyResult }
-
+      { path: 'student/my-results', component: MyResult },
+  
+  { path: 'student/reset-password', component: StudentPasswordReset,},
     ]
   },
 
@@ -357,6 +369,7 @@ export const routes: Routes = [
       { path: 'instructor/assignment/attempts', component: InstructorAssignmentAttempts },
 
       { path: 'instructor/grade', component: InstructorGrade   },
+      { path: 'instructor/password-reset', component: InstructorPasswordReset },
 
 
     ]
