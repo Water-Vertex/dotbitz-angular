@@ -47,9 +47,15 @@ export class StudentCheckout implements OnInit {
   financeId: string = '';
   financeProvider: string = '';
   batchFull: boolean = false;
-  
-  // ✅ ADDED: Already enrolled check
+
+  // Already enrolled check
   isAlreadyEnrolled: boolean = false;
+
+  // Monthly Payment Properties
+  isMonthlyPayment: boolean = false;
+  monthlyFee: number = 0;
+  totalMonths: number = 0;
+  currentMonth: number = 1;
 
   constructor(
     private route: ActivatedRoute,
@@ -77,10 +83,13 @@ export class StudentCheckout implements OnInit {
         this.student = student;
         this.course = course.data;
         this.loading = false;
-        
-        // ✅ ADDED: Check if student is already enrolled in this course
+
+        // Calculate monthly fee
+        this.calculateMonthlyFee();
+
+        // Check if student is already enrolled in this course
         this.checkEnrollmentStatus();
-        
+
         this.loadBatches(courseId);
         this.cdr.detectChanges();
       },
@@ -92,24 +101,46 @@ export class StudentCheckout implements OnInit {
     });
   }
 
-  // ✅ ADDED: Method to check if student is already enrolled
+  // Calculate monthly fee based on course duration
+  calculateMonthlyFee(): void {
+    if (this.course && this.course.start_date && this.course.end_date) {
+      const start = new Date(this.course.start_date);
+      const end = new Date(this.course.end_date);
+
+      // Calculate months difference
+      const yearDiff = end.getFullYear() - start.getFullYear();
+      const monthDiff = end.getMonth() - start.getMonth();
+      this.totalMonths = (yearDiff * 12) + monthDiff;
+
+      if (this.totalMonths <= 0) {
+        this.totalMonths = 1; // Minimum 1 month
+      }
+
+      // Calculate monthly fee from discounted price
+      const discountedPrice = this.course?.discounted_fee ?
+        parseFloat(this.course.discounted_fee) :
+        parseFloat(this.course?.course_fee || 0);
+
+      this.monthlyFee = this.totalMonths > 0 ?
+        parseFloat((discountedPrice / this.totalMonths).toFixed(2)) :
+        discountedPrice;
+    }
+  }
+
+  // Check enrollment status
   checkEnrollmentStatus(): void {
-    // Check if student has enrollments array and if this course exists in it
     if (this.student?.enrollments && Array.isArray(this.student.enrollments)) {
       this.isAlreadyEnrolled = this.student.enrollments.some(
         (enrollment: any) => enrollment.course_id === this.course?.id || enrollment.course?.id === this.course?.id
       );
     }
-    
-    // If already enrolled, show warning message
+
     if (this.isAlreadyEnrolled) {
       this.showBatchChangeToastMessage('You are already enrolled in this course!', 'warning');
     }
   }
 
-  // -----------------------------------------------
-  // Batch Logic
-  // -----------------------------------------------
+  // Load batches
   loadBatches(courseId: number): void {
     this.loadingBatches = true;
     this.orderService.getBatchesByCourse(courseId).subscribe({
@@ -137,7 +168,7 @@ export class StudentCheckout implements OnInit {
     }
 
     this.selectedBatch = this.batches.find(b => b.id == this.batchId);
-    
+
     if (!this.selectedBatch) {
       return;
     }
@@ -150,7 +181,6 @@ export class StudentCheckout implements OnInit {
       return;
     }
 
-    // Show loading toast
     this.showBatchChangeToastMessage(`Loading schedule for ${this.selectedBatch.name}...`, 'info');
     this.loadingSchedules = true;
     this.cdr.detectChanges();
@@ -159,7 +189,7 @@ export class StudentCheckout implements OnInit {
       next: (res: any) => {
         this.batchSchedules = res.data || [];
         this.loadingSchedules = false;
-        
+
         if (this.batchSchedules.length > 0) {
           this.showBatchChangeToastMessage(
             `✓ Schedule loaded for ${this.selectedBatch?.name}`,
@@ -187,27 +217,27 @@ export class StudentCheckout implements OnInit {
   }
 
   showBatchChangeToastMessage(message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info'): void {
-    // Clear existing timeout
     if (this.toastTimeout) {
       clearTimeout(this.toastTimeout);
     }
-    
+
     this.toastMessage = message;
     this.toastType = type;
     this.showBatchChangeToast = true;
     this.cdr.detectChanges();
-    
+
     this.toastTimeout = setTimeout(() => {
       this.showBatchChangeToast = false;
       this.cdr.detectChanges();
     }, 3000);
   }
 
-  // -----------------------------------------------
-  // Amounts
-  // -----------------------------------------------
+  // Amount calculations
   get subAmount(): number {
-    return parseFloat(this.course?.course_fee ?? 0);
+    if (this.isMonthlyPayment && this.monthlyFee) {
+      return this.monthlyFee;
+    }
+    return parseFloat(this.course?.discounted_fee ? this.course?.discounted_fee : this.course?.course_fee || 0);
   }
 
   get discountAmount(): number {
@@ -219,13 +249,23 @@ export class StudentCheckout implements OnInit {
   }
 
   get totalAmount(): number {
+    if (this.isMonthlyPayment && this.monthlyFee) {
+      const total = this.monthlyFee - this.discountAmount;
+      return parseFloat((total < 0 ? 0 : total).toFixed(2));
+    }
     const total = this.subAmount - this.discountAmount;
     return parseFloat((total < 0 ? 0 : total).toFixed(2));
   }
 
-  // -----------------------------------------------
-  // Coupon Logic
-  // -----------------------------------------------
+  get originalTotal(): number {
+    return parseFloat(this.course?.course_fee || 0);
+  }
+
+  get discountedTotal(): number {
+    return parseFloat(this.course?.discounted_fee || this.course?.course_fee || 0);
+  }
+
+  // Coupon methods
   applyCoupon(): void {
     this.couponError = '';
     this.couponApplied = false;
@@ -272,17 +312,19 @@ export class StudentCheckout implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // -----------------------------------------------
-  // Submit Order
-  // -----------------------------------------------
+  // Toggle monthly payment
+  toggleMonthlyPayment(event: any): void {
+    this.isMonthlyPayment = event.target.checked;
+    this.cdr.detectChanges();
+  }
+
+  // Submit order
   proceedToPay(): void {
-    // ✅ UPDATED: Add already enrolled validation
     if (this.isAlreadyEnrolled) {
       this.showBatchChangeToastMessage('You are already enrolled in this course!', 'warning');
       return;
     }
-    
-    // Validation checks
+
     if (!this.batchId) {
       this.showBatchChangeToastMessage('Please select a batch', 'warning');
       return;
@@ -303,11 +345,19 @@ export class StudentCheckout implements OnInit {
     this.submitting = true;
     this.cdr.detectChanges();
 
+    let subAmount = this.subAmount;
+    let totalAmount = this.totalAmount;
+
+    if (this.isMonthlyPayment) {
+      subAmount = this.monthlyFee;
+      totalAmount = this.monthlyFee - this.discountAmount;
+    }
+
     const payload: any = {
       course_id: this.course.id,
       batch_id: this.batchId,
-      sub_amount: this.subAmount,
-      total_amount: this.totalAmount,
+      sub_amount: subAmount,
+      total_amount: totalAmount,
       discount: this.discountAmount,
       coupon_code: this.couponApplied ? this.couponCode : null,
       payment_method: this.paymentMethod,
@@ -316,9 +366,11 @@ export class StudentCheckout implements OnInit {
       is_financed: this.isFinanced,
       finance_id: this.isFinanced ? this.financeId : null,
       finance_provider: this.isFinanced ? this.financeProvider : null,
+      is_monthly_payment: this.isMonthlyPayment,
+      total_months: this.isMonthlyPayment ? this.totalMonths : null,
+      current_month: this.isMonthlyPayment ? this.currentMonth : null
     };
 
-    // Add success and cancel URLs for Stripe payment
     if (this.paymentMethod === 'stripe') {
       payload.success_url = `${window.location.origin}/student/payment/confirmation`;
       payload.cancel_url = `${window.location.origin}/student/payment/cancellation`;
@@ -328,14 +380,11 @@ export class StudentCheckout implements OnInit {
       next: (res: any) => {
         this.submitting = false;
         this.cdr.detectChanges();
-        
+
         if (res.success) {
-          // Check if this is a Stripe payment that requires redirect
           if (res.data?.redirect && res.data?.checkout_url) {
-            // Redirect to Stripe Checkout page
             window.location.href = res.data.checkout_url;
           } else {
-            // Non-Stripe payment (cash, bank transfer, etc.)
             this.showBatchChangeToastMessage(`Order placed successfully! Order #${res.data.order_number}`, 'success');
             setTimeout(() => {
               this.router.navigate(['/student/courses/list']);
@@ -348,7 +397,7 @@ export class StudentCheckout implements OnInit {
       error: (err) => {
         this.submitting = false;
         this.cdr.detectChanges();
-        
+
         if (err.status === 409) {
           this.showBatchChangeToastMessage('You are already enrolled in this course!', 'warning');
         } else if (err.status === 422) {
@@ -362,33 +411,28 @@ export class StudentCheckout implements OnInit {
     });
   }
 
-  // -----------------------------------------------
-  // Helper Methods
-  // -----------------------------------------------
-  
-  // Format batch date range in human-readable format
+  // Helper methods
   formatBatchDateRange(batch: any): string {
     if (!batch || !batch.start_date || !batch.end_date) return 'Date TBD';
-    
+
     const start = new Date(batch.start_date);
     const end = new Date(batch.end_date);
-    
+
     const startMonth = start.toLocaleString('default', { month: 'short' });
     const endMonth = end.toLocaleString('default', { month: 'short' });
     const startDay = start.getDate();
     const endDay = end.getDate();
     const year = end.getFullYear();
-    
+
     if (startMonth === endMonth) {
       return `${startMonth} ${startDay} - ${endDay}, ${year}`;
     }
     return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
   }
 
-  // Format time to 12-hour format
   formatTime(time: string): string {
     if (!time) return 'TBD';
-    
+
     const [hours, minutes] = time.split(':');
     let hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -396,28 +440,26 @@ export class StudentCheckout implements OnInit {
     return `${hour}:${minutes} ${ampm}`;
   }
 
-  // Calculate duration between two times
   getDuration(startTime: string, endTime: string): string {
     if (!startTime || !endTime) return 'TBD';
-    
+
     const [startHour, startMin] = startTime.split(':').map(Number);
     const [endHour, endMin] = endTime.split(':').map(Number);
-    
+
     let durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
     if (durationMinutes < 0) durationMinutes += 24 * 60;
-    
+
     const hours = Math.floor(durationMinutes / 60);
     const minutes = durationMinutes % 60;
-    
+
     if (hours === 0) return `${minutes} min`;
     if (minutes === 0) return `${hours} hr`;
     return `${hours} hr ${minutes} min`;
   }
 
-  // Get short day name
   getShortDay(day: string): string {
     if (!day) return '';
-    
+
     const dayMap: { [key: string]: string } = {
       'monday': 'Mon',
       'tuesday': 'Tue',

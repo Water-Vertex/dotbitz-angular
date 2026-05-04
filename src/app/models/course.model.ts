@@ -25,6 +25,7 @@ export interface Course {
     course_description?: string;
     course_duration?: number;
     course_fee?: string | number;
+    discounted_fee?: string | number;
     course_level?: string;
     age_limit?: string;
     start_date?: string;

@@ -18,7 +18,7 @@
             </svg>
             <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
           </button>
-          <a  *ngIf="can('create_courses')" 
+          <a  *ngIf="can('create_courses')"
             routerLink="/admin/course/add"
             class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
           >
@@ -203,22 +203,22 @@
           <div class="flex items-center justify-between pt-3 border-t border-gray-100">
             <div>
               <span *ngIf="course.course_fee" class="font-bold text-gray-900">
-                ${{ course.course_fee }}
+                  ${{ course.course_fee }}
               </span>
-              <span *ngIf="!course.course_fee" class="font-medium text-green-600 text-sm">
-                Free
+              <span *ngIf="course.discounted_fee" class="font-medium text-green-600 text-sm">
+                  ${{ course.discounted_fee }}
               </span>
             </div>
 
             <div class="flex gap-2">
 
 
-              <a    
-               *ngIf="can('edit_courses')" 
-              [routerLink]="['/admin/course/edit', course?.id]" 
+              <a
+               *ngIf="can('edit_courses')"
+              [routerLink]="['/admin/course/edit', course?.id]"
               class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium">
               Edit
-            
+
             </a>
               <button   *ngIf="can('delete_courses')" (click)="deleteCourse(course.id)" class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium">Delete</button>
             </div>

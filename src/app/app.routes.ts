@@ -143,6 +143,9 @@ import { AdminBillDetail } from './components/admin/pages/bills/bill-details/bil
 import { GuardianMyBills } from './components/guardian/pages/bills/my-bills/my-bills';
 import { StudentMyBills } from './components/student/pages/bills/my-bills/my-bills';
 import { GuardianScheduleList } from './components/guardian/pages/class-schedule/schedule-list/schedule-list';
+import { Setting } from './components/admin/pages/settings/setting/setting';
+import { SeoSetting } from './components/admin/pages/settings/seo-setting/seo-setting';
+import { SitemapComponent } from './components/admin/pages/settings/sitemap/sitemap';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -247,15 +250,19 @@ export const routes: Routes = [
 
       // ✅ Grade routes
       { path: 'admin/grade', component: AdminGrade, canActivate: [permissionGuard], data: { permission: 'view_reports' } },
-// Roles routes
-{ path: 'admin/roles/list', component: RoleList },
-{ path: 'admin/roles/add', component: RoleAdd },
-{ path: 'admin/roles/edit/:id', component: RoleEdit },
+      // Roles routes
+      { path: 'admin/roles/list', component: RoleList },
+      { path: 'admin/roles/add', component: RoleAdd },
+      { path: 'admin/roles/edit/:id', component: RoleEdit },
       // ✅ ROLES & PERMISSIONS - SIRF ADMIN
       { path: 'admin/roles-permissions', component: RolesPermissionsComponent, canActivate: [permissionGuard], data: { permission: 'manage_roles' } },
 
       { path: 'admin/bills',         component: AdminBillList },
       { path: 'admin/bills/:orderId', component: AdminBillDetail },
+
+      { path: 'admin/settings', component: Setting },
+      { path: 'admin/seo-settings', component: SeoSetting },
+      { path: 'admin/sitemap', component: SitemapComponent },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
@@ -274,7 +281,7 @@ export const routes: Routes = [
       { path: 'guardian/dashboard', component: GuardianDashboard },
       { path: 'guardian/profile', component: ProfileShow },
       { path: 'guardian/profile/edit', component: ProfileEdit },
-      { path: 'guardian/class-schedule', component: GuardianClassSchedule },
+      { path: 'guardian/class-schedule', component: GuardianScheduleList },
       { path: 'guardian/courses/list', component: GuardianCourseList },
       { path: 'guardian/course/detail/:id', component: GuardianCourseDetail},
       { path: 'guardian/checkout/:id', component: GuardianCheckout },
