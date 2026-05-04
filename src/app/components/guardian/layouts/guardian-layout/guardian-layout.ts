@@ -92,4 +92,8 @@ currentUser: User | null = null;
   getEmail(): string {
     return this.currentUser?.email || 'guardian@example.com';
   }
+
+navigateToResetPassword(): void {
+  this.router.navigate(['/guardian/password-reset']); 
+}
 }

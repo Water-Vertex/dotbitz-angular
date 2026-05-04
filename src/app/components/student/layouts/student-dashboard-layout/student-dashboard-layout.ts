@@ -69,5 +69,7 @@ navigateToProfile() {
   getEmail(): string {
     return this.currentUser?.email || 'student@example.com';
   }
-
+navigateToResetPassword(): void {
+  this.router.navigate(['/student/reset-password']);
+}
 }

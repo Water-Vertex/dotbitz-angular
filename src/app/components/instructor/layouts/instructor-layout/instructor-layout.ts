@@ -79,4 +79,10 @@ export class InstructorLayout implements OnInit {
   getEmail(): string {
     return this.currentUser?.email || 'instructor@example.com';
   }
+
+  navigateToPasswordReset(): void {
+  // Iska path wahi hona chahiye jo aapne routing file mein rakha hai
+  this.router.navigate(['/instructor/password-reset']);
+
+}
 }

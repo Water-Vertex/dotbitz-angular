@@ -170,4 +170,11 @@ getInstructors(search: string = ''): Observable<any> {
       );
     }
 
+    resetPassword(data: any): Observable<any> {
+  return this.http.put(`${this.InstructorApiUrl}/reset-password`, data, {
+    headers: this.getHeaders()
+  }).pipe(
+    catchError(err => throwError(() => err))
+  );
+}
 }
