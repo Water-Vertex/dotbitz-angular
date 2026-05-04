@@ -171,21 +171,21 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Main Menu
                     </h3>
-                    
+
                     <!-- Dashboard -->
                     <a *ngIf="can('view_dashboard')" routerLink="/admin/dashboard" data-nav-item data-href="/admin/dashboard"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                         Dashboard
                     </a>
-                    
+
                     <!-- Instructors -->
                     <a *ngIf="can('view_instructors')" routerLink="/admin/instructor/list" data-nav-item data-href="/admin/instructor/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i>
                         Instructors
                     </a>
-                    
+
                     <!-- Students -->
                     <a *ngIf="can('view_students')" routerLink="/admin/student/list" data-nav-item data-href="/admin/student/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
@@ -240,7 +240,7 @@
                         <i class="fas fa-users mr-3 w-5 text-center"></i>
                         Batches
                     </a>
-                    
+
                     <!-- Class Schedule -->
                     <a *ngIf="can('view_class_schedules')" routerLink="/admin/class-schedule/list" data-nav-item data-href="/admin/class-schedule/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
@@ -254,7 +254,7 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Content
                     </h3>
-                    
+
                     <!-- MCQs -->
                     <a *ngIf="can('view_mcqs')" routerLink="/admin/mcqs/list" data-nav-item data-href="/admin/mcqs/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
@@ -352,7 +352,7 @@
                         <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i>
                         Grades Book
                     </a>
-                    
+
                     <!-- FAQs -->
                     <a *ngIf="can('view_faqs')" routerLink="/admin/faq/list" data-nav-item data-href="/admin/faq/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
@@ -371,14 +371,14 @@
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
                         Configuration
                     </h3>
-                    
+
                     <!-- Announcements -->
                     <a *ngIf="can('view_announcements')" routerLink="/admin/announcement/list" data-nav-item data-href="/admin/announcement/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-microphone mr-3 w-5 text-center"></i>
                         Announcements
                     </a>
-                    
+
                     <!-- Coupons -->
                     <a *ngIf="can('view_coupons')" routerLink="/admin/coupon/list" data-nav-item data-href="/admin/coupon/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
@@ -390,11 +390,26 @@
         <i class="fas fa-user-tag mr-3 w-5 text-center"></i> Roles
     </a>
                 <!-- Roles & Permissions - SIRF ADMIN -->
-                <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions" 
+                <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions"
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                     <i class="fas fa-shield-alt mr-3 w-5 text-center"></i>
                     Roles & Permissions
                 </a>
+                 <a routerLink="/admin/settings" data-nav-item data-href="/admin/settings"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-receipt mr-3 w-5"></i>
+                        Settings
+                    </a>
+                       <a routerLink="/admin/seo-settings" data-nav-item data-href="/admin/seo-settings"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-receipt mr-3 w-5"></i>
+                        SEO Settings
+                    </a>
+                     <a routerLink="/admin/sitemap" data-nav-item data-href="/admin/sitemap"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-sitemap mr-3 w-5"></i>
+                        Sitemap
+                    </a>  
             </div>
         </nav>
 
@@ -431,15 +446,15 @@
                 <!-- Main Navigation Section - Mobile -->
                 <div class="mb-6">
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Main Menu</h3>
-                    
+
                     <a *ngIf="can('view_dashboard')" routerLink="/admin/dashboard" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i> Dashboard
                     </a>
-                    
+
                     <a *ngIf="can('view_instructors')" routerLink="/admin/instructor/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i> Instructors
                     </a>
-                    
+
                     <a *ngIf="can('view_students')" routerLink="/admin/student/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-users mr-3 w-5 text-center"></i> Students
                     </a>
@@ -451,7 +466,7 @@
                     <a *ngIf="can('view_batches')" routerLink="/admin/batches/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-users mr-3 w-5 text-center"></i> Batches
                     </a>
-                    
+
                     <a *ngIf="can('view_class_schedules')" routerLink="/admin/class-schedule/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i> Class Schedule
                     </a>
@@ -460,31 +475,31 @@
                 <!-- Content Section - Mobile -->
                 <div class="mb-6">
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Content</h3>
-                    
+
                     <a *ngIf="can('view_mcqs')" routerLink="/admin/mcqs/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-quote-left mr-3 w-5 text-center"></i> MCQs
                     </a>
-                    
+
                     <a *ngIf="can('view_quizzes')" routerLink="/admin/quiz/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i> Quiz List
                     </a>
-                    
+
                     <a *ngIf="can('view_policies')" routerLink="/admin/policy/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-file mr-3 w-5 text-center"></i> Policies
                     </a>
-                    
+
                     <a *ngIf="can('view_assessments')" routerLink="/admin/assessments/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i> Assessments List
                     </a>
-                    
+
                     <a *ngIf="can('view_assignments')" routerLink="/admin/assignment/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i> Assignments List
                     </a>
-                    
+
                     <a *ngIf="can('view_reports')" routerLink="/admin/grade" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-file-circle-question mr-3 w-5 text-center"></i> Grades Book
                     </a>
-                    
+
                     <a *ngIf="can('view_faqs')" routerLink="/admin/faq/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-question-circle mr-3 w-5 text-center"></i> FAQs
                     </a>
@@ -498,11 +513,11 @@
                 <!-- Settings Section - Mobile -->
                 <div class="mb-6">
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Configuration</h3>
-                    
+
                     <a *ngIf="can('view_announcements')" routerLink="/admin/announcement/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-microphone mr-3 w-5 text-center"></i> Announcements
                     </a>
-                    
+
                     <a *ngIf="can('view_coupons')" routerLink="/admin/coupon/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-tags mr-3 w-5 text-center"></i> Coupons
                     </a>
@@ -514,6 +529,21 @@
                 <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                     <i class="fas fa-shield-alt mr-3 w-5 text-center"></i> Roles & Permissions
                 </a>
+                 <a routerLink="/admin/settings" data-nav-item data-href="/admin/settings"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-receipt mr-3 w-5"></i>
+                        Settings
+                    </a>
+                       <a routerLink="/admin/seo-settings" data-nav-item data-href="/admin/seo-settings"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-receipt mr-3 w-5"></i>
+                        SEO Settings
+                    </a>
+                     <a routerLink="/admin/sitemap" data-nav-item data-href="/admin/sitemap"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-sitemap mr-3 w-5"></i>
+                        Sitemap
+                    </a>
             </div>
         </nav>
 

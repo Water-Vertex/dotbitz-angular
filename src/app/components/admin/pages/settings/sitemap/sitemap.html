@@ -1,0 +1,200 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Sitemap Generator</h1>
+        <p class="text-gray-500 mt-1 text-sm">
+          Auto-generated sitemap with
+          <span class="font-semibold text-blue-600">{{ urlCounts.total }}</span> URLs
+          <span *ngIf="lastGenerated" class="text-gray-400 ml-2">
+            · Last updated: {{ lastGenerated }}
+          </span>
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+
+        <!-- Refresh -->
+        <button (click)="loadSitemap()" [disabled]="loading"
+          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center
+                 gap-2 text-sm font-medium disabled:opacity-50">
+          <i class="fas fa-sync-alt" [class.animate-spin]="loading"></i>
+          Regenerate
+        </button>
+
+        <!-- Download XML -->
+        <button (click)="downloadXml()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center
+                 gap-2 text-sm font-medium">
+          <i class="fas fa-download"></i>
+          Download XML
+        </button>
+
+        <!-- View public XML -->
+        <a [href]="getPublicXmlUrl()" target="_blank"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center
+                 gap-2 text-sm font-medium">
+          <i class="fas fa-external-link-alt"></i>
+          sitemap.xml
+        </a>
+
+        <!-- HTML / XML toggle -->
+        <div class="flex bg-gray-100 rounded-lg p-1">
+          <button (click)="sitemapType = 'html'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [ngClass]="sitemapType === 'html'
+              ? 'bg-white shadow-sm text-blue-600'
+              : 'text-gray-600 hover:text-gray-800'">
+            📄 HTML
+          </button>
+          <button (click)="sitemapType = 'xml'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            [ngClass]="sitemapType === 'xml'
+              ? 'bg-white shadow-sm text-blue-600'
+              : 'text-gray-600 hover:text-gray-800'">
+            🔗 XML
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- URL Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
+      <div class="text-center p-4 bg-blue-50 rounded-xl">
+        <p class="text-2xl font-bold text-blue-600">{{ urlCounts.static || 0 }}</p>
+        <p class="text-xs text-blue-800 mt-1 font-medium">Static Pages</p>
+      </div>
+      <div class="text-center p-4 bg-emerald-50 rounded-xl">
+        <p class="text-2xl font-bold text-emerald-600">{{ urlCounts.courses || 0 }}</p>
+        <p class="text-xs text-emerald-800 mt-1 font-medium">Courses</p>
+      </div>
+      <div class="text-center p-4 bg-violet-50 rounded-xl">
+        <p class="text-2xl font-bold text-violet-600">{{ urlCounts.posts || 0 }}</p>
+        <p class="text-xs text-violet-800 mt-1 font-medium">Blog Posts</p>
+      </div>
+      <div class="text-center p-4 bg-amber-50 rounded-xl">
+        <p class="text-2xl font-bold text-amber-600">{{ urlCounts.categories || 0 }}</p>
+        <p class="text-xs text-amber-800 mt-1 font-medium">Categories</p>
+      </div>
+      <div class="text-center p-4 bg-gray-100 rounded-xl">
+        <p class="text-2xl font-bold text-gray-700">{{ urlCounts.total || 0 }}</p>
+        <p class="text-xs text-gray-600 mt-1 font-medium">Total URLs</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2 text-sm">Generating sitemap...</p>
+  </div>
+
+  <!-- ===== HTML SITEMAP ===== -->
+  <div *ngIf="!loading && sitemapType === 'html'" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-6">HTML Sitemap</h2>
+
+    <!-- Static Pages -->
+    <div class="mb-8">
+      <h3 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2 border-b pb-3">
+        <i class="fas fa-file text-blue-500"></i>
+        Static Pages ({{ staticPages.length }})
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div *ngFor="let page of staticPages"
+          class="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50
+                 transition-colors group">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-gray-800 text-sm">{{ page.title }}</p>
+              <p class="text-xs text-gray-500 mt-1 truncate">{{ page.url }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mt-3">
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+              [ngClass]="getPriorityColor(page.priority)">
+              P{{ page.priority }}
+            </span>
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+              [ngClass]="getFreqColor(page.changefreq)">
+              {{ page.changefreq }}
+            </span>
+            <a [href]="page.url" target="_blank"
+              class="ml-auto text-xs text-blue-500 hover:underline flex items-center gap-1">
+              <i class="fas fa-external-link-alt text-[10px]"></i> Visit
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Content -->
+    <div *ngFor="let key of getDynamicKeys()" class="mb-8">
+      <h3 class="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2 border-b pb-3 capitalize">
+        <i class="fas fa-database text-green-500"></i>
+        {{ key }} ({{ dynamicContent[key]?.length || 0 }})
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div *ngFor="let item of dynamicContent[key]"
+          class="p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50
+                 transition-colors">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-gray-800 text-sm">{{ item.title }}</p>
+              <p class="text-xs text-gray-500 mt-1 truncate">{{ item.url }}</p>
+            </div>
+            <span class="text-xs text-gray-400 shrink-0">{{ item.lastmod }}</span>
+          </div>
+          <div class="flex items-center gap-2 mt-3">
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+              [ngClass]="getPriorityColor(item.priority)">
+              P{{ item.priority }}
+            </span>
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium"
+              [ngClass]="getFreqColor(item.changefreq)">
+              {{ item.changefreq }}
+            </span>
+            <a [href]="item.url" target="_blank"
+              class="ml-auto text-xs text-blue-500 hover:underline flex items-center gap-1">
+              <i class="fas fa-external-link-alt text-[10px]"></i> Visit
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== XML SITEMAP ===== -->
+  <div *ngIf="!loading && sitemapType === 'xml'"
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-gray-800">XML Sitemap Preview</h2>
+      <div class="flex items-center gap-3">
+        <a [href]="getPublicXmlUrl()" target="_blank"
+          class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200
+                 text-xs font-medium flex items-center gap-1">
+          <i class="fas fa-external-link-alt text-[10px]"></i> View Live
+        </a>
+        <button (click)="copyXml()"
+          class="px-3 py-1.5 bg-gray-700 text-white rounded-lg hover:bg-gray-800
+                 text-xs font-medium flex items-center gap-1">
+          <i class="fas fa-copy"></i> Copy XML
+        </button>
+        <button (click)="downloadXml()"
+          class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                 text-xs font-medium flex items-center gap-1">
+          <i class="fas fa-download"></i> Download
+        </button>
+      </div>
+    </div>
+
+    <pre class="p-6 bg-gray-900 text-green-400 overflow-x-auto text-xs leading-relaxed
+                max-h-[500px] overflow-y-auto">{{ xmlContent }}</pre>
+
+  </div>
+
+</div>

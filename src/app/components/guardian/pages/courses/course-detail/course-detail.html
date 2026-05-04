@@ -134,7 +134,10 @@
             <!-- Price & Actions -->
             <div class="p-6">
               <div class="mb-4">
-                <span class="text-3xl font-bold text-gray-900">${{ course.course_fee }}</span>
+                <span class="text-sm font-bold text-gray-900 line-through">${{ course.course_fee }}</span>
+                <span *ngIf="course.discounted_fee" class="font-medium text-green-600 text-3xl">
+                  ${{ course.discounted_fee }}
+              </span>
               </div>
 
               <!-- Action Buttons -->
@@ -205,11 +208,11 @@
 
                 <!-- Not Eligible - Assessment Required -->
                 <div *ngIf="course.status === 'active' && eligibilityChecked && !isEligibleForEnrollment && !alreadyEnrolled && selectedStudentId">
-                  <button disabled
-                          class="w-full py-3 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed">
-                    <i class="fas fa-lock mr-2"></i>
-                    Enrollment Locked
-                  </button>
+                  <a href="https://dotbitz.com/book-assessment/{{course.id}}"
+            class="w-full py-3 bg-[#FF6500] text-white font-semibold rounded-lg">
+      <i class="fas fa-lock mr-2"></i>
+      Book Free Assessment
+    </a>
                   <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
                     <div class="flex items-start gap-2">
                       <i class="fas fa-exclamation-triangle text-orange-600 text-sm mt-0.5"></i>

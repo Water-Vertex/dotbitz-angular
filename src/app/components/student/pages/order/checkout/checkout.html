@@ -1,15 +1,24 @@
 <div *ngIf="loading" class="max-w-7xl mx-auto px-4">
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
-      <div class="inline-block">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-      </div>
-      <p class="text-gray-500 mt-4">Loading Checkout...</p>
+  <div class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <div class="inline-block">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
     </div>
+    <p class="text-gray-500 mt-4">Loading Checkout...</p>
   </div>
+</div>
 
 <div *ngIf="!loading" class="bg-gray-50 min-h-screen py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    
+
+    <!-- Already Enrolled Warning -->
+    <div *ngIf="isAlreadyEnrolled" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+      <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
+      <div>
+        <p class="font-semibold text-red-700">Already Enrolled</p>
+        <p class="text-sm text-red-600">You are already enrolled in this course. You cannot enroll again.</p>
+      </div>
+    </div>
+
     <!-- Header -->
     <div class="mb-6">
       <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
@@ -21,7 +30,7 @@
     </div>
 
     <div class="grid lg:grid-cols-3 gap-6">
-      
+
       <!-- Left Column -->
       <div class="lg:col-span-2 space-y-4">
 
@@ -59,9 +68,10 @@
           </div>
           <div *ngIf="course" class="p-5">
             <div class="flex gap-4">
-              <img *ngIf="course.thumbnail_image" 
+              <img *ngIf="course.thumbnail_image"
                    [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
-                   class="w-24 h-24 object-cover rounded" />
+                   class="w-24 h-24 object-cover rounded"
+                   [alt]="course.course_name" />
               <div class="flex-1">
                 <h3 class="font-semibold text-gray-900 mb-1">{{ course.course_name }}</h3>
                 <div class="flex flex-wrap gap-3 text-xs text-gray-500">
@@ -70,6 +80,12 @@
                   <span>{{ course.course_duration }} weeks</span>
                   <span>•</span>
                   <span>Starts {{ course.start_date | date: 'MMM d, yyyy' }}</span>
+                  <span>•</span>
+                  <span>Ends {{ course.end_date | date: 'MMM d, yyyy' }}</span>
+                </div>
+                <div *ngIf="totalMonths > 0" class="mt-2 text-xs text-gray-500">
+                  <i class="fas fa-calendar-alt mr-1"></i>
+                  Course Duration: {{ totalMonths }} month{{ totalMonths > 1 ? 's' : '' }}
                 </div>
               </div>
             </div>
@@ -77,176 +93,139 @@
         </div>
 
         <!-- Batch Selection Card -->
-       <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-  <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
-    <h2 class="text-sm font-semibold text-gray-900">Select Batch</h2>
-  </div>
-  <div class="p-5">
-    <div *ngIf="loadingBatches" class="flex items-center gap-2 text-sm text-gray-500">
-      <div class="animate-spin rounded-full h-4 w-4 border-2 border-gray-200 border-t-orange-500"></div>
-      <span>Loading batches...</span>
-    </div>
-
-    <select *ngIf="!loadingBatches"
-      [(ngModel)]="batchId"
-      (change)="onBatchChange()"
-      [disabled]="loadingSchedules"
-      class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 disabled:bg-gray-50 disabled:cursor-wait transition-colors">
-      <option [ngValue]="null">Select a batch</option>
-      <option *ngFor="let batch of batches" [value]="batch.id">
-        {{ batch.name }} - {{ formatBatchDateRange(batch) }}
-        {{ batch.is_full ? '(Full)' : '(' + (batch.enrolled_count || 0) + '/' + (batch.students || 0) + ' seats)' }}
-      </option>
-    </select>
-
-    <!-- Loading Indicator for Schedule -->
-    <div *ngIf="loadingSchedules" class="mt-4">
-      <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <div class="animate-spin rounded-full h-5 w-5 border-2 border-orange-200 border-t-orange-500"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="h-2 w-2 bg-orange-500 rounded-full animate-pulse"></div>
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Select Batch</h2>
+          </div>
+          <div class="p-5">
+            <div *ngIf="loadingBatches" class="flex items-center gap-2 text-sm text-gray-500">
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-gray-200 border-t-orange-500"></div>
+              <span>Loading batches...</span>
             </div>
-          </div>
-          <div>
-            <p class="text-sm font-medium text-orange-500">Loading schedule...</p>
-            <p class="text-xs text-gray-500 mt-0.5">Please wait while we fetch class timings</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <p *ngIf="!loadingBatches && batches.length === 0" class="text-sm text-gray-400 mt-2">
-      No batches available
-    </p>
+            <select *ngIf="!loadingBatches"
+              [(ngModel)]="batchId"
+              (change)="onBatchChange()"
+              [disabled]="loadingSchedules"
+              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 disabled:bg-gray-50 disabled:cursor-wait transition-colors">
+              <option [ngValue]="null">Select a batch</option>
+              <option *ngFor="let batch of batches" [value]="batch.id">
+                {{ batch.name }} - {{ formatBatchDateRange(batch) }}
+                {{ batch.is_full ? '(Full)' : '(' + (batch.enrolled_count || 0) + '/' + (batch.students || 0) + ' seats)' }}
+              </option>
+            </select>
 
-    <!-- Enhanced Schedule Display -->
-    <div *ngIf="selectedBatch && !batchFull && batchSchedules.length > 0 && !loadingSchedules" class="mt-4">
-      <div class="bg-gradient-to-r from-orange-500/5 to-transparent p-3 rounded-lg mb-3">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-xs font-medium text-gray-500">Selected Batch</p>
-            <p class="text-sm font-semibold text-gray-900">{{ selectedBatch.name }}</p>
-          </div>
-          <div class="text-right">
-            <p class="text-xs font-medium text-gray-500">Batch Duration</p>
-            <p class="text-sm text-gray-700">{{ formatBatchDateRange(selectedBatch) }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Complete Schedule Table -->
-      <div class="mt-3">
-        <div class="flex items-center justify-between mb-2">
-          <p class="text-xs font-semibold text-gray-700">Class Schedule</p>
-          <span class="text-xs text-gray-500">{{ batchSchedules.length }} sessions</span>
-        </div>
-        
-        <div class="border border-gray-200 rounded-lg overflow-hidden">
-          <table class="w-full text-sm">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Day</th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Time</th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              <tr *ngFor="let schedule of batchSchedules" class="hover:bg-gray-50 transition-colors">
-                <td class="px-3 py-2 text-sm text-gray-900">
-                  <span class="font-medium capitalize">{{ schedule.day }}</span>
-                  <span class="text-xs text-gray-400 ml-1">({{ getShortDay(schedule.day) }})</span>
-                </td>
-                <td class="px-3 py-2 text-sm text-gray-600">
-                  {{ formatTime(schedule.start_time) }} - {{ formatTime(schedule.end_time) }}
-                 </td>
-               
-                <td class="px-3 py-2">
-                  <span class="text-xs px-2 py-0.5 rounded-full"
-                    [ngClass]="{
-                      'bg-green-100 text-green-700': schedule.status === 'scheduled',
-                      'bg-orange-100 text-orange-700': schedule.status === 'ongoing',
-                      'bg-gray-100 text-gray-500': schedule.status === 'completed',
-                      'bg-red-100 text-red-500': schedule.status === 'cancelled'
-                    }">
-                    {{ schedule.status | titlecase }}
-                  </span>
-                 </td>
-               </tr>
-            </tbody>
-           </table>
-        </div>
-
-        <!-- Schedule Summary Cards for Mobile -->
-        <div class="md:hidden space-y-2 mt-3">
-          <div *ngFor="let schedule of batchSchedules" 
-               class="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
-            <div class="flex justify-between items-start mb-2">
-              <div>
-                <p class="font-semibold text-gray-900 capitalize">{{ schedule.day }}</p>
-                <p class="text-xs text-gray-500">{{ getShortDay(schedule.day) }}</p>
+            <!-- Loading Indicator for Schedule -->
+            <div *ngIf="loadingSchedules" class="mt-4">
+              <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                <div class="flex items-center gap-3">
+                  <div class="relative">
+                    <div class="animate-spin rounded-full h-5 w-5 border-2 border-orange-200 border-t-orange-500"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="h-2 w-2 bg-orange-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-orange-500">Loading schedule...</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Please wait while we fetch class timings</p>
+                  </div>
+                </div>
               </div>
-              <span class="text-xs px-2 py-0.5 rounded-full"
-                [ngClass]="{
-                  'bg-green-100 text-green-700': schedule.status === 'scheduled',
-                  'bg-orange-100 text-orange-700': schedule.status === 'ongoing',
-                  'bg-gray-100 text-gray-500': schedule.status === 'completed',
-                  'bg-red-100 text-red-500': schedule.status === 'cancelled'
-                }">
-                {{ schedule.status | titlecase }}
-              </span>
             </div>
-            <div class="flex items-center gap-3 text-sm text-gray-600">
-              <span>{{ formatTime(schedule.start_time) }}</span>
-              <span>→</span>
-              <span>{{ formatTime(schedule.end_time) }}</span>
-              <span class="text-xs text-gray-400">({{ getDuration(schedule.start_time, schedule.end_time) }})</span>
+
+            <p *ngIf="!loadingBatches && batches.length === 0" class="text-sm text-gray-400 mt-2">
+              No batches available
+            </p>
+
+            <!-- Enhanced Schedule Display -->
+            <div *ngIf="selectedBatch && !batchFull && batchSchedules.length > 0 && !loadingSchedules" class="mt-4">
+              <div class="bg-gradient-to-r from-orange-500/5 to-transparent p-3 rounded-lg mb-3">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-xs font-medium text-gray-500">Selected Batch</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ selectedBatch.name }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-xs font-medium text-gray-500">Batch Duration</p>
+                    <p class="text-sm text-gray-700">{{ formatBatchDateRange(selectedBatch) }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Complete Schedule Table -->
+              <div class="mt-3">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-xs font-semibold text-gray-700">Class Schedule</p>
+                  <span class="text-xs text-gray-500">{{ batchSchedules.length }} sessions</span>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                  <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Day</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Time</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr *ngFor="let schedule of batchSchedules" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-3 py-2 text-sm text-gray-900">
+                          <span class="font-medium capitalize">{{ schedule.day }}</span>
+                          <span class="text-xs text-gray-400 ml-1">({{ getShortDay(schedule.day) }})</span>
+                        </td>
+                        <td class="px-3 py-2 text-sm text-gray-600">
+                          {{ formatTime(schedule.start_time) }} - {{ formatTime(schedule.end_time) }}
+                        </td>
+                        <td class="px-3 py-2">
+                          <span class="text-xs px-2 py-0.5 rounded-full"
+                            [ngClass]="{
+                              'bg-green-100 text-green-700': schedule.status === 'scheduled',
+                              'bg-orange-100 text-orange-700': schedule.status === 'ongoing',
+                              'bg-gray-100 text-gray-500': schedule.status === 'completed',
+                              'bg-red-100 text-red-500': schedule.status === 'cancelled'
+                            }">
+                            {{ schedule.status | titlecase }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Schedule Loaded Successfully Indicator -->
+                <div class="mt-3 flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1">
+                      <i class="fas fa-check-circle text-green-500 text-xs"></i>
+                      <span>Schedule loaded successfully</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <i class="fas fa-clock text-gray-400 text-xs"></i>
+                      <span>All times are in local timezone</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <i class="fas fa-calendar-alt text-gray-400 text-xs"></i>
+                    <span>Starts {{ selectedBatch.start_date | date: 'MMM d, yyyy' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- No Schedule -->
+            <div *ngIf="selectedBatch && !batchFull && batchSchedules.length === 0 && !loadingSchedules" class="mt-4 p-3 bg-gray-50 rounded-lg text-center">
+              <i class="fas fa-calendar-times text-gray-400 text-lg mb-1"></i>
+              <p class="text-sm text-gray-500">Schedule not yet available</p>
+              <p class="text-xs text-gray-400 mt-1">Please check back later or contact support</p>
+            </div>
+
+            <div *ngIf="batchFull && batchId" class="mt-3 text-xs text-red-600 bg-red-50 px-3 py-2 rounded">
+              <i class="fas fa-exclamation-circle mr-1"></i>
+              This batch is full. Please select another batch.
             </div>
           </div>
         </div>
-
-        <!-- Schedule Loaded Successfully Indicator -->
-        <div class="mt-3 flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1">
-              <i class="fas fa-check-circle text-green-500 text-xs"></i>
-              <span>Schedule loaded successfully</span>
-            </div>
-            <div class="flex items-center gap-1">
-              <i class="fas fa-clock text-gray-400 text-xs"></i>
-              <span>All times are in local timezone</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-1">
-            <i class="fas fa-calendar-alt text-gray-400 text-xs"></i>
-            <span>Starts {{ selectedBatch.start_date | date: 'MMM d, yyyy' }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- No Schedule -->
-    <div *ngIf="selectedBatch && !batchFull && batchSchedules.length === 0 && !loadingSchedules" class="mt-4 p-3 bg-gray-50 rounded-lg text-center">
-      <i class="fas fa-calendar-times text-gray-400 text-lg mb-1"></i>
-      <p class="text-sm text-gray-500">Schedule not yet available</p>
-      <p class="text-xs text-gray-400 mt-1">Please check back later or contact support</p>
-    </div>
-
-    <div *ngIf="batchFull && batchId" class="mt-3 text-xs text-red-600 bg-red-50 px-3 py-2 rounded">
-      <i class="fas fa-exclamation-circle mr-1"></i>
-      This batch is full. Please select another batch.
-    </div>
-  </div>
-</div>
-
-<!-- Optional: Add a toast or snackbar for better feedback -->
-<div *ngIf="showBatchChangeToast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm z-50 animate-fade-in-up">
-  <div class="flex items-center gap-2">
-    <i class="fas fa-layer-group text-orange-500"></i>
-    <span>Batch changed to {{ selectedBatch?.name }}</span>
-  </div>
-</div>
 
         <!-- Payment Method Card -->
         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -255,17 +234,8 @@
           </div>
           <div class="p-5">
             <div class="grid grid-cols-3 gap-2">
-              <!-- <label class="flex items-center gap-2 p-2 border border-gray-200 rounded cursor-pointer hover:border-orange-500 transition-colors"
-                     [class.border-orange-500 bg-orange-500/5]="paymentMethod === 'cash'">
-                <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="cash" class="w-3.5 h-3.5">
-                <span class="text-sm">Cash</span>
-              </label>
               <label class="flex items-center gap-2 p-2 border border-gray-200 rounded cursor-pointer hover:border-orange-500 transition-colors"
-                     [class.border-orange-500 bg-orange-500/5]="paymentMethod === 'bank_transfer'">
-                <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="bank_transfer" class="w-3.5 h-3.5">
-                <span class="text-sm">Bank Transfer</span>
-              </label> -->
-              <label class="flex items-center gap-2 p-2 border border-gray-200 rounded cursor-pointer hover:border-orange-500 transition-colors">
+                     [class.border-orange-500 bg-orange-500/5]="paymentMethod === 'stripe'">
                 <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="stripe" class="w-3.5 h-3.5">
                 <span class="text-sm">Card / Stripe</span>
               </label>
@@ -326,23 +296,70 @@
           <div class="px-5 py-3 border-b border-gray-200">
             <h2 class="text-sm font-semibold text-gray-900">Order Summary</h2>
           </div>
-          
+
           <div class="p-5 space-y-3">
+            <!-- Monthly Payment Option -->
+            <div class="pb-2 border-b border-gray-100">
+              <label class="flex items-center justify-between cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox"
+                         [checked]="isMonthlyPayment"
+                         (change)="toggleMonthlyPayment($event)"
+                         [disabled]="isAlreadyEnrolled"
+                         class="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500">
+                  <span class="text-sm font-medium text-gray-700">Pay Monthly</span>
+                </div>
+                <div *ngIf="isMonthlyPayment && monthlyFee" class="text-xs text-green-600">
+                  <i class="fas fa-calendar-alt mr-1"></i>
+                  {{ totalMonths }} months
+                </div>
+              </label>
+
+              <div *ngIf="isMonthlyPayment && monthlyFee" class="mt-2 p-2 bg-orange-50 rounded-lg">
+                <div class="text-xs text-gray-600 mb-1">Monthly Payment Plan</div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-semibold text-gray-900">${{ monthlyFee | number:'1.2-2' }}/month</span>
+                  <span class="text-xs text-gray-500">for {{ totalMonths }} months</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  You'll be charged ${{ monthlyFee | number:'1.2-2' }} today
+                </div>
+              </div>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div *ngIf="!isMonthlyPayment && course" class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Original Price</span>
+                <span class="text-gray-400 line-through">${{ originalTotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Discounted Price</span>
+                <span class="font-medium text-gray-900">${{ discountedTotal | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
             <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Course Fee</span>
+              <span class="text-gray-600">{{ isMonthlyPayment ? 'Monthly Fee' : 'Course Fee' }}</span>
               <span class="font-medium text-gray-900">${{ subAmount | number:'1.2-2' }}</span>
             </div>
-            
+
             <div *ngIf="couponApplied" class="flex justify-between text-sm text-green-600">
               <span>Discount</span>
               <span>-${{ discountAmount | number:'1.2-2' }}</span>
             </div>
-            
+
             <div class="pt-3 border-t border-gray-200">
               <div class="flex justify-between">
-                <span class="font-semibold text-gray-900">Total</span>
+                <span class="font-semibold text-gray-900">Total Today</span>
                 <span class="text-lg font-bold text-orange-500">${{ totalAmount | number:'1.2-2' }}</span>
               </div>
+            </div>
+
+            <div *ngIf="isMonthlyPayment && totalMonths > 1" class="text-xs text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              Remaining {{ totalMonths - 1 }} payments of ${{ monthlyFee | number:'1.2-2' }} will be charged monthly
             </div>
 
             <div class="text-xs text-gray-500 flex items-center gap-1">
@@ -350,30 +367,19 @@
               <span>Secure checkout</span>
             </div>
 
-            <!-- Finance Option -->
-            <!-- <label class="flex items-center gap-2 py-2 cursor-pointer">
-              <input type="checkbox" [(ngModel)]="isFinanced" class="w-3.5 h-3.5 rounded border-gray-300">
-              <span class="text-xs text-gray-700">This order will be financed</span>
-            </label> -->
-
-            <div *ngIf="isFinanced" class="space-y-2 pt-2">
-              <input type="text" [(ngModel)]="financeId" placeholder="Finance ID"
-                class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-orange-500">
-              <input type="text" [(ngModel)]="financeProvider" placeholder="Finance Provider"
-                class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-orange-500">
-            </div>
-
             <div class="pt-3 space-y-2">
               <button (click)="proceedToPay()"
                 [disabled]="submitting || batchFull || !batchId || !paymentMethod || isAlreadyEnrolled"
                 class="w-full py-2 bg-orange-500 text-white text-sm font-medium rounded hover:bg-[#052b63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                <span *ngIf="!submitting">Complete Checkout</span>
+                <span *ngIf="!submitting">
+                  {{ isMonthlyPayment ? 'Pay $' + (totalAmount | number:'1.2-2') + ' Today' : 'Complete Checkout' }}
+                </span>
                 <span *ngIf="submitting" class="flex items-center justify-center gap-2">
                   <div class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
                   Processing...
                 </span>
               </button>
-              
+
               <button routerLink="/student/courses/list"
                 class="w-full py-2 border border-gray-300 text-gray-600 text-sm font-medium rounded hover:bg-gray-50 transition-colors">
                 Cancel
@@ -386,18 +392,44 @@
   </div>
 </div>
 
-<!-- Add this CSS for better radio button styling -->
+<!-- Toast Notification -->
+<div *ngIf="showBatchChangeToast"
+     class="fixed bottom-4 right-4 z-50 animate-fade-in-up"
+     [ngClass]="{
+       'bg-green-600': toastType === 'success',
+       'bg-red-600': toastType === 'error',
+       'bg-blue-600': toastType === 'info',
+       'bg-yellow-600': toastType === 'warning'
+     }">
+  <div class="px-4 py-2 rounded-lg shadow-lg text-white text-sm flex items-center gap-2">
+    <i class="fas"
+       [ngClass]="{
+         'fa-check-circle': toastType === 'success',
+         'fa-exclamation-circle': toastType === 'error',
+         'fa-info-circle': toastType === 'info',
+         'fa-exclamation-triangle': toastType === 'warning'
+       }"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>
+
 <style>
   input[type="radio"] {
     accent-color: #073a89;
   }
-</style>
 
-<!-- Already Enrolled Warning Card -->
-<div *ngIf="isAlreadyEnrolled" class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-  <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
-  <div>
-    <p class="font-semibold text-red-700">Already Enrolled</p>
-    <p class="text-sm text-red-600">You are already enrolled in this course. You cannot enroll again.</p>
-  </div>
-</div>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.3s ease-out;
+  }
+</style>

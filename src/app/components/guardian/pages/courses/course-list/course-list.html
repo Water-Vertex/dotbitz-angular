@@ -155,10 +155,10 @@
           <div class="flex items-center justify-between pt-3 border-t border-gray-100">
             <div>
               <span *ngIf="course.course_fee" class="font-bold text-gray-900">
-                ${{ course.course_fee }}
+                  ${{ course.course_fee }}
               </span>
-              <span *ngIf="!course.course_fee" class="font-medium text-green-600 text-sm">
-                Free
+              <span *ngIf="course.discounted_fee" class="font-medium text-green-600 text-sm">
+                  ${{ course.discounted_fee }}
               </span>
             </div>
 

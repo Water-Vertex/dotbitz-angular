@@ -60,6 +60,7 @@ export class CourseEdit implements OnInit {
       course_description: [''],
       course_duration: [''],
       course_fee: [''],
+      discounted_fee: [''],
       course_level: [''],
       age_limit: [''],
       start_date: [''],
