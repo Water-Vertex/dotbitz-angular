@@ -162,7 +162,7 @@
 <!-- Schedule Cards - Accordion Style -->
 <div *ngIf="!isLoadingSchedules && selectedCourseId && filteredSchedules.length > 0" class="space-y-4">
   <div *ngFor="let schedule of filteredSchedules; let i = index" class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-    
+
     <!-- Card Header (Always Visible) -->
     <div class="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200" (click)="toggleSchedule(i)">
       <div class="flex items-center justify-between">
@@ -202,7 +202,19 @@
               </span>
             </div>
           </div>
-
+<div class="flex items-center space-x-3">
+  <span [class]="'px-3 py-1 text-xs font-semibold rounded-full ' + getStatusClass(schedule.status)">
+    {{ schedule.status | uppercase }} </span>
+    <!-- ✅ Google Calendar Button (NEW) -->
+      <button (click)="$event.stopPropagation(); addScheduleToCalendar(schedule)"
+      class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-100 text-xs font-medium transition-colors" title="Add to Google Calendar">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+       </svg> Add to Calendar </button>
+       <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" [class.rotate-180]="expandedSchedule === i" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
           <!-- Status & Expand Icon -->
           <div class="flex items-center space-x-3">
             <span [class]="'px-3 py-1 text-xs font-semibold rounded-full ' + getStatusClass(schedule.status)">
@@ -235,7 +247,7 @@
               <span class="text-sm text-gray-600">Time:</span>
               <span class="text-sm font-medium text-gray-900">{{ formatTimeRange(schedule.start_time, schedule.end_time) }}</span>
             </div>
-           
+
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600">Status:</span>
               <span [class]="'text-sm font-medium ' + (schedule.status === 'ongoing' ? 'text-green-600' : 'text-gray-600')">

@@ -26,7 +26,28 @@
 <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-6">
     <form [formGroup]="scheduleForm" (ngSubmit)="onSubmit()" class="space-y-6">
 
-       <!-- Instructor (Auto-filled, read-only) -->
+        <!-- Google Calendar Info Banner (Top of Form) -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+                <div class="flex-shrink-0">
+                    <svg class="w-5 h-5 text-blue-500 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h4 class="text-sm font-semibold text-blue-800 mb-1">📅 Automatic Google Calendar Sync</h4>
+                    <ul class="text-xs text-blue-700 space-y-1">
+                        <li>✓ After clicking "Create Schedule(s)", Google Calendar will open automatically</li>
+                        <li>✓ Multiple schedules will open one by one (800ms delay between each)</li>
+                        <li>✓ ⚠️ Please allow popups if prompted by your browser</li>
+                        <li>✓ Each schedule can be added to your calendar with one click</li>
+                        <li>✓ Students and admins will receive email notifications automatically</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructor (Auto-filled, read-only) -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 Instructor
@@ -218,23 +239,21 @@
         </div>
 
         <!-- Note -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Note
-                </label>
-
-                <textarea
-                    formControlName="note"
-                    rows="4"
-                    maxlength="1000"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                    placeholder="Enter batch note"
-                ></textarea>
-
-                <div class="text-xs text-gray-500 text-right mt-1">
-                    {{ scheduleForm.get('note')?.value?.length || 0 }}/1000
-                </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Note
+            </label>
+            <textarea
+                formControlName="note"
+                rows="4"
+                maxlength="1000"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                placeholder="Enter batch note"
+            ></textarea>
+            <div class="text-xs text-gray-500 text-right mt-1">
+                {{ scheduleForm.get('note')?.value?.length || 0 }}/1000
             </div>
+        </div>
 
         <!-- Status -->
         <div>
@@ -251,19 +270,38 @@
             </select>
         </div>
 
+        <!-- Info message about multiple schedules -->
+        <div *ngIf="selectionMode !== 'single'" class="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
+            <i class="fas fa-info-circle mr-2"></i>
+            {{ daysArray.length }} schedule(s) will be created (one for each selected day)
+        </div>
+
+        <!-- Google Calendar Popup Warning (Before Submit Button) -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                <div class="text-xs text-yellow-700">
+                    <p class="font-medium">⚠️ Browser Popup Warning</p>
+                    <p class="mt-0.5">After saving, Google Calendar will open automatically. If nothing happens, please check if popups are blocked and allow them for this site.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Form Actions -->
-        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button
                 type="button"
                 (click)="cancel()"
-                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
                 Cancel
             </button>
             <button
                 type="submit"
                 [disabled]="scheduleForm.invalid || isSubmitting"
-                class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2"
+                class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-colors"
             >
                 <span *ngIf="!isSubmitting">
                     <i class="fas fa-save mr-2"></i>
@@ -276,10 +314,5 @@
             </button>
         </div>
 
-        <!-- Info message about multiple schedules -->
-        <div *ngIf="selectionMode !== 'single'" class="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
-            <i class="fas fa-info-circle mr-2"></i>
-            {{ daysArray.length }} schedule(s) will be created (one for each selected day)
-        </div>
     </form>
 </div>

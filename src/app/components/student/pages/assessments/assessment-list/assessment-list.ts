@@ -146,7 +146,7 @@
 //   return Math.round(total / completed.length);
 // }
 
-  
+
 
 //   // Status Helper Methods
 //  getStatusBadgeClass(item: any): string {

@@ -317,4 +317,37 @@ export class OrderService {
       }
     });
   }
+
+  getAdminBills(status?: string, search?: string): Observable<any> {
+  let url = `${environment.AdminApiUrl}/bills`;
+  const params: string[] = [];
+
+  if (status) params.push(`status=${status}`);
+  if (search) params.push(`search=${search}`);
+  if (params.length) url += `?${params.join('&')}`;
+
+  return this.http.get(url, { headers: this.getHeaders() });
+}
+
+// Admin - Bill detail
+getAdminBillDetail(orderId: number): Observable<any> {
+  return this.http.get(
+    `${environment.AdminApiUrl}/bills/${orderId}`,
+    { headers: this.getHeaders() }
+  );
+}
+getStudentBills(): Observable<any> {
+  return this.http.get(
+    `${this.apiUrl}/my-bills`,
+    { headers: this.getHeaders() }
+  );
+}
+
+// Guardian - My bills
+getGuardianBills(): Observable<any> {
+  return this.http.get(
+    `${this.guardianApiUrl}/my-bills`,
+    { headers: this.getHeaders() }
+  );
+}
 }

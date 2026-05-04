@@ -136,11 +136,11 @@
 
     <!-- Courses heading -->
     <h2 *ngIf="courses.length > 0" class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-      Your Assign assessment 
+      Your Assign assessment
       <!-- — {{ courses.length }}  -->
     </h2>
 
-   
+
     <div *ngIf="courses.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       <div *ngFor="let course of courses; trackBy: trackById"
         (click)="selectCourse(course)"

@@ -145,7 +145,15 @@
               <p class="text-lg font-bold text-orange-600">{{ getDayNumber(schedule.start_time) }}</p>
             </div>
           </div>
-
+<button (click)="addAllToCalendar()"
+  [disabled]="schedules.length === 0"
+  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center
+         gap-2 text-sm font-medium disabled:opacity-50">
+  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+  </svg>
+  Add All to Google Calendar
+</button>
           <!-- Course Info -->
           <div class="flex-1">
             <h3 class="text-lg font-semibold text-gray-900">{{ getCourseName(schedule.course_id) }}</h3>
@@ -237,7 +245,16 @@
         >
           Edit Schedule
         </button>
-
+<!-- Existing Edit/Delete buttons ke saath -->
+<button (click)="addToCalendar(schedule)"
+  class="px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg
+         hover:bg-blue-100 text-xs font-medium flex items-center gap-1"
+  title="Add to Google Calendar">
+  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+  </svg>
+  Add to Calendar
+</button>
         <a
           *ngIf="schedule.meeting_link"
           [href]="schedule.meeting_link"

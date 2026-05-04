@@ -132,7 +132,7 @@ import { StudentResult } from './components/guardian/pages/results/student-resul
 import { StudentClassScheduleList } from './components/student/pages/class-schedule/schedule-list/schedule-list';
 import { GuardianConfirmation } from './components/guardian/pages/payment/confirmation/confirmation';
 import { GuardianList } from './components/admin/pages/guardians/guardian-list/guardian-list';
-import { GuardianClassSchedule } from './components/guardian/pages/class-schedule/class-schedule';
+
 import { RolesPermissionsComponent } from './components/admin/pages/roles-permissions/roles-permissions';
 import { RoleList } from './components/admin/pages/roles/role-list/role-list';
 import { RoleAdd } from './components/admin/pages/roles/role-add/role-add';
@@ -142,6 +142,11 @@ import { GuardianPasswordReset } from './components/guardian/pages/profile/passw
 import { InstructorPasswordReset } from './components/instructor/pages/profile/password/password-reset/password-reset';
 import { AdminPasswordReset } from './components/admin/pages/profile/password/password-reset/password-reset';
 
+import { AdminBillList } from './components/admin/pages/bills/bill-list/bill-list';
+import { AdminBillDetail } from './components/admin/pages/bills/bill-details/bill-details';
+import { GuardianMyBills } from './components/guardian/pages/bills/my-bills/my-bills';
+import { StudentMyBills } from './components/student/pages/bills/my-bills/my-bills';
+import { GuardianScheduleList } from './components/guardian/pages/class-schedule/schedule-list/schedule-list';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -257,6 +262,9 @@ export const routes: Routes = [
       // ✅ ROLES & PERMISSIONS - SIRF ADMIN
       { path: 'admin/roles-permissions', component: RolesPermissionsComponent, canActivate: [permissionGuard], data: { permission: 'manage_roles' } },
 
+      { path: 'admin/bills',         component: AdminBillList },
+      { path: 'admin/bills/:orderId', component: AdminBillDetail },
+
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
@@ -285,6 +293,9 @@ export const routes: Routes = [
       { path: 'guardian/student-assessments', component: GuardianAssessmentList },
       { path: 'guardian/student-results', component: StudentResult },
       { path: 'guardian/payment/confirmation',  component: GuardianConfirmation  },
+      { path: 'guardian/class-schedule', component: GuardianScheduleList },
+
+      { path: 'guardian/my-bills',   component: GuardianMyBills },
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
@@ -319,6 +330,8 @@ export const routes: Routes = [
       { path: 'student/my-results', component: MyResult },
   
   { path: 'student/reset-password', component: StudentPasswordReset,},
+      { path: 'student/my-bills',    component: StudentMyBills }
+
     ]
   },
 
