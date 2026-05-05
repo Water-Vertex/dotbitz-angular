@@ -150,6 +150,7 @@ import { GuardianScheduleList } from './components/guardian/pages/class-schedule
 import { Setting } from './components/admin/pages/settings/setting/setting';
 import { SeoSetting } from './components/admin/pages/settings/seo-setting/seo-setting';
 import { SitemapComponent } from './components/admin/pages/settings/sitemap/sitemap';
+import { PreRegistrationComponent } from './components/admin/pages/registrations/pre-registration/pre-registration';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -272,6 +273,8 @@ export const routes: Routes = [
       { path: 'admin/seo-settings', component: SeoSetting },
       { path: 'admin/sitemap', component: SitemapComponent },
 
+      { path: 'admin/pre-registrations', component:PreRegistrationComponent},
+
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
@@ -310,7 +313,7 @@ export const routes: Routes = [
 
   // Student Routes
   { path: 'student/login', component: StudentLogin },
-    
+
   {
     path: '',
     canActivate: [authGuard],
@@ -335,7 +338,7 @@ export const routes: Routes = [
       { path: 'student/assessment/view/:id', component: StudentAssessmentView },
       { path: 'student/assessment-result', component: StudentAssessmentResult },
       { path: 'student/my-results', component: MyResult },
-  
+
   { path: 'student/reset-password', component: StudentPasswordReset,},
       { path: 'student/my-bills',    component: StudentMyBills }
 

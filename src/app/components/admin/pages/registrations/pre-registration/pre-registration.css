@@ -1,0 +1,20 @@
+/* Add any custom styles here */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Optional: Add smooth transitions */
+.hover\:bg-gray-50 {
+    transition: background-color 0.2s ease;
+}
+
+/* Responsive table adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

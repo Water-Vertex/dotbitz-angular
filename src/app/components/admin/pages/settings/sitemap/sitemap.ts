@@ -20,7 +20,7 @@ export class SitemapComponent implements OnInit {
   dynamicContent: { [key: string]: any[] } = {};
   allUrls: any[]                           = [];
   urlCounts: any                           = {
-    static: 0, courses: 0, posts: 0, categories: 0, total: 0
+    static: 0, courses: 0, policies: 0, categories: 0, total: 0
   };
   lastGenerated = '';
 
