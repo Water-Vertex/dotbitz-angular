@@ -31,7 +31,8 @@ export class RolesPermissionsComponent implements OnInit {
         'assignments', 'assessments', 'quizzes', 'mcqs',
         'announcements', 'faqs', 'policies', 'contacts', 'appointments',
         'class_schedules', 'orders', 'coupons','course_instructors', 
-    'course_curricula','assessment_queries','assessment_attempts','reports','roles'
+    'course_curricula','assessment_queries','assessment_attempts','reports','roles',
+     'settings', 'seo_settings','sitemap',
     ];
 
     constructor(
@@ -94,18 +95,36 @@ refreshUsers(): void {
         }
     });
 }
-    groupPermissions(): void {
-        this.permissionGroups = {};
+    // groupPermissions(): void {
+    //     this.permissionGroups = {};
         
-        this.modules.forEach(module => {
-            const modulePermissions = this.allPermissions.filter(p => p.includes(module));
-            if (modulePermissions.length > 0) {
-                this.permissionGroups[module] = modulePermissions;
-            }
+    //     this.modules.forEach(module => {
+    //         const modulePermissions = this.allPermissions.filter(p => p.includes(module));
+    //         if (modulePermissions.length > 0) {
+    //             this.permissionGroups[module] = modulePermissions;
+    //         }
+    //     });
+        
+    //     this.cdr.detectChanges();
+    // }
+    groupPermissions(): void {
+    this.permissionGroups = {};
+    
+    this.modules.forEach(module => {
+        const modulePermissions = this.allPermissions.filter(p => {
+            const parts = p.split('_');
+            const action = parts[0]; // view, create, edit, delete
+            const moduleName = parts.slice(1).join('_'); // baaki sab module name
+            return moduleName === module;
         });
         
-        this.cdr.detectChanges();
-    }
+        if (modulePermissions.length > 0) {
+            this.permissionGroups[module] = modulePermissions;
+        }
+    });
+    
+    this.cdr.detectChanges();
+}
 
     get permissionModules(): string[] {
         return Object.keys(this.permissionGroups).sort();

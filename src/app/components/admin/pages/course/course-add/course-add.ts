@@ -63,6 +63,12 @@ export class CourseAdd implements OnInit {
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
+      meta_title: [''],
+meta_description: [''],
+meta_keyword: [''],
+meta_tags: [''],
+focus_keyword: [''],
+page_schema: [''],
     });
 
   }
