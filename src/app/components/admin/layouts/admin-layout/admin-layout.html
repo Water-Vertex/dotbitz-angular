@@ -365,7 +365,7 @@
                         <i class="fas fa-question-circle mr-3 w-5 text-center"></i>
                         FAQs
                     </a>
-                     <a routerLink="/admin/bills" data-nav-item data-href="/admin/bills"
+                     <a  *ngIf="can('view_orders')" routerLink="/admin/bills" data-nav-item data-href="/admin/bills"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-receipt mr-3 w-5"></i>
                         Bills
@@ -401,17 +401,17 @@
                     <i class="fas fa-shield-alt mr-3 w-5 text-center"></i>
                     Roles & Permissions
                 </a>
-                 <a routerLink="/admin/settings" data-nav-item data-href="/admin/settings"
+                 <a *ngIf="can('view_settings')" routerLink="/admin/settings" data-nav-item data-href="/admin/settings"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-receipt mr-3 w-5"></i>
                         Settings
                     </a>
-                       <a routerLink="/admin/seo-settings" data-nav-item data-href="/admin/seo-settings"
+                       <a   *ngIf="can('view_seo_settings')"  routerLink="/admin/seo-settings" data-nav-item data-href="/admin/seo-settings"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-receipt mr-3 w-5"></i>
                         SEO Settings
                     </a>
-                     <a routerLink="/admin/sitemap" data-nav-item data-href="/admin/sitemap"
+                     <a   *ngIf="can('view_sitemap')" routerLink="/admin/sitemap" data-nav-item data-href="/admin/sitemap"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-sitemap mr-3 w-5"></i>
                         Sitemap
@@ -515,12 +515,16 @@
                     <a *ngIf="can('view_faqs')" routerLink="/admin/faq/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-question-circle mr-3 w-5 text-center"></i> FAQs
                     </a>
-                     <a routerLink="/admin/bills" data-nav-item data-href="/admin/bills"
+                     <a  *ngIf="can('view_orders')" 
+                     routerLink="/admin/bills" data-nav-item data-href="/admin/bills"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-receipt mr-3 w-5"></i>
                         Bills
                     </a>
                 </div>
+
+
+
 
                 <!-- Settings Section - Mobile -->
                 <div class="mb-6">
@@ -541,17 +545,17 @@
                 <a *ngIf="isAdmin()" routerLink="/admin/roles-permissions" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
                     <i class="fas fa-shield-alt mr-3 w-5 text-center"></i> Roles & Permissions
                 </a>
-                 <a routerLink="/admin/settings" data-nav-item data-href="/admin/settings"
+                 <a  *ngIf="can('view_settings')" routerLink="/admin/settings" data-nav-item data-href="/admin/settings"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-receipt mr-3 w-5"></i>
                         Settings
                     </a>
-                       <a routerLink="/admin/seo-settings" data-nav-item data-href="/admin/seo-settings"
+                       <a   *ngIf="can('view_seo_settings')" routerLink="/admin/seo-settings" data-nav-item data-href="/admin/seo-settings"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-receipt mr-3 w-5"></i>
                         SEO Settings
                     </a>
-                     <a routerLink="/admin/sitemap" data-nav-item data-href="/admin/sitemap"
+                     <a  *ngIf="can('view_sitemap')"  routerLink="/admin/sitemap" data-nav-item data-href="/admin/sitemap"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-sitemap mr-3 w-5"></i>
                         Sitemap

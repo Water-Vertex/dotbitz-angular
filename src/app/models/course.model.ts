@@ -35,6 +35,15 @@ export interface Course {
     instructor_id: number;   // <-- ID of the instructor
     instructor?: Instructor; // <-- Full instructor object from API
     thumbnail_image?: string;
+
+
+    // ========== SEO FIELDS - ==========
+    meta_title?: string;
+    meta_description?: string;
+    meta_keyword?: string;
+    meta_tags?: string;
+    focus_keyword?: string;
+    page_schema?: string;
 }
 
 export interface CoursePayload {
