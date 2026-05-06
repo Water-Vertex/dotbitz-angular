@@ -195,24 +195,26 @@ export class GuardianCourseDetail implements OnInit, OnDestroy {
     this.studentAge = this.calculateAge(this.studentData.date_of_birth);
 
     // ✅ Guardian logic
-    if (this.studentAge < 18) {
-      this.isEligibleForEnrollment = true;
-      this.showParentMessage = false;
-      this.enrollmentMessage = '';
-      this.eligibilityChecked = true;
-      this.cdr.detectChanges();
-    } else {
-      this.checkAssessmentCompletion();
-    }
+    // if (this.studentAge < 18) {
+    //   this.isEligibleForEnrollment = true;
+    //   this.showParentMessage = false;
+    //   this.enrollmentMessage = '';
+    //   this.eligibilityChecked = true;
+    //   this.cdr.detectChanges();
+    // } else {
+    //   this.checkAssessmentCompletion();
+    // }
+    this.checkAssessmentCompletion();
   }
 
   // ✅ Assessment Check
   checkAssessmentCompletion(): void {
 
     this.courseService
-      .checkStudentAssessmentCompleted(this.selectedStudentId!, +this.id)
+      .checkGuardianStudentAssessmentCompleted(this.selectedStudentId!, +this.id)
       .subscribe({
         next: (res: any) => {
+          console.log('API Response:', res);
 
           if (res.already_enrolled) {
             this.alreadyEnrolled = true;

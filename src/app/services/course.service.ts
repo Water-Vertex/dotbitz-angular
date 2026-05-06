@@ -263,7 +263,11 @@ getCheckedQuizDetail(attemptId: number): Observable<any> {
 
   checkStudentAssessmentCompleted(studentId: number, courseId: number): Observable<any> {
     return this.http.get(`${environment.StudentApiUrl}/check-assessment/${studentId}/${courseId}`, { headers: this.getHeaders() });
+   
   }
+  checkGuardianStudentAssessmentCompleted(studentId: number, courseId: number): Observable<any> {
+  return this.http.get(`${environment.GuardianApiUrl}/check-assessment/${studentId}/${courseId}`, { headers: this.getHeaders() });
+}
 
   enrollStudentInCourse(courseId: number): Observable<any> {
     return this.http.post(`${environment.StudentApiUrl}/enroll-course`, { course_id: courseId }, { headers: this.getHeaders() });
