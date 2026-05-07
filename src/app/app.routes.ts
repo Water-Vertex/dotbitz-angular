@@ -151,7 +151,9 @@ import { Setting } from './components/admin/pages/settings/setting/setting';
 import { SeoSetting } from './components/admin/pages/settings/seo-setting/seo-setting';
 import { SitemapComponent } from './components/admin/pages/settings/sitemap/sitemap';
 import { PreRegistrationComponent } from './components/admin/pages/registrations/pre-registration/pre-registration';
-
+import { ProgramaticSeoList } from './components/admin/pages/settings/programatic-seo/programatic-seo-list/programatic-seo-list';
+import { ProgramaticSeoEdit } from './components/admin/pages/settings/programatic-seo/programatic-seo-edit/programatic-seo-edit';
+import { ProgramaticSeoView } from './components/admin/pages/settings/programatic-seo/programatic-seo-view/programatic-seo-view';
 export const routes: Routes = [
   { path: 'login', component: Login },
 
@@ -274,6 +276,19 @@ export const routes: Routes = [
       { path: 'admin/sitemap', component: SitemapComponent },
 
       { path: 'admin/pre-registrations', component:PreRegistrationComponent},
+
+       {
+    path: 'admin/programatic-seo',
+    component: ProgramaticSeoList
+  },
+  {
+    path: 'admin/programatic-seo/edit/:id',
+    component: ProgramaticSeoEdit
+  },
+  {
+    path: 'admin/programatic-seo/view/:id',
+    component: ProgramaticSeoView
+  },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
