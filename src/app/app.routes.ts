@@ -138,6 +138,12 @@ import { GuardianMyBills } from './components/guardian/pages/bills/my-bills/my-b
 import { AdminSettings } from './components/admin/pages/settings/settings-add/settings-add';
 import { SeoSettings } from './components/admin/pages/seo-settings/seo-settings-add/seo-settings-add';
 import { SitemapComponent } from './components/admin/pages/sitemap/sitemap/sitemap';
+import { AdminEventList } from './components/admin/pages/events/event-list/event-list';
+import { AdminEventForm } from './components/admin/pages/events/event-add/event-add';
+import { StudentEvents }  from './components/student/pages/events/events/events';
+import { InstructorEvents } from './components/instructor/pages/events/events/events';
+import { GuardianEvents }  from './components/guardian/pages/events/events/events';
+
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -245,6 +251,10 @@ export const routes: Routes = [
       { path: 'admin/bills/:orderId', component: AdminBillDetail },
 
       { path: 'admin/grade', component: AdminGrade },
+      
+      { path: 'admin/events',component: AdminEventList },
+      { path: 'admin/events/add',component: AdminEventForm }, 
+      { path: 'admin/events/edit/:id', component: AdminEventForm },
       { path: 'admin/settings', component: AdminSettings },
       
       { path: 'admin/seo-settings', component: SeoSettings },
@@ -275,6 +285,7 @@ export const routes: Routes = [
       { path: 'guardian/student-results', component: StudentResult },
       { path: 'guardian/payment/confirmation',  component: GuardianConfirmation  },
       { path: 'guardian/my-bills',   component: GuardianMyBills },
+      { path: 'guardian/events', component: GuardianEvents },
 
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
@@ -306,6 +317,7 @@ export const routes: Routes = [
       { path: 'student/assessment/view/:id', component: StudentAssessmentView },
       { path: 'student/assessment-result', component: StudentAssessmentResult },
       { path: 'student/my-results', component: MyResult },
+      { path: 'student/events', component: StudentEvents },
       { path: 'student/my-bills',    component: StudentMyBills }
     ]
   },
@@ -355,7 +367,7 @@ export const routes: Routes = [
       { path: 'instructor/quiz/check/:attemptId', component: InstructorQuizCheck },
       { path: 'instructor/quiz/view/:attemptId', component: InstructorQuizView },
       { path: 'instructor/assignment/attempts', component: InstructorAssignmentAttempts },
-
+      { path: 'instructor/events', component: InstructorEvents },
       { path: 'instructor/grade', component: InstructorGrade   },
 
 
