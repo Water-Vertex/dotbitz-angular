@@ -30,11 +30,13 @@ export class MyResult implements OnInit {
   showQuizView = false;
   viewingAttempt: any = null;
   loadingView = false;
+  reattempting: number | null = null; 
 
-  constructor(
-    private courseService: CourseService,
-    private cdr: ChangeDetectorRef
-  ) {}
+constructor(
+  private courseService: CourseService,
+  private cdr: ChangeDetectorRef,
+  private router: Router
+) {}
 
   ngOnInit(): void {
     this.loadCourses();
@@ -200,4 +202,34 @@ export class MyResult implements OnInit {
     const percent = totalMarks > 0 ? Math.round((obtained / totalMarks) * 100) : 0;
     return { totalMarks, obtained, percent };
   }
+
+reattemptQuiz(quizId: number): void {
+  if (!confirm('Are you sure you want to reattempt this quiz? Your previous attempt will be reset.')) return;
+
+  this.reattempting = quizId;
+  this.courseService.reattemptQuiz(quizId).subscribe({
+    next: (res: any) => {
+      this.reattempting = null;
+
+      // ✅ localStorage cleanup
+      localStorage.removeItem(`quiz_${quizId}_timer`);
+      localStorage.removeItem(`quiz_${quizId}_answers`);
+      localStorage.removeItem(`quiz_${quizId}_attempt`);
+      localStorage.removeItem(`quiz_${quizId}_start_time`);
+      localStorage.removeItem(`quiz_${quizId}_remaining`);
+      localStorage.removeItem(`quiz_attempt_${quizId}`);
+
+      alert('Reattempt started! You can now take the quiz again.');
+      this.router.navigate(['/student/quiz', quizId]);
+    },
+    error: (err: any) => {
+      this.reattempting = null;
+      alert(err.error?.message || 'Failed to start reattempt.');
+    }
+  });
+}
+
+canReattempt(percent: number): boolean {
+  return percent <= 79;  // C = 70-79, D = 60-69, F = <60
+}
 }

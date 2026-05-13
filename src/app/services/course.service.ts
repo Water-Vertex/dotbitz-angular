@@ -272,4 +272,12 @@ getCheckedQuizDetail(attemptId: number): Observable<any> {
     getGuardianStudents(): Observable<any> {
       return this.http.get(`${environment.GuardianApiUrl}/students`, { headers: this.getHeaders() });
     }
+reattemptQuiz(quizId: number): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz/${quizId}/reattempt`,
+    {},
+    { headers: this.getHeaders() }
+  );
+}
+    
 }

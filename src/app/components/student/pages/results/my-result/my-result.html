@@ -299,6 +299,11 @@
                   <span *ngIf="result.is_overdue" class="text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded-full font-medium">Overdue</span>
                   <span *ngIf="result.status === 'time_up'" class="text-[10px] px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full font-medium">Time Up</span>
                   <span *ngIf="result.status === 'completed' && !result.is_overdue" class="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Completed</span>
+
+                    <span *ngIf="result.is_reattempt"
+          class="text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">
+          <i class="fas fa-redo-alt mr-0.5"></i> Reattempted
+        </span>
                 </div>
               </div>
               <div class="col-span-2 text-center">
@@ -322,6 +327,16 @@
                 <button (click)="viewQuiz(result.attempt_id)" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-orange-700 transition-colors">
                   View Quiz
                 </button>
+                 <button *ngIf="canReattempt(result.percent)"
+        (click)="reattemptQuiz(result.quiz_id)"
+        [disabled]="reattempting === result.quiz_id"
+        class="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-xs font-medium
+               hover:bg-orange-600 transition-colors disabled:opacity-60 flex items-center gap-1">
+        <span *ngIf="reattempting === result.quiz_id"
+          class="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
+        <i *ngIf="reattempting !== result.quiz_id" class="fas fa-redo-alt"></i>
+        {{ reattempting === result.quiz_id ? 'Starting...' : 'Reattempt' }}
+      </button>
               </div>
             </div>
           </div>

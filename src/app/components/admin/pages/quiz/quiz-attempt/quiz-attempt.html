@@ -197,6 +197,18 @@
                 <p class="text-xs text-gray-500">Due: {{ quiz.due_date | date: 'MMM d, yyyy' }}</p>
               </div>
               <ng-container [ngSwitch]="getStatus(student, quiz.id)">
+                <!-- Mobile — existing buttons ke upar badge -->
+<div class="mt-1" *ngIf="getQuizData(student, quiz.id)?.attempt?.is_reattempt">
+  <span class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] font-medium
+               inline-flex items-center gap-1">
+    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+      </path>
+    </svg>
+    Reattempted
+  </span>
+</div>
                 <span *ngSwitchCase="'submitted'" class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
                   Submitted
                 </span>
@@ -302,52 +314,78 @@
                     </button>
                   </div>
 
-                  <!-- Overdue Submitted -->
-                  <div *ngSwitchCase="'overdue_submitted'" class="flex flex-col items-start gap-2">
-                    <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium inline-flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      Overdue
-                    </span>
-                    <div *ngIf="getQuizData(student, quiz.id)?.attempt?.obtained_marks !== null" class="text-xs text-gray-600">
-                      Marks: {{ getQuizData(student, quiz.id)?.attempt?.obtained_marks }}/{{ quiz.marks }}
-                    </div>
-                    <button *ngIf="!getQuizData(student, quiz.id)?.attempt?.is_checked"
-                      (click)="onCheck(getQuizData(student, quiz.id)?.attempt?.id)"
-                      class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
-                      Check Submission
-                    </button>
-                    <button *ngIf="getQuizData(student, quiz.id)?.attempt?.is_checked"
-                      (click)="onView(getQuizData(student, quiz.id)?.attempt?.id)"
-                      class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs border border-gray-200 shadow-sm font-medium hover:bg-gray-200 transition-colors">
-                      View Results
-                    </button>
+<!-- ✅ Overdue case mein bhi badge -->
+<div *ngSwitchCase="'overdue_submitted'" class="flex flex-col items-start gap-2">
+  <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium inline-flex items-center gap-1">
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    Overdue
+  </span>
+
+  <!-- ✅ Reattempt badge -->
+  <span *ngIf="getQuizData(student, quiz.id)?.attempt?.is_reattempt"
+    class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] font-medium
+           inline-flex items-center gap-1">
+    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+      </path>
+    </svg>
+    Reattempted
+  </span>
+
+  <div *ngIf="getQuizData(student, quiz.id)?.attempt?.obtained_marks !== null" class="text-xs text-gray-600">
+    Marks: {{ getQuizData(student, quiz.id)?.attempt?.obtained_marks }}/{{ quiz.marks }}
+  </div>
+  <button *ngIf="!getQuizData(student, quiz.id)?.attempt?.is_checked"
+    (click)="onCheck(getQuizData(student, quiz.id)?.attempt?.id)"
+    class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
+    Check Submission
+  </button>
+  <button *ngIf="getQuizData(student, quiz.id)?.attempt?.is_checked"
+    (click)="onView(getQuizData(student, quiz.id)?.attempt?.id)"
+    class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs border border-gray-200 shadow-sm font-medium hover:bg-gray-200 transition-colors">
+    View Results
+  </button>
                   </div>
 
                   <!-- Submitted (on time) -->
-                  <div *ngSwitchCase="'submitted'" class="flex flex-col items-start gap-2">
-                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium inline-flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      Submitted
-                    </span>
-                    <div *ngIf="getQuizData(student, quiz.id)?.attempt?.obtained_marks !== null" class="text-xs text-gray-600">
-                      Marks: {{ getQuizData(student, quiz.id)?.attempt?.obtained_marks }}/{{ quiz.marks }}
-                    </div>
-                    <button *ngIf="!getQuizData(student, quiz.id)?.attempt?.is_checked"
-                      (click)="onCheck(getQuizData(student, quiz.id)?.attempt?.id)"
-                      class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
-                      Check Submission
-                    </button>
-                    <button *ngIf="getQuizData(student, quiz.id)?.attempt?.is_checked"
-                      (click)="onView(getQuizData(student, quiz.id)?.attempt?.id)"
-                      class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs border border-gray-200 shadow-sm font-medium hover:bg-gray-200 transition-colors">
-                      View Results
-                    </button>
-                  </div>
+                 <!-- ✅ Reattempted badge — submitted case mein add karo -->
+<div *ngSwitchCase="'submitted'" class="flex flex-col items-start gap-2">
+  <span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium inline-flex items-center gap-1">
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    Submitted
+  </span>
 
+  <!-- ✅ Reattempt badge -->
+  <span *ngIf="getQuizData(student, quiz.id)?.attempt?.is_reattempt"
+    class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] font-medium
+           inline-flex items-center gap-1">
+    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+      </path>
+    </svg>
+    Reattempted
+  </span>
+
+  <div *ngIf="getQuizData(student, quiz.id)?.attempt?.obtained_marks !== null" class="text-xs text-gray-600">
+    Marks: {{ getQuizData(student, quiz.id)?.attempt?.obtained_marks }}/{{ quiz.marks }}
+  </div>
+  <button *ngIf="!getQuizData(student, quiz.id)?.attempt?.is_checked"
+    (click)="onCheck(getQuizData(student, quiz.id)?.attempt?.id)"
+    class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
+    Check Submission
+  </button>
+  <button *ngIf="getQuizData(student, quiz.id)?.attempt?.is_checked"
+    (click)="onView(getQuizData(student, quiz.id)?.attempt?.id)"
+    class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs border border-gray-200 shadow-sm font-medium hover:bg-gray-200 transition-colors">
+    View Results
+  </button>
+</div>
                 </ng-container>
               </td>
             </tr>

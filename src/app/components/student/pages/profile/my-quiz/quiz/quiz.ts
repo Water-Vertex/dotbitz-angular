@@ -89,40 +89,55 @@ onVisibilityChange(): void {
     });
   }
 
-  startOrResumeQuiz(): void {
-    this.loading = true;
-    this.courseService.startQuiz(this.quizId).subscribe({
-      next: (res: any) => {
-        if (res.success) {
-          this.quiz       = res.data.quiz;
-          this.attempt    = res.data.attempt;
-          this.isResume   = res.is_resume || false;
-          this.isOverdueAttempt = res.data.attempt?.is_overdue || false;
-          this.loading    = false;
+startOrResumeQuiz(): void {
+  this.loading = true;
+  this.courseService.startQuiz(this.quizId).subscribe({
+    next: (res: any) => {
+      if (res.success) {
+        this.quiz             = res.data.quiz;
+        this.attempt          = res.data.attempt;
+        this.isResume         = res.is_resume || false;
+        this.isOverdueAttempt = res.data.attempt?.is_overdue || false;
+        this.loading          = false;
 
-          if (this.isResume) {
-            // Load saved answers
-            this.loadSavedAnswers();
-          }
+        const isReattempt = res.data.attempt?.is_reattempt || false;
 
-          this.initTimer();
-          this.cdr.detectChanges();
+        // ✅ Reattempt hai — localStorage poora clear karo
+        if (isReattempt) {
+          localStorage.removeItem(`quiz_answers_${this.attempt.id}`);
+          localStorage.removeItem(`quiz_${this.quizId}_timer`);
+          localStorage.removeItem(`quiz_${this.quizId}_remaining`);
+          localStorage.removeItem(`quiz_${this.quizId}_answers`);
+          localStorage.removeItem(`quiz_attempt_${this.quizId}`);
+
+          // ✅ Fresh answers
+          this.answers          = {};
+          // ✅ isResume false karo taake fresh timer mile
+          this.isResume         = false;
+          this.remainingSeconds = (this.quiz.duration || 30) * 60;
+
+        } else if (this.isResume) {
+          // Normal resume — saved answers load karo
+          this.loadSavedAnswers();
         }
-      },
-      error: (err) => {
-        this.loading = false;
-        if (err.status === 409) {
-          alert('You have already attempted this quiz.');
-        } else if (err.status === 403) {
-          alert(err.error?.message || 'Quiz deadline has passed.');
-        } else {
-          alert('Failed to start quiz.');
-        }
-        this.router.navigate(['/student/my-courses']);
+
+        this.initTimer();
+        this.cdr.detectChanges();
       }
-    });
-  }
-
+    },
+    error: (err) => {
+      this.loading = false;
+      if (err.status === 409) {
+        alert('You have already attempted this quiz.');
+      } else if (err.status === 403) {
+        alert(err.error?.message || 'Quiz deadline has passed.');
+      } else {
+        alert('Failed to start quiz.');
+      }
+      this.router.navigate(['/student/my-courses']);
+    }
+  });
+}
   loadSavedAnswers(): void {
     // Load from localStorage first (faster)
     const saved = localStorage.getItem(`quiz_answers_${this.attempt.id}`);
@@ -157,42 +172,43 @@ onVisibilityChange(): void {
     });
   }
 
-  initTimer(): void {
-    const totalSecs = (this.quiz.duration || 30) * 60;
-    this.totalSeconds = totalSecs;
+initTimer(): void {
+  const totalSecs   = (this.quiz.duration || 30) * 60;
+  this.totalSeconds = totalSecs;
 
-    // Agar resume hai aur remainingSeconds already set hai
-    if (this.isResume && this.remainingSeconds > 0) {
-      // Keep existing remainingSeconds
-    } else if (this.isResume && this.attempt?.created_at) {
-      // Calculate remaining from attempt start time
-      const startTime = new Date(this.attempt.created_at).getTime();
-      const elapsed   = Math.floor((Date.now() - startTime) / 1000);
-      this.remainingSeconds = Math.max(0, totalSecs - elapsed);
-    } else {
-      this.remainingSeconds = totalSecs;
+  // ✅ Agar remainingSeconds pehle se set hai (reattempt case) — use karo
+  if (this.remainingSeconds > 0 && this.remainingSeconds <= totalSecs) {
+    // Already set — kuch mat karo
+  } else if (this.isResume && this.remainingSeconds > 0) {
+    // localStorage se restore hua
+  } else if (this.isResume && this.attempt?.created_at) {
+    const startTime       = new Date(this.attempt.created_at).getTime();
+    const elapsed         = Math.floor((Date.now() - startTime) / 1000);
+    this.remainingSeconds = Math.max(0, totalSecs - elapsed);
+  } else {
+    // Fresh start
+    this.remainingSeconds = totalSecs;
+  }
+
+  if (this.remainingSeconds <= 0) {
+    this.onTimeUp();
+    return;
+  }
+
+  this.timerInterval = setInterval(() => {
+    this.remainingSeconds--;
+    this.cdr.detectChanges();
+
+    if (this.remainingSeconds % 30 === 0) {
+      this.autoSaveAnswers();
     }
 
     if (this.remainingSeconds <= 0) {
+      this.clearTimer();
       this.onTimeUp();
-      return;
     }
-
-    this.timerInterval = setInterval(() => {
-      this.remainingSeconds--;
-      this.cdr.detectChanges();
-
-      // Auto-save every 30 seconds
-      if (this.remainingSeconds % 30 === 0) {
-        this.autoSaveAnswers();
-      }
-
-      if (this.remainingSeconds <= 0) {
-        this.clearTimer();
-        this.onTimeUp();
-      }
-    }, 1000);
-  }
+  }, 1000);
+}
 
   clearTimer(): void {
     if (this.timerInterval) {
@@ -285,3 +301,9 @@ onVisibilityChange(): void {
     return Object.keys(obj);
   }
 }
+
+
+
+
+
+
