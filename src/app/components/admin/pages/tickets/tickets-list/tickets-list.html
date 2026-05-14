@@ -1,0 +1,252 @@
+<div class="space-y-6">
+
+  <!-- Reply Modal -->
+  <div *ngIf="showReplyModal"
+    class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-[#073a89] rounded-t-2xl flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-white">Respond to Ticket</h2>
+          <p class="text-blue-200 text-sm font-mono mt-0.5">
+            {{ selectedTicket?.ticket_number }}
+          </p>
+        </div>
+        <button (click)="closeReplyModal()"
+          class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center
+                 justify-center transition-colors">
+          <i class="fas fa-times text-white text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Ticket Info -->
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-full bg-[#073a89]/10 flex items-center justify-center
+                      text-[#073a89] font-bold text-sm shrink-0">
+            {{ selectedTicket?.name?.charAt(0) }}
+          </div>
+          <div>
+            <p class="font-semibold text-gray-900 text-sm">{{ selectedTicket?.name }}</p>
+            <p class="text-xs text-gray-500">{{ selectedTicket?.email }}</p>
+          </div>
+          <span class="ml-auto px-2 py-0.5 rounded-full text-xs font-medium capitalize"
+            [ngClass]="getUserTypeBadge(selectedTicket?.user_type)">
+            {{ selectedTicket?.user_type }}
+          </span>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 p-3 mt-2">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            Issue: {{ selectedTicket?.issue }}
+          </p>
+          <p class="text-sm text-gray-700">{{ selectedTicket?.message }}</p>
+        </div>
+      </div>
+
+      <!-- Previous Reply -->
+      <div *ngIf="selectedTicket?.latest_reply"
+        class="px-6 py-3 bg-purple-50 border-b border-purple-100">
+        <p class="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-1">
+          Previous Reply — {{ selectedTicket.latest_reply.created_at }}
+        </p>
+        <p class="text-sm text-gray-700">{{ selectedTicket.latest_reply.reply }}</p>
+      </div>
+
+      <!-- Reply Textarea -->
+      <div class="p-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Your Reply <span class="text-red-500">*</span>
+        </label>
+        <textarea [(ngModel)]="replyText" rows="5"
+          placeholder="Write your response to the student/guardian..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none">
+        </textarea>
+        <p class="text-xs text-gray-400 mt-1">{{ replyText.length }}/2000</p>
+
+        <div class="flex justify-end gap-3 mt-4">
+          <button (click)="closeReplyModal()"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+            Cancel
+          </button>
+          <button (click)="submitReply()" [disabled]="replying"
+            class="px-6 py-2 bg-[#073a89] text-white rounded-lg text-sm font-medium
+                   hover:bg-[#052b63] disabled:opacity-60 flex items-center gap-2">
+            <span *ngIf="replying"
+              class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+            <i *ngIf="!replying" class="fas fa-paper-plane"></i>
+            {{ replying ? 'Sending...' : 'Send Reply' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6 flex items-center justify-between shadow-sm">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Support Tickets</h1>
+      <p class="text-gray-500 mt-1 text-sm">
+        Manage and respond to student and guardian support requests
+      </p>
+    </div>
+    <button (click)="loadTickets()" [disabled]="loading"
+      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center
+             gap-2 text-sm font-medium disabled:opacity-50">
+      <i class="fas fa-sync-alt" [class.animate-spin]="loading"></i>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+    <div class="flex flex-wrap items-center gap-4">
+
+      <!-- Search -->
+      <div class="flex-1 min-w-[240px]">
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()"
+            placeholder="Search by name, email, ticket#, issue..."
+            class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50
+                   focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+
+      <!-- Status filter -->
+      <div class="flex items-center gap-2">
+        <label class="text-sm font-medium text-gray-700">Status:</label>
+        <select [(ngModel)]="selectedStatus" (change)="onStatusFilter()"
+          class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[160px]">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="in_review">In Review</option>
+          <option value="responded">Responded</option>
+          <option value="resolved">Resolved</option>
+          <option value="closed">Closed</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2 text-sm">Loading tickets...</p>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && tickets.length === 0"
+    class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <i class="fas fa-ticket-alt text-4xl text-gray-300 mb-3 block"></i>
+    <p class="text-gray-500">No tickets found.</p>
+  </div>
+
+  <!-- Tickets Table -->
+  <div *ngIf="!loading && tickets.length > 0"
+    class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ticket</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issue</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr *ngFor="let ticket of tickets; let i = index"
+          class="hover:bg-gray-50 transition-colors">
+
+          <td class="px-6 py-4 text-gray-500">{{ i + 1 }}</td>
+
+          <!-- Ticket number -->
+          <td class="px-6 py-4">
+            <span class="font-mono text-xs font-bold text-[#073a89] bg-blue-50
+                         px-2 py-1 rounded-lg border border-blue-200">
+              {{ ticket.ticket_number }}
+            </span>
+            <div *ngIf="ticket.has_reply"
+              class="mt-1 flex items-center gap-1 text-[10px] text-purple-600">
+              <i class="fas fa-reply text-[9px]"></i> Replied
+            </div>
+          </td>
+
+          <!-- User -->
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-[#073a89]/10 flex items-center justify-center
+                          text-[#073a89] font-bold text-xs shrink-0">
+                {{ ticket.name?.charAt(0) }}
+              </div>
+              <div>
+                <p class="font-medium text-gray-900 text-sm">{{ ticket.name }}</p>
+                <p class="text-xs text-gray-500">{{ ticket.email }}</p>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full font-medium capitalize mt-0.5 inline-block"
+                  [ngClass]="getUserTypeBadge(ticket.user_type)">
+                  {{ ticket.user_type }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Issue -->
+          <td class="px-6 py-4">
+            <p class="font-medium text-gray-800 text-sm">{{ ticket.issue }}</p>
+            <p class="text-xs text-gray-500 mt-0.5 line-clamp-1">{{ ticket.message }}</p>
+          </td>
+
+          <!-- Status -->
+          <!-- <td class="px-6 py-4">
+            <select [value]="ticket.status"
+              (change)="updateStatus(ticket.id, $any($event.target).value)"
+              class="px-2 py-1 border border-gray-300 rounded-lg text-xs bg-gray-50
+                     focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer">
+              <option value="pending">Pending</option>
+              <option value="in_review">In Review</option>
+              <option value="responded">Responded</option>
+              <option value="resolved">Resolved</option>
+              <option value="closed">Closed</option>
+            </select>
+          </td> -->
+
+          <!-- Status -->
+<td class="px-6 py-4">
+  <span class="px-2 py-1 rounded-full text-xs font-medium capitalize inline-block"
+    [ngClass]="getStatusClass(ticket.status)">
+    {{ getStatusLabel(ticket.status) }}
+  </span>
+</td>
+          <!-- Date -->
+          <td class="px-6 py-4 text-gray-500 text-xs">{{ ticket.created_at }}</td>
+
+          <!-- Actions -->
+          <td class="px-6 py-4">
+            <button (click)="openReplyModal(ticket)"
+              class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+              [ngClass]="ticket.has_reply
+                ? 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100'
+                : 'bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100'">
+              <i class="fas" [ngClass]="ticket.has_reply ? 'fa-reply-all' : 'fa-reply'"></i>
+              {{ ticket.has_reply ? 'Update Reply' : 'Respond' }}
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="px-6 py-3 bg-gray-50 border-t border-gray-100 text-sm text-gray-500">
+      {{ tickets.length }} of {{ allTickets.length }} tickets
+    </div>
+  </div>
+
+</div>

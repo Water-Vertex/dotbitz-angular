@@ -143,7 +143,9 @@ import { AdminEventForm } from './components/admin/pages/events/event-add/event-
 import { StudentEvents }  from './components/student/pages/events/events/events';
 import { InstructorEvents } from './components/instructor/pages/events/events/events';
 import { GuardianEvents }  from './components/guardian/pages/events/events/events';
-
+import { StudentSupportTickets }  from './components/student/pages/tickets/tickets-add/tickets-add';
+import { GuardianSupportTickets } from './components/guardian/pages/tickets/tickets-add/tickets-add';
+import { AdminSupportTickets } from './components/admin/pages/tickets/tickets-list/tickets-list';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -260,6 +262,8 @@ export const routes: Routes = [
       { path: 'admin/seo-settings', component: SeoSettings },
 
       { path: 'admin/sitemap', component: SitemapComponent },
+      { path: 'admin/support-tickets', component: AdminSupportTickets },
+
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
@@ -286,7 +290,7 @@ export const routes: Routes = [
       { path: 'guardian/payment/confirmation',  component: GuardianConfirmation  },
       { path: 'guardian/my-bills',   component: GuardianMyBills },
       { path: 'guardian/events', component: GuardianEvents },
-
+      { path: 'guardian/support', component: GuardianSupportTickets },
       { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
     ],
   },
@@ -318,6 +322,7 @@ export const routes: Routes = [
       { path: 'student/assessment-result', component: StudentAssessmentResult },
       { path: 'student/my-results', component: MyResult },
       { path: 'student/events', component: StudentEvents },
+      { path: 'student/support',  component: StudentSupportTickets },
       { path: 'student/my-bills',    component: StudentMyBills }
     ]
   },
