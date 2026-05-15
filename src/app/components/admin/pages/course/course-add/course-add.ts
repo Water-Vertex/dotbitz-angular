@@ -63,6 +63,10 @@ export class CourseAdd implements OnInit {
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
+
+       classes_per_week:  [''],
+      total_classes:     [''],
+      course_hours:      [''],
       meta_title: [''],
 meta_description: [''],
 meta_keyword: [''],
@@ -80,6 +84,32 @@ page_schema: [''],
   }
   get course_code() {
     return this.courseForm.get('course_code');
+  }
+
+  calculateTotals(): void {
+    const startDate      = this.courseForm.get('start_date')?.value;
+    const endDate        = this.courseForm.get('end_date')?.value;
+    const classesPerWeek = Number(this.courseForm.get('classes_per_week')?.value);
+    const hoursPerClass  = Number(this.courseForm.get('course_duration')?.value);
+
+    if (!startDate || !endDate || !classesPerWeek || !hoursPerClass) return;
+
+    const start = new Date(startDate);
+    const end   = new Date(endDate);
+    if (end <= start) return;
+
+    const diffMs     = end.getTime() - start.getTime();
+    const totalWeeks = Math.ceil(diffMs / (1000 * 60 * 60 * 24 * 7));
+
+    const totalClasses = totalWeeks * classesPerWeek;
+    const totalHours   = totalClasses * hoursPerClass;
+
+    this.courseForm.patchValue({
+      total_classes: totalClasses,
+      course_hours:  totalHours.toString(),
+    }, { emitEvent: false });
+
+    this.cdr.detectChanges();
   }
 
   onFileSelected(event: any) {

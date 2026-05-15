@@ -35,7 +35,9 @@ export interface Course {
     instructor_id: number;   // <-- ID of the instructor
     instructor?: Instructor; // <-- Full instructor object from API
     thumbnail_image?: string;
-
+  classes_per_week?: number;
+    total_classes?: number;
+    course_hours?: string;
 
     // ========== SEO FIELDS - ==========
     meta_title?: string;
