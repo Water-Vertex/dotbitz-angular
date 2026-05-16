@@ -76,6 +76,13 @@
           Quizzes
           <div *ngIf="activeTab === 'quiz'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
         </button>
+        <button (click)="setTab('review')"
+  [class]="'py-4 text-base font-medium transition-all relative ' +
+    (activeTab === 'review' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+  Reviews
+  <div *ngIf="activeTab === 'review'"
+    class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+</button>
       </div>
     </div>
   </div>
@@ -285,6 +292,115 @@
         </div>
       </div>
     </div>
+
+    <!-- Reviews Tab -->
+<div *ngIf="activeTab === 'review'">
+
+  <div *ngIf="reviewsLoading" class="flex justify-center py-16">
+    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+  </div>
+
+  <div *ngIf="!reviewsLoading" class="space-y-6">
+
+    <!-- Already Reviewed -->
+    <div *ngIf="myReview"
+      class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <p class="font-semibold text-gray-900">Your Review</p>
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize"
+              [ngClass]="{
+                'bg-yellow-100 text-yellow-700': myReview.status === 'pending',
+                'bg-green-100 text-green-700':   myReview.status === 'approved',
+                'bg-red-100 text-red-700':       myReview.status === 'rejected'
+              }">
+              {{ myReview.status }}
+            </span>
+          </div>
+
+          <!-- Stars -->
+          <div class="flex items-center gap-1 mb-3">
+            <ng-container *ngFor="let s of [1,2,3,4,5]">
+              <i class="text-lg"
+                [ngClass]="s <= myReview.rating ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300'">
+              </i>
+            </ng-container>
+            <span class="text-sm text-gray-500 ml-1">({{ myReview.rating }}/5)</span>
+          </div>
+
+          <p class="text-sm text-gray-700 leading-relaxed">{{ myReview.review }}</p>
+          <p class="text-xs text-gray-400 mt-2">Submitted on {{ myReview.created_at }}</p>
+
+          <p *ngIf="myReview.status === 'pending'" class="text-xs text-yellow-600 mt-2">
+            <i class="fas fa-clock mr-1"></i>
+            Your review is pending approval. It will appear on the website once approved.
+          </p>
+        </div>
+
+        <button (click)="deleteReview()"
+          class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg
+                 text-xs font-medium hover:bg-red-100 shrink-0">
+          <i class="fas fa-trash mr-1"></i> Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Review Form -->
+    <div *ngIf="!myReview"
+      class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h3 class="text-lg font-bold text-gray-900 mb-1">Leave a Review</h3>
+      <p class="text-sm text-gray-500 mb-5">Share your experience with this course</p>
+
+      <!-- Star Rating -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-700 mb-3">
+          Your Rating <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-center gap-2">
+          <ng-container *ngFor="let s of [1,2,3,4,5]">
+            <button type="button"
+              (click)="setRating(s)"
+              (mouseenter)="setHover(s)"
+              (mouseleave)="clearHover()"
+              class="text-3xl transition-transform hover:scale-110 focus:outline-none">
+              <i [ngClass]="s <= (hoverRating || reviewRating)
+                  ? 'fas fa-star text-yellow-400'
+                  : 'far fa-star text-gray-300'">
+              </i>
+            </button>
+          </ng-container>
+          <span *ngIf="reviewRating" class="text-sm text-gray-500 ml-2">
+            {{ ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][reviewRating] }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Review Text -->
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Your Review <span class="text-red-500">*</span>
+        </label>
+        <textarea [(ngModel)]="reviewText" rows="4"
+          placeholder="Tell others about your experience with this course..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50
+                 focus:outline-none focus:ring-2 focus:ring-[#073a89] resize-none">
+        </textarea>
+        <p class="text-xs text-gray-400 mt-1">{{ reviewText.length }}/1000</p>
+      </div>
+
+      <button (click)="submitReview()" [disabled]="submittingReview"
+        class="px-6 py-2.5 bg-[#073a89] text-white rounded-lg text-sm font-medium
+               hover:bg-[#052b63] disabled:opacity-60 flex items-center gap-2">
+        <span *ngIf="submittingReview"
+          class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+        <i *ngIf="!submittingReview" class="fas fa-paper-plane"></i>
+        {{ submittingReview ? 'Submitting...' : 'Submit Review' }}
+      </button>
+    </div>
+
+  </div>
+</div>
   </div>
 </div>
 

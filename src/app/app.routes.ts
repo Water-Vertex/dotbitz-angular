@@ -146,6 +146,7 @@ import { GuardianEvents }  from './components/guardian/pages/events/events/event
 import { StudentSupportTickets }  from './components/student/pages/tickets/tickets-add/tickets-add';
 import { GuardianSupportTickets } from './components/guardian/pages/tickets/tickets-add/tickets-add';
 import { AdminSupportTickets } from './components/admin/pages/tickets/tickets-list/tickets-list';
+import { AdminReviews } from './components/admin/pages/reviews/reviews/reviews';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -164,6 +165,7 @@ export const routes: Routes = [
       { path: 'admin/faq/list', component: FaqList },
       { path: 'admin/faq/add', component: FaqAdd },
       { path: 'admin/faq/edit/:id', component: FaqEdit },
+      { path: 'admin/reviews', component: AdminReviews },
 
       // Instructor routes
       { path: 'admin/instructor/list', component: InstructorList },

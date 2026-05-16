@@ -3,11 +3,13 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CourseService } from '../../../../../../services/course.service';
 import { AssignmentService } from '../../../../../../services/assignment.service';
+import { ReviewService } from '../../../../../../services/review.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-course-details',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink,FormsModule],
   templateUrl: './course-details.html',
   styleUrls: ['./course-details.css']
 })
@@ -18,7 +20,7 @@ export class GuardianCourseDetails implements OnInit {
   id!: string;
   loading = false;
 
-  activeTab: 'instructor' | 'curriculum' | 'assignment' | 'quiz' = 'instructor';
+  activeTab: 'curriculum' | 'assignment' | 'quiz' | 'review' = 'curriculum';
 
   // Assignment tab
   assignments: any[] = [];
@@ -39,12 +41,21 @@ export class GuardianCourseDetails implements OnInit {
   selectedAssignment: any = null;
   selectedSubmission: any = null;
   viewingSubmission = false;
-
+reviews: any[]    = [];
+reviewsLoading    = false;
+myReview: any     = null;
+showReviewForm    = false;
+reviewRating      = 0;
+reviewText        = '';
+submittingReview  = false;
+reviewSubmitted   = false;
+hoverRating       = 0;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private courseService: CourseService,
     private assignmentService: AssignmentService,
+    private reviewService: ReviewService,  
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -81,6 +92,62 @@ export class GuardianCourseDetails implements OnInit {
     });
   }
 
+loadReviews(): void {
+  this.reviewsLoading = true;
+  this.reviewService.getGuardianReviews().subscribe({  
+    next: (res: any) => {
+      const allReviews = res.data || [];
+      this.myReview     = allReviews.find((r: any) => r.course_id == +this.id) || null;
+      this.reviewsLoading = false;
+      this.cdr.detectChanges();
+    },
+    error: () => { this.reviewsLoading = false; }
+  });
+}
+setRating(rating: number): void {
+  this.reviewRating = rating;
+}
+
+setHover(rating: number): void {
+  this.hoverRating = rating;
+}
+
+clearHover(): void {
+  this.hoverRating = 0;
+}
+submitReview(): void {
+  if (!this.reviewRating) { alert('Please select a rating.'); return; }
+  if (!this.reviewText.trim()) { alert('Please write a review.'); return; }
+
+  this.submittingReview = true;
+  this.reviewService.submitGuardianReview({  // ✅ guardian
+    course_id: +this.id,
+    rating:    this.reviewRating,
+    review:    this.reviewText.trim(),
+  }).subscribe({
+    next: (res: any) => {
+      this.submittingReview = false;
+      this.myReview         = res.data;
+      this.showReviewForm   = false;
+      this.cdr.detectChanges();
+    },
+    error: (err: any) => {
+      this.submittingReview = false;
+      alert(err.error?.message || 'Failed to submit review.');
+    }
+  });
+}
+
+deleteReview(): void {
+  if (!confirm('Delete your review?')) return;
+  this.reviewService.deleteGuardianReview(this.myReview.id).subscribe({  // ✅ guardian
+    next: () => {
+      this.myReview = null; this.reviewRating = 0; this.reviewText = '';
+      this.cdr.detectChanges();
+    },
+    error: () => { alert('Failed to delete review.'); }
+  });
+}
   loadCourse(): void {
     this.loading = true;
     this.courseService.getStudentCourseDetail(this.courseId).subscribe({
@@ -129,7 +196,7 @@ export class GuardianCourseDetails implements OnInit {
     });
   }
 
-  setTab(tab: 'instructor' | 'curriculum' | 'assignment' | 'quiz') {
+  setTab(tab:  'curriculum' | 'assignment' | 'quiz'|'review') {
     this.activeTab = tab;
     localStorage.setItem('guardianTab', tab);
 
@@ -139,6 +206,8 @@ export class GuardianCourseDetails implements OnInit {
     if (tab === 'quiz' && !this.quizzesLoaded) {
       this.loadQuizzes();
     }
+          if (tab === 'review') { this.loadReviews(); }  
+
   }
 
   toggleCurriculum(index: number) {

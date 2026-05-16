@@ -3,11 +3,13 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CourseService } from '../../../../../../services/course.service';
 import { AssignmentService } from '../../../../../../services/assignment.service';
+import { ReviewService } from '../../../../../../services/review.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-course-student',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink,FormsModule],
   templateUrl: './course-details.html',
 })
 export class MyCourseDetail implements OnInit {
@@ -15,7 +17,7 @@ export class MyCourseDetail implements OnInit {
   courseId!: number;
   batchId!:number;
   loading = true;
-  activeTab: 'instructor' | 'curriculum' | 'assignment' | 'quiz' = 'instructor';
+  activeTab: 'curriculum' | 'assignment' | 'quiz' | 'review' = 'curriculum';
 
   // Assignment tab
   assignments: any[] = [];
@@ -39,12 +41,22 @@ export class MyCourseDetail implements OnInit {
   submittingAssignment = false;
   submitFileError: string = '';
   expandedIndices: number[] = [];
+reviews: any[]    = [];
+reviewsLoading    = false;
+myReview: any     = null;
+showReviewForm    = false;
+reviewRating      = 0;
+reviewText        = '';
+submittingReview  = false;
+reviewSubmitted   = false;
+hoverRating       = 0;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private courseService: CourseService,
     private assignmentService: AssignmentService,
+      private reviewService: ReviewService,  
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -76,10 +88,9 @@ export class MyCourseDetail implements OnInit {
   }
 
   setTab(tab: string): void {
-    this.activeTab = tab as 'instructor' | 'curriculum' | 'assignment' | 'quiz';
+    this.activeTab = tab as  'curriculum' | 'assignment' | 'quiz'|'review';
     if (tab === 'assignment' && !this.assignmentsLoaded) {
-          console.log('Current course ID:', this.courseId);
-    console.log('Current course object:', this.course);
+
     if (!this.assignmentsLoaded) {
       this.loadAssignments();
     }
@@ -87,8 +98,64 @@ export class MyCourseDetail implements OnInit {
     if (tab === 'quiz' && !this.quizzesLoaded) {
       this.loadQuizzes();
     }
-  }
+      if (tab === 'review') { this.loadReviews(); }  
 
+  }
+loadReviews(): void {
+  this.reviewsLoading = true;
+  this.reviewService.getStudentReviews().subscribe({
+    next: (res: any) => {
+      const allReviews = res.data || [];
+      // Is course ki review find karo
+      this.myReview = allReviews.find((r: any) => r.course_id == this.courseId) || null;
+      this.reviewsLoading = false;
+      this.cdr.detectChanges();
+    },
+    error: () => { this.reviewsLoading = false; }
+  });
+}
+
+setRating(rating: number): void { this.reviewRating = rating; }
+setHover(rating: number): void  { this.hoverRating  = rating; }
+clearHover(): void               { this.hoverRating  = 0; }
+
+submitReview(): void {
+  if (!this.reviewRating) { alert('Please select a rating.'); return; }
+  if (!this.reviewText.trim()) { alert('Please write a review.'); return; }
+
+  this.submittingReview = true;
+  this.reviewService.submitStudentReview({
+    course_id: this.courseId,
+    rating:    this.reviewRating,
+    review:    this.reviewText.trim(),
+  }).subscribe({
+    next: (res: any) => {
+      this.submittingReview = false;
+      this.myReview         = res.data;
+      this.showReviewForm   = false;
+      this.reviewSubmitted  = true;
+      this.cdr.detectChanges();
+    },
+    error: (err: any) => {
+      this.submittingReview = false;
+      alert(err.error?.message || 'Failed to submit review.');
+    }
+  });
+}
+
+deleteReview(): void {
+  if (!confirm('Delete your review?')) return;
+  this.reviewService.deleteStudentReview(this.myReview.id).subscribe({
+    next: () => {
+      this.myReview        = null;
+      this.reviewSubmitted = false;
+      this.reviewRating    = 0;
+      this.reviewText      = '';
+      this.cdr.detectChanges();
+    },
+    error: () => { alert('Failed to delete review.'); }
+  });
+}
 // loadAssignments(): void {
 //   this.assignmentsLoading = true;
 //   this.assignmentService.getAssignmentsByCourse(this.courseId).subscribe({
