@@ -35,7 +35,7 @@ export class CourseEdit implements OnInit {
           '|', 'blockQuote', '|', 'undo', 'redo', '|','codeBlock'
         ],
       };
-
+private curriculums: { duration?: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -44,6 +44,7 @@ export class CourseEdit implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
+    
   ) {}
 
   ngOnInit(): void {
@@ -100,40 +101,61 @@ page_schema: [''],
     }
   }
 
- calculateTotals(): void {
-    const startDate      = this.courseForm.get('start_date')?.value;
-    const endDate        = this.courseForm.get('end_date')?.value;
-    const classesPerWeek = Number(this.courseForm.get('classes_per_week')?.value);
-    const hoursPerClass  = Number(this.courseForm.get('course_duration')?.value);
 
-    if (!startDate || !endDate || !classesPerWeek || !hoursPerClass) return;
 
-    const start = new Date(startDate);
-    const end   = new Date(endDate);
-    if (end <= start) return;
+private parseWeeks(duration?: string): number {
+  if (!duration || duration.trim() === '') return 0;
+  const d = duration.trim();
 
-    const diffMs     = end.getTime() - start.getTime();
-    const totalWeeks = Math.ceil(diffMs / (1000 * 60 * 60 * 24 * 7));
-
-    const totalClasses = totalWeeks * classesPerWeek;
-    const totalHours   = totalClasses * hoursPerClass;
-
-    this.courseForm.patchValue({
-      total_classes: totalClasses,
-      course_hours:  totalHours.toString(),
-    }, { emitEvent: false });
-
-    this.cdr.detectChanges();
+  const rangeMatch = d.match(/^(\d+)\s*-\s*(\d+)$/);
+  if (rangeMatch) {
+    return Math.max(0, parseInt(rangeMatch[2], 10) - parseInt(rangeMatch[1], 10) + 1);
   }
 
-  loadCourse(): void {
+  if (/^\d+$/.test(d)) return 1;
+
+  return 0;
+}
+
+calculateTotals(): void {
+  const classesPerWeek = Number(this.courseForm.get('classes_per_week')?.value);
+  const hoursPerClass  = Number(this.courseForm.get('course_duration')?.value);
+
+  const totalWeeks = this.curriculums.reduce(
+    (sum, c) => sum + this.parseWeeks(c.duration), 0
+  );
+
+  const totalClasses = (classesPerWeek > 0 && totalWeeks > 0)
+    ? totalWeeks * classesPerWeek
+    : 0;
+
+  const totalHours = (hoursPerClass > 0 && totalClasses > 0)
+    ? totalClasses * hoursPerClass
+    : 0;
+
+  this.courseForm.patchValue(
+    { total_classes: totalClasses, course_hours: totalHours.toString() },
+    { emitEvent: false }
+  );
+  this.cdr.detectChanges();
+}
+
+ loadCourse(): void {
     this.courseService.getCourse(this.courseId).subscribe({
       next: (res: CourseApiResponse) => {
         const course = res.data as any;
+
+        // Curriculum rows save karo calculation ke liye
+        this.curriculums = course.curriculums ?? [];
+
         this.courseForm.patchValue({
           ...course,
           is_featured: !!course.is_featured,
         });
+
+        // Ab curriculum se calculate karo
+        this.calculateTotals();
+
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -144,12 +166,13 @@ page_schema: [''],
     });
   }
 
-  onSubmit(): void {
+ 
+onSubmit(): void {
     if (this.courseForm.invalid) return;
 
     this.isSubmitting = true;
     const formData = new FormData();
-    formData.append('_method', 'PUT'); // Method Spoofing
+    formData.append('_method', 'PUT');
 
     Object.keys(this.courseForm.value).forEach((key) => {
       if (key !== 'thumbnail_image') {
@@ -175,6 +198,5 @@ page_schema: [''],
       },
     });
   }
-
   cancel = () => this.router.navigate(['/admin/course/list']);
 }
