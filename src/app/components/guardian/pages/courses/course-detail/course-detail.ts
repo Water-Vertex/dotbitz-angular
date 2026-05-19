@@ -183,29 +183,59 @@ export class GuardianCourseDetail implements OnInit, OnDestroy {
   }
 
   // ✅ Eligibility Logic (MAIN FIX)
+  // checkEnrollmentEligibility(): void {
+
+  //   if (!this.studentData) {
+  //     this.showParentMessage = true;
+  //     this.enrollmentMessage = 'Please select a student first.';
+  //     this.eligibilityChecked = true;
+  //     return;
+  //   }
+
+  //   this.studentAge = this.calculateAge(this.studentData.date_of_birth);
+
+  //   // ✅ Guardian logic
+  //   // if (this.studentAge < 18) {
+  //   //   this.isEligibleForEnrollment = true;
+  //   //   this.showParentMessage = false;
+  //   //   this.enrollmentMessage = '';
+  //   //   this.eligibilityChecked = true;
+  //   //   this.cdr.detectChanges();
+  //   // } else {
+  //   //   this.checkAssessmentCompletion();
+  //   // }
+  //   this.checkAssessmentCompletion();
+  // }
+
   checkEnrollmentEligibility(): void {
-
-    if (!this.studentData) {
-      this.showParentMessage = true;
-      this.enrollmentMessage = 'Please select a student first.';
-      this.eligibilityChecked = true;
-      return;
-    }
-
-    this.studentAge = this.calculateAge(this.studentData.date_of_birth);
-
-    // ✅ Guardian logic
-    // if (this.studentAge < 18) {
-    //   this.isEligibleForEnrollment = true;
-    //   this.showParentMessage = false;
-    //   this.enrollmentMessage = '';
-    //   this.eligibilityChecked = true;
-    //   this.cdr.detectChanges();
-    // } else {
-    //   this.checkAssessmentCompletion();
-    // }
-    this.checkAssessmentCompletion();
+  if (!this.studentData) {
+    this.showParentMessage = true;
+    this.enrollmentMessage = 'Select a student first.';
+    this.eligibilityChecked = true;
+    return;
   }
+
+  this.studentAge = this.calculateAge(this.studentData.date_of_birth);
+
+  // First check exemption (Guardian API)
+  this.courseService.checkGuardianExemption(this.selectedStudentId!, +this.id).subscribe({
+    next: (exemptionRes: any) => {
+      if (exemptionRes.exempted) {
+        this.isEligibleForEnrollment = true;
+        this.alreadyEnrolled = false;
+        this.showParentMessage = false;
+        this.eligibilityChecked = true;
+        this.cdr.detectChanges();
+        return;
+      }
+      // Not exempted → normal assessment check
+      this.checkAssessmentCompletion();
+    },
+    error: () => this.checkAssessmentCompletion()
+  });
+}
+
+// Keep existing checkAssessmentCompletion() unchanged
 
   // ✅ Assessment Check
   checkAssessmentCompletion(): void {

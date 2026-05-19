@@ -133,57 +133,100 @@ export class StudentCourseDetail implements OnInit {
   }
 
   // Check if student has completed assessment
-  checkAssessmentCompletion(studentId: number): void {
-    this.courseService.checkStudentAssessmentCompleted(studentId, +this.id).subscribe({
-      next: (res: any) => {
-        console.log('API Response:', res);
+//   checkAssessmentCompletion(studentId: number): void {
+//     this.courseService.checkStudentAssessmentCompleted(studentId, +this.id).subscribe({
+//       next: (res: any) => {
+//         console.log('API Response:', res);
 
-        // Check if already enrolled
-        if (res.already_enrolled) {
-          this.alreadyEnrolled = true;
-          this.isEligibleForEnrollment = false;
-          this.showParentMessage = true;
-          this.enrollmentMessage = 'You are already enrolled in this course.';
+//         // Check if already enrolled
+//         if (res.already_enrolled) {
+//           this.alreadyEnrolled = true;
+//           this.isEligibleForEnrollment = false;
+//           this.showParentMessage = true;
+//           this.enrollmentMessage = 'You are already enrolled in this course.';
+//           this.eligibilityChecked = true;
+//           this.cdr.detectChanges();
+//           return;
+//         }
+
+//         this.alreadyEnrolled = false;
+
+//         // Check if assessment is completed
+//         if (res.completed) {
+//           this.isEligibleForEnrollment = true;
+//           this.showParentMessage = false;
+//           this.enrollmentMessage = '';
+//         } else {
+//           this.isEligibleForEnrollment = false;
+//           this.showParentMessage = true;
+//           this.enrollmentMessage = 'Please complete the assessment before enrolling in this course.';
+//         }
+
+//         this.eligibilityChecked = true;
+//         this.cdr.detectChanges();
+//       },
+//       error: (err) => {
+//         console.error('Error checking assessment completion:', err);
+//         this.alreadyEnrolled = false;
+//         this.isEligibleForEnrollment = false;
+//         this.showParentMessage = true;
+
+//         if (err.status === 404) {
+//           this.enrollmentMessage = 'No assessment found for this course. Please contact support.';
+//         } else if (err.status === 409) {
+//           this.alreadyEnrolled = true;
+//           this.enrollmentMessage = 'You are already enrolled in this course.';
+//         } else {
+//           this.enrollmentMessage = 'Unable to verify eligibility. Please try again later.';
+//         }
+
+//         this.eligibilityChecked = true;
+//         this.cdr.detectChanges();
+//       }
+//     });
+// }
+checkAssessmentCompletion(studentId: number): void {
+  // First check exemption (Student API)
+  this.courseService.checkStudentExemption(studentId, +this.id).subscribe({
+    next: (exemptionRes: any) => {
+      if (exemptionRes.exempted) {
+        this.isEligibleForEnrollment = true;
+        this.alreadyEnrolled = false;
+        this.showParentMessage = false;
+        this.eligibilityChecked = true;
+        this.cdr.detectChanges();
+        return;
+      }
+      // Not exempted → normal assessment check
+      this.courseService.checkStudentAssessmentCompleted(studentId, +this.id).subscribe({
+        next: (res: any) => {
+          if (res.already_enrolled) {
+            this.alreadyEnrolled = true;
+            this.isEligibleForEnrollment = false;
+            this.enrollmentMessage = 'Already enrolled.';
+          } else if (res.completed) {
+            this.isEligibleForEnrollment = true;
+            this.showParentMessage = false;
+          } else {
+            this.isEligibleForEnrollment = false;
+            this.enrollmentMessage = 'Please complete assessment first.';
+          }
           this.eligibilityChecked = true;
           this.cdr.detectChanges();
-          return;
+        },
+        error: (err) => {
+          if (err.status === 409) this.alreadyEnrolled = true;
+          else this.enrollmentMessage = 'Error checking eligibility.';
+          this.eligibilityChecked = true;
+          this.cdr.detectChanges();
         }
-
-        this.alreadyEnrolled = false;
-
-        // Check if assessment is completed
-        if (res.completed) {
-          this.isEligibleForEnrollment = true;
-          this.showParentMessage = false;
-          this.enrollmentMessage = '';
-        } else {
-          this.isEligibleForEnrollment = false;
-          this.showParentMessage = true;
-          this.enrollmentMessage = 'Please complete the assessment before enrolling in this course.';
-        }
-
-        this.eligibilityChecked = true;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error checking assessment completion:', err);
-        this.alreadyEnrolled = false;
-        this.isEligibleForEnrollment = false;
-        this.showParentMessage = true;
-
-        if (err.status === 404) {
-          this.enrollmentMessage = 'No assessment found for this course. Please contact support.';
-        } else if (err.status === 409) {
-          this.alreadyEnrolled = true;
-          this.enrollmentMessage = 'You are already enrolled in this course.';
-        } else {
-          this.enrollmentMessage = 'Unable to verify eligibility. Please try again later.';
-        }
-
-        this.eligibilityChecked = true;
-        this.cdr.detectChanges();
-      }
-    });
+      });
+    },
+    error: () => {
+      // Fallback to normal assessment check
+      this.courseService.checkStudentAssessmentCompleted(studentId, +this.id).subscribe;
+    }
+  });
 }
 
 // Optional: Add contact support method

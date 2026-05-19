@@ -276,4 +276,15 @@ getCheckedQuizDetail(attemptId: number): Observable<any> {
     getGuardianStudents(): Observable<any> {
       return this.http.get(`${environment.GuardianApiUrl}/students`, { headers: this.getHeaders() });
     }
+
+// Student side - uses StudentApiUrl
+checkStudentExemption(studentId: number, courseId: number): Observable<any> {
+  return this.http.get(`${environment.StudentApiUrl}/check-exemption/${studentId}/${courseId}`, { headers: this.getHeaders() });
+}
+
+// Guardian side - uses GuardianApiUrl
+checkGuardianExemption(studentId: number, courseId: number): Observable<any> {
+  return this.http.get(`${environment.GuardianApiUrl}/check-exemption/${studentId}/${courseId}`, { headers: this.getHeaders() });
+}
+
 }

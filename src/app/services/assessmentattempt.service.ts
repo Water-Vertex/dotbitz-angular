@@ -117,6 +117,10 @@ saveProgress(attemptId: number, answers: any[]): Observable<any> {
     });
   }
 
+  addExemption(data: { student_id: number, course_id: number }): Observable<any> {
+  return this.http.post(`${environment.AdminApiUrl}/exemptions`, data, { headers: this.getHeaders() });
+}
+
   // ==========================
   // --- GUEST SIDE METHODS ---
   // ==========================
