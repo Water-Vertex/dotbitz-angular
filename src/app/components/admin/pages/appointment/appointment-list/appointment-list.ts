@@ -23,7 +23,7 @@ export class AppointmentList implements OnInit, OnDestroy {
   appointments: Appointment[] = [];
   filteredAppointments: Appointment[] = [];
   searchTerm: string = '';
-  selectedCourseId: string = ''; // empty string means "All Courses"
+  selectedCourseId: string = '';
   uniqueCourses: CourseOption[] = [];
   isLoading = false;
 
@@ -51,13 +51,6 @@ export class AppointmentList implements OnInit, OnDestroy {
           let rawData = res?.data || [];
           if (!Array.isArray(rawData)) rawData = [];
 
-          // Fix thumbnail paths if needed (though not used in UI, but safe)
-          rawData.forEach((apt: any) => {
-            if (apt.course?.thumbnail_image && !apt.course.thumbnail_image.startsWith('http')) {
-              apt.course.thumbnail_image = `https://dotbitz.com/public/assets/images/courses/${apt.course.thumbnail_image}`;
-            }
-          });
-
           this.appointments = rawData;
           this.prepareCourseFilterOptions();
           this.applyFilters();
@@ -72,7 +65,6 @@ export class AppointmentList implements OnInit, OnDestroy {
       });
   }
 
-  // Extract unique courses from appointments for dropdown
   prepareCourseFilterOptions(): void {
     const courseMap = new Map<string, { name: string; count: number }>();
     this.appointments.forEach(apt => {
@@ -97,12 +89,10 @@ export class AppointmentList implements OnInit, OnDestroy {
   applyFilters(): void {
     let result = [...this.appointments];
 
-    // Filter by selected course
     if (this.selectedCourseId) {
       result = result.filter(apt => apt.course_id?.toString() === this.selectedCourseId);
     }
 
-    // Filter by search term (name, email, phone, course name)
     const term = this.searchTerm.trim().toLowerCase();
     if (term) {
       result = result.filter(apt =>
@@ -127,7 +117,7 @@ export class AppointmentList implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.toastService.success('Success', 'Record deleted');
-          this.loadAppointments(); // Reload list
+          this.loadAppointments();
         },
         error: () => {
           this.toastService.error('Error', 'Failed to delete appointment');
