@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AssessmentAttemptService } from '../../../../../services/assessmentattempt.service';
 import { AuthService } from '../../../../../services/auth.service';
+import { ToastService } from '../../../../../services/toast.service'; 
 
 @Component({
   selector: 'app-attempted-assessment',
@@ -20,6 +21,7 @@ export class AttemptedAssessment implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     public auth: AuthService, 
+    private toastService: ToastService,   
   ) {}
 
   can(permission: string): boolean {
@@ -71,5 +73,26 @@ export class AttemptedAssessment implements OnInit {
 
   onView(attemptId: number): void {
     this.router.navigate(['/admin/assessment/view', attemptId]);
+  }
+
+
+    addExemption(attempt: any): void {
+    if (!attempt.student_id || !attempt.course_id) {
+      this.toastService.error('Error', 'Missing student or course information.');
+      return;
+    }
+    this.assessmentAttemptService.addExemption({
+      student_id: attempt.student_id,
+      course_id: attempt.course_id
+    }).subscribe({
+      next: () => {
+        this.toastService.success('Exemption Added', `Exemption added for ${attempt.student_name} - ${attempt.course_name}`);
+        attempt.is_exempted = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toastService.error('Failed', err.error?.message || err.message || 'Could not add exemption');
+      }
+    });
   }
 }

@@ -35,7 +35,7 @@ export class CourseEdit implements OnInit {
           '|', 'blockQuote', '|', 'undo', 'redo', '|','codeBlock'
         ],
       };
-
+private curriculums: { duration?: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -44,6 +44,7 @@ export class CourseEdit implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
+    
   ) {}
 
   ngOnInit(): void {
@@ -70,6 +71,9 @@ export class CourseEdit implements OnInit {
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
+        classes_per_week:  [''],
+    total_classes:     [''],
+    course_hours:      [''],
       meta_title: [''],
 meta_description: [''],
 meta_keyword: [''],
@@ -99,14 +103,59 @@ page_schema: [''],
 
 
 
-  loadCourse(): void {
+private parseWeeks(duration?: string): number {
+  if (!duration || duration.trim() === '') return 0;
+  const d = duration.trim();
+
+  const rangeMatch = d.match(/^(\d+)\s*-\s*(\d+)$/);
+  if (rangeMatch) {
+    return Math.max(0, parseInt(rangeMatch[2], 10) - parseInt(rangeMatch[1], 10) + 1);
+  }
+
+  if (/^\d+$/.test(d)) return 1;
+
+  return 0;
+}
+
+calculateTotals(): void {
+  const classesPerWeek = Number(this.courseForm.get('classes_per_week')?.value);
+  const hoursPerClass  = Number(this.courseForm.get('course_duration')?.value);
+
+  const totalWeeks = this.curriculums.reduce(
+    (sum, c) => sum + this.parseWeeks(c.duration), 0
+  );
+
+  const totalClasses = (classesPerWeek > 0 && totalWeeks > 0)
+    ? totalWeeks * classesPerWeek
+    : 0;
+
+  const totalHours = (hoursPerClass > 0 && totalClasses > 0)
+    ? totalClasses * hoursPerClass
+    : 0;
+
+  this.courseForm.patchValue(
+    { total_classes: totalClasses, course_hours: totalHours.toString() },
+    { emitEvent: false }
+  );
+  this.cdr.detectChanges();
+}
+
+ loadCourse(): void {
     this.courseService.getCourse(this.courseId).subscribe({
       next: (res: CourseApiResponse) => {
         const course = res.data as any;
+
+        // Curriculum rows save karo calculation ke liye
+        this.curriculums = course.curriculums ?? [];
+
         this.courseForm.patchValue({
           ...course,
           is_featured: !!course.is_featured,
         });
+
+        // Ab curriculum se calculate karo
+        this.calculateTotals();
+
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -117,12 +166,13 @@ page_schema: [''],
     });
   }
 
-  onSubmit(): void {
+ 
+onSubmit(): void {
     if (this.courseForm.invalid) return;
 
     this.isSubmitting = true;
     const formData = new FormData();
-    formData.append('_method', 'PUT'); // Method Spoofing
+    formData.append('_method', 'PUT');
 
     Object.keys(this.courseForm.value).forEach((key) => {
       if (key !== 'thumbnail_image') {
@@ -148,6 +198,5 @@ page_schema: [''],
       },
     });
   }
-
   cancel = () => this.router.navigate(['/admin/course/list']);
 }

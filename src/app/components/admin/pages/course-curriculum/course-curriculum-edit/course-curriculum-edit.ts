@@ -40,12 +40,14 @@ export class CourseCurriculumEdit implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
   ) {
    
-    this.curriculumForm = this.fb.group({
-      course_id: [null, Validators.required],
-      title: ['', Validators.required],
-      duration: [''], 
-      description: [''],
-    });
+this.curriculumForm = this.fb.group({
+  course_id: [null, Validators.required],
+  course_hours: [''],    // ✅ ADD
+  total_classes: [''],   // ✅ ADD
+  title: ['', Validators.required],
+  duration: [''],
+  description: [''],
+});
   }
 
   ngOnInit(): void {
@@ -85,7 +87,9 @@ export class CourseCurriculumEdit implements OnInit, OnDestroy {
             course_id: data.course_id,
             title: data.title,
             duration: data.duration ? String(data.duration) : '',  
-            description: data.description
+            description: data.description,
+             course_hours: data.course_hours || '',      
+  total_classes: data.total_classes || '',   
           });
           console.log("Data Loaded into Form:", data);
         }

@@ -63,6 +63,10 @@ export class CourseAdd implements OnInit {
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
+
+       classes_per_week:  [''],
+      total_classes:     [''],
+      course_hours:      [''],
       meta_title: [''],
 meta_description: [''],
 meta_keyword: [''],
@@ -81,6 +85,14 @@ page_schema: [''],
   get course_code() {
     return this.courseForm.get('course_code');
   }
+
+  calculateTotals(): void {
+  this.courseForm.patchValue(
+    { total_classes: 0, course_hours: '0' },
+    { emitEvent: false }
+  );
+  this.cdr.detectChanges();
+}
 
   onFileSelected(event: any) {
     const file = event.target.files[0]; // Capture it in a local constant
