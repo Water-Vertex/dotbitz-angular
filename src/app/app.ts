@@ -3,13 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { HttpClientModule } from '@angular/common/http';
-
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule], // ✅ add HttpClientModule
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })

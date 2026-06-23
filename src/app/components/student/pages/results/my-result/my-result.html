@@ -1,0 +1,401 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Quiz View Modal -->
+  <div *ngIf="showQuizView" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" (click)="closeQuizView()">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="bg-orange-500 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-white">Quiz Review</h2>
+            <p *ngIf="viewingAttempt" class="text-orange-100 text-sm mt-0.5">{{ viewingAttempt.quiz?.name }}</p>
+          </div>
+          <button (click)="closeQuizView()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loadingView" class="flex-1 flex items-center justify-center p-12">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-blue-600 mx-auto mb-3"></div>
+          <p class="text-gray-500 text-sm">Loading quiz review...</p>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!loadingView && viewingAttempt" class="flex-1 overflow-y-auto">
+        <!-- Summary Bar -->
+        <div class="px-6 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-center gap-4 text-sm">
+          <span class="text-gray-600">
+            <span class="font-semibold text-gray-900">{{ viewingAttempt.obtained_marks }}</span>
+            / {{ viewingAttempt.quiz?.marks }} marks
+          </span>
+          <span *ngIf="viewingAttempt.is_overdue" class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+            Overdue (-5%)
+          </span>
+          <span *ngIf="viewingAttempt.status === 'time_up'" class="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs font-medium">
+            Time Up
+          </span>
+          <span *ngIf="viewingAttempt.remarks && viewingAttempt.remarks !== 'Submitted by student' && viewingAttempt.remarks !== 'Time up — auto submitted'" class="text-gray-500 italic text-xs">
+            "{{ viewingAttempt.remarks }}"
+          </span>
+        </div>
+
+        <!-- Answers List -->
+        <div class="p-6 space-y-4">
+          <div *ngFor="let answer of viewingAttempt.answers; let i = index" class="rounded-xl border overflow-hidden"
+            [ngClass]="{
+              'border-green-200': getAnswerStatus(answer) === 'correct',
+              'border-red-200': getAnswerStatus(answer) === 'wrong',
+              'border-gray-200': getAnswerStatus(answer) === 'pending'
+            }">
+
+            <div class="px-5 py-3 flex items-start gap-3"
+              [ngClass]="{
+                'bg-green-50': getAnswerStatus(answer) === 'correct',
+                'bg-red-50': getAnswerStatus(answer) === 'wrong',
+                'bg-gray-50': getAnswerStatus(answer) === 'pending'
+              }">
+              <span class="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{{ i + 1 }}</span>
+              <div class="flex-1 flex items-start justify-between gap-4 flex-wrap">
+                <p class="text-sm font-medium text-gray-800">{{ answer.mcq?.question }}</p>
+                <span class="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full"
+                  [ngClass]="{
+                    'bg-green-100 text-green-700': getAnswerStatus(answer) === 'correct',
+                    'bg-red-100 text-red-600': getAnswerStatus(answer) === 'wrong',
+                    'bg-gray-100 text-gray-500': getAnswerStatus(answer) === 'pending'
+                  }">
+                  {{ getAnswerStatus(answer) | titlecase }}
+                </span>
+              </div>
+            </div>
+
+            <div class="px-5 py-3 grid grid-cols-2 gap-3">
+              <div>
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Your Answer</p>
+                <p class="text-sm font-medium"
+                  [ngClass]="{
+                    'text-green-700': getAnswerStatus(answer) === 'correct',
+                    'text-red-600': getAnswerStatus(answer) === 'wrong',
+                    'text-gray-600': getAnswerStatus(answer) === 'pending'
+                  }">
+                  {{ answer.student_answer || 'No answer given' }}
+                </p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Correct Answer</p>
+                <p class="text-sm font-medium text-green-700">{{ answer.mcq?.answer || '-' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3 border-t border-gray-200 bg-gray-50 flex justify-end">
+        <button (click)="closeQuizView()" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- ========== STEP 1: Courses List ========== -->
+    <div *ngIf="!selectedCourse">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">My Results</h1>
+        <p class="text-sm text-gray-500 mt-1">Select a course to view your quiz and assignment results</p>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loadingCourses" class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+        <div class="inline-block">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        </div>
+        <p class="text-gray-500 mt-4">Loading your courses...</p>
+      </div>
+
+      <!-- No Courses -->
+      <div *ngIf="!loadingCourses && courses.length === 0" class="bg-white rounded-xl border border-gray-200 p-16 text-center shadow-sm">
+        <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-50 rounded-full mb-6">
+          <svg class="w-12 h-12 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No Enrolled Courses</h3>
+        <p class="text-gray-500">You are not enrolled in any courses yet.</p>
+      </div>
+
+      <!-- Courses Grid -->
+      <div *ngIf="!loadingCourses && courses.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let course of courses" (click)="selectCourse(course)" class="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-orange-200 transition-all cursor-pointer hover:-translate-y-1">
+          <!-- Thumbnail -->
+          <div class="relative aspect-[16/9] bg-gradient-to-r from-orange-500 to-blue-600 overflow-hidden">
+            <img *ngIf="course.thumbnail_image" [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" [alt]="course.course_name">
+            <div *ngIf="!course.thumbnail_image" class="w-full h-full flex items-center justify-center">
+              <svg class="w-12 h-12 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm">{{ course.course_name }}</h3>
+            <div class="flex items-center gap-2 mt-2 text-xs text-gray-400">
+              <span>{{ course.course_level }}</span>
+              <span>•</span>
+              <span>{{ course.course_duration }} weeks</span>
+            </div>
+            <div class="mt-4 flex items-center justify-end">
+              <span class="text-xs font-medium text-blue-600 flex items-center gap-1">
+                View Results
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STEP 2: Course Results ========== -->
+    <div *ngIf="selectedCourse">
+      <!-- Back + Header -->
+      <div class="flex items-center gap-4 mb-6">
+        <button (click)="backToCourses()" class="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">{{ selectedCourse.course_name }}</h1>
+          <p class="text-sm text-gray-500">Your checked results</p>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" *ngIf="quizResults.length > 0 || assignmentResults.length > 0">
+        <!-- Quiz Summary Card -->
+        <div *ngIf="quizResults.length > 0" class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Quiz Summary</p>
+              <p class="text-2xl font-bold text-blue-600">{{ getQuizSummary().obtained }} <span class="text-sm font-normal text-gray-400">/ {{ getQuizSummary().totalMarks }}</span></p>
+            </div>
+            <span class="w-12 h-12 rounded-full border-2 flex items-center justify-center text-base font-bold shrink-0" [ngClass]="getGradeBadgeColor(getQuizSummary().percent)">
+              {{ getGrade(getQuizSummary().percent) }}
+            </span>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-500">{{ quizResults.length }} quiz(zes) checked</span>
+              <span class="font-semibold" [ngClass]="getPercentColor(getQuizSummary().percent)">{{ getQuizSummary().percent }}%</span>
+            </div>
+            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700" [style.width.%]="getQuizSummary().percent" [ngClass]="getProgressColor(getQuizSummary().percent)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assignment Summary Card -->
+        <div *ngIf="assignmentResults.length > 0" class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Assignment Summary</p>
+              <p class="text-2xl font-bold text-blue-600">{{ getAssignmentSummary().obtained }} <span class="text-sm font-normal text-gray-400">/ {{ getAssignmentSummary().totalMarks }}</span></p>
+            </div>
+            <span class="w-12 h-12 rounded-full border-2 flex items-center justify-center text-base font-bold shrink-0" [ngClass]="getGradeBadgeColor(getAssignmentSummary().percent)">
+              {{ getGrade(getAssignmentSummary().percent) }}
+            </span>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-500">{{ assignmentResults.length }} assignment(s) graded</span>
+              <span class="font-semibold" [ngClass]="getPercentColor(getAssignmentSummary().percent)">{{ getAssignmentSummary().percent }}%</span>
+            </div>
+            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700" [style.width.%]="getAssignmentSummary().percent" [ngClass]="getProgressColor(getAssignmentSummary().percent)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Grade Card -->
+        <div *ngIf="quizResults.length > 0 || assignmentResults.length > 0" class="bg-orange-500  rounded-xl p-5 shadow-md text-white">
+          <div>
+            <p class="text-xs font-semibold text-orange-200 uppercase tracking-wider mb-1">Overall Grade</p>
+            <p class="text-3xl font-bold">{{ getOverallSummary().obtained }} <span class="text-lg font-normal text-orange-200">/ {{ getOverallSummary().totalMarks }}</span></p>
+          </div>
+          <div class="mt-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-orange-200">{{ getOverallSummary().percent }}% overall</span>
+              <span class="text-2xl font-bold px-3 py-1 rounded-lg bg-white/20">{{ getGrade(getOverallSummary().percent) }}</span>
+            </div>
+            <div class="h-2 bg-white/20 rounded-full overflow-hidden">
+              <div class="h-full bg-white rounded-full transition-all duration-700" [style.width.%]="getOverallSummary().percent"></div>
+            </div>
+            <div class="mt-3 grid grid-cols-6 gap-1 text-center">
+              <div *ngFor="let g of ['F','D','C','B','A','A+']" class="text-[10px] py-0.5 rounded font-medium" [ngClass]="getGrade(getOverallSummary().percent) === g ? 'bg-white text-blue-600' : 'bg-white/10 text-orange-200'">
+                {{ g }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="flex border-b border-gray-200">
+          <button (click)="setTab('quiz')" class="flex-1 py-4 text-sm font-medium transition-colors flex items-center justify-center gap-2"
+            [ngClass]="activeTab === 'quiz' ? 'text-blue-600 border-b-2 border-blue-600 bg-orange-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Quiz Results
+          </button>
+          <button (click)="setTab('assignment')" class="flex-1 py-4 text-sm font-medium transition-colors flex items-center justify-center gap-2"
+            [ngClass]="activeTab === 'assignment' ? 'text-blue-600 border-b-2 border-blue-600 bg-orange-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Assignment Results
+          </button>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div *ngIf="activeTab === 'quiz'" class="p-6">
+          <div *ngIf="loadingQuiz" class="text-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+            <p class="text-gray-500 text-sm mt-3">Loading quiz results...</p>
+          </div>
+
+          <div *ngIf="!loadingQuiz && quizResults.length === 0" class="text-center py-12">
+            <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <p class="text-gray-500 text-sm">No checked quiz results yet.</p>
+          </div>
+
+          <div *ngIf="!loadingQuiz && quizResults.length > 0" class="space-y-3">
+            <div class="grid grid-cols-12 gap-3 px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-200">
+              <div class="col-span-5">Quiz</div>
+              <div class="col-span-2 text-center">Marks</div>
+              <div class="col-span-1 text-center">Grade</div>
+              <div class="col-span-4 text-center">Progress</div>
+            </div>
+
+            <div *ngFor="let result of quizResults" class="grid grid-cols-12 gap-3 items-center px-4 py-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-orange-200 transition-colors">
+              <div class="col-span-5">
+                <p class="font-medium text-gray-900 text-sm leading-snug">{{ result.quiz_name }}</p>
+                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                  <span *ngIf="result.is_overdue" class="text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded-full font-medium">Overdue</span>
+                  <span *ngIf="result.status === 'time_up'" class="text-[10px] px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full font-medium">Time Up</span>
+                  <span *ngIf="result.status === 'completed' && !result.is_overdue" class="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Completed</span>
+                     <span *ngIf="result.is_reattempt"
+          class="text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">
+          <i class="fas fa-redo-alt mr-0.5"></i> Reattempted
+        </span>
+                </div>
+              </div>
+              <div class="col-span-2 text-center">
+                <p class="text-base font-bold text-blue-600">{{ result.obtained_marks }}</p>
+                <p class="text-xs text-gray-400">/ {{ result.total_marks }}</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full border-2 text-sm font-bold" [ngClass]="getGradeBadgeColor(result.percent)">
+                  {{ getGrade(result.percent) }}
+                </span>
+              </div>
+              <div class="col-span-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-semibold" [ngClass]="getPercentColor(result.percent)">{{ result.percent }}%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500" [style.width.%]="result.percent" [ngClass]="getProgressColor(result.percent)"></div>
+                </div>
+              </div>
+              <div class="col-span-12 mt-2 text-right">
+                <button (click)="viewQuiz(result.attempt_id)" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-orange-700 transition-colors">
+                  View Quiz
+                </button>
+                 <button *ngIf="canReattempt(result.percent)"
+        (click)="reattemptQuiz(result.quiz_id)"
+        [disabled]="reattempting === result.quiz_id"
+        class="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-xs font-medium
+               hover:bg-orange-600 transition-colors disabled:opacity-60 flex items-center gap-1">
+        <span *ngIf="reattempting === result.quiz_id"
+          class="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
+        <i *ngIf="reattempting !== result.quiz_id" class="fas fa-redo-alt"></i>
+        {{ reattempting === result.quiz_id ? 'Starting...' : 'Reattempt' }}
+      </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assignment Tab -->
+        <div *ngIf="activeTab === 'assignment'" class="p-6">
+          <div *ngIf="loadingAssignment" class="text-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+            <p class="text-gray-500 text-sm mt-3">Loading assignment results...</p>
+          </div>
+
+          <div *ngIf="!loadingAssignment && assignmentResults.length === 0" class="text-center py-12">
+            <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <p class="text-gray-500 text-sm">No graded assignment results yet.</p>
+          </div>
+
+          <div *ngIf="!loadingAssignment && assignmentResults.length > 0" class="space-y-3">
+            <div class="grid grid-cols-12 gap-3 px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-200">
+              <div class="col-span-5">Assignment</div>
+              <div class="col-span-2 text-center">Marks</div>
+              <div class="col-span-1 text-center">Grade</div>
+              <div class="col-span-4 text-center">Progress</div>
+            </div>
+
+            <div *ngFor="let result of assignmentResults" class="grid grid-cols-12 gap-3 items-center px-4 py-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-orange-200 transition-colors">
+              <div class="col-span-5">
+                <p class="font-medium text-gray-900 text-sm leading-snug">{{ result.assignment_name }}</p>
+                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                  <span *ngIf="result.is_late" class="text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded-full font-medium">Late</span>
+                  <span *ngIf="!result.is_late" class="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">On Time</span>
+                  <span class="text-[10px] text-gray-400">{{ result.submitted_at | date: 'MMM d' }}</span>
+                </div>
+                <p *ngIf="result.remarks" class="mt-1 text-xs text-blue-600 italic">"{{ result.remarks }}"</p>
+              </div>
+              <div class="col-span-2 text-center">
+                <p class="text-base font-bold text-blue-600">{{ result.obtained_marks }}</p>
+                <p class="text-xs text-gray-400">/ {{ result.total_marks }}</p>
+              </div>
+              <div class="col-span-1 text-center">
+                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full border-2 text-sm font-bold" [ngClass]="getGradeBadgeColor(result.percent)">
+                  {{ getGrade(result.percent) }}
+                </span>
+              </div>
+              <div class="col-span-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-semibold" [ngClass]="getPercentColor(result.percent)">{{ result.percent }}%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500" [style.width.%]="result.percent" [ngClass]="getProgressColor(result.percent)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,22 +6,13 @@ import { PolicyService } from '../../../../../services/policy.service';
 import { PolicyFormData } from '../../../../../models/policy.model';
 import { ToastService } from '../../../../../services/toast.service';
 import { QuillModule } from 'ngx-quill';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-policy-add',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterLink,
-    QuillModule,
-    CKEditorModule,
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, QuillModule],
   templateUrl: './policy-add.html',
-  styleUrls: ['./policy-add.css'],
+  styleUrls: ['./policy-add.css']
 })
 export class PolicyAdd implements OnInit {
   policyForm: FormGroup;
@@ -29,63 +20,43 @@ export class PolicyAdd implements OnInit {
   policyId: number | null = null;
   isLoading: boolean = false;
   isSubmitting: boolean = false;
-  // quillModules ki jagah yeh add karo
-  public Editor: any = ClassicEditor;
-  public editorConfig = {
+   quillModules = {
     toolbar: [
-      'heading',
-      '|',
-      'bold',
-      'italic',
-      'underline',
-      '|',
-      'link',
-      'bulletedList',
-      'numberedList',
-      '|',
-      'blockQuote',
-      '|',
-      'undo',
-      'redo',
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ header: 1 }, { header: 2 }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ script: 'sub' }, { script: 'super' }],
+      [{ indent: '-1' }, { indent: '+1' }],
+      [{ direction: 'rtl' }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      [{ color: [] }, { background: [] }],
+      [{ font: [] }],
+      [{ align: [] }],
+      ['clean'],
+      ['link', 'image', 'video'],
     ],
   };
-  //  quillModules = {
-  //   toolbar: [
-  //     ['bold', 'italic', 'underline', 'strike'],
-  //     ['blockquote', 'code-block'],
-  //     [{ header: 1 }, { header: 2 }],
-  //     [{ list: 'ordered' }, { list: 'bullet' }],
-  //     [{ script: 'sub' }, { script: 'super' }],
-  //     [{ indent: '-1' }, { indent: '+1' }],
-  //     [{ direction: 'rtl' }],
-  //     [{ size: ['small', false, 'large', 'huge'] }],
-  //     [{ color: [] }, { background: [] }],
-  //     [{ font: [] }],
-  //     [{ align: [] }],
-  //     ['clean'],
-  //     ['link', 'image', 'video'],
-  //   ],
-  // };
 
   constructor(
     private fb: FormBuilder,
     private polucyService: PolicyService,
     private toastService: ToastService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {
     this.policyForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(255)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      meta_title: [''],
-      meta_tags: [''],
-      meta_keywords: [''],
-      meta_description: [''],
+      meta_title : [''],
+      meta_tags : [''],
+      meta_keywords : [''],
+      meta_description : ['']
     });
   }
 
   ngOnInit(): void {
-    this.route.params.subscribe((params) => {
+    this.route.params.subscribe(params => {
       const id = params['id'];
       if (id) {
         this.isEditMode = true;
@@ -115,7 +86,7 @@ export class PolicyAdd implements OnInit {
         this.toastService.error('Error', 'Failed to load Policy. Please try again.');
         this.router.navigate(['/admin/policy/list']);
         this.isLoading = false;
-      },
+      }
     });
   }
 
@@ -133,7 +104,7 @@ export class PolicyAdd implements OnInit {
     console.log('Submitting Policy form data:', {
       formData,
       isEditMode: this.isEditMode,
-      policyId: this.policyId,
+      policyId: this.policyId
     });
 
     if (this.isEditMode && this.policyId) {
@@ -151,7 +122,7 @@ export class PolicyAdd implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
-        },
+        }
       });
     } else {
       // Create Policy
@@ -168,7 +139,7 @@ export class PolicyAdd implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
-        },
+        }
       });
     }
   }
@@ -179,7 +150,7 @@ export class PolicyAdd implements OnInit {
       statusText: error?.statusText,
       error: error?.error,
       message: error?.message,
-      url: error?.url,
+      url: error?.url
     });
 
     if (error.status === 422) {
@@ -197,10 +168,7 @@ export class PolicyAdd implements OnInit {
 
       this.toastService.error('Validation Error', errorMessages.trim());
     } else if (error.status === 0) {
-      this.toastService.error(
-        'Network Error',
-        'Cannot connect to server. Check if Laravel server is running.',
-      );
+      this.toastService.error('Network Error', 'Cannot connect to server. Check if Laravel server is running.');
     } else if (error.status === 404) {
       this.toastService.error('Not Found', 'API endpoint not found. Check server URL.');
     } else if (error.status === 401) {
@@ -209,8 +177,7 @@ export class PolicyAdd implements OnInit {
     } else if (error.status === 500) {
       this.toastService.error('Server Error', 'Internal server error. Check Laravel logs.');
     } else {
-      const errorMessage =
-        error.error?.message || error.message || 'Failed to save Policy. Please try again.';
+      const errorMessage = error.error?.message || error.message || 'Failed to save Policy. Please try again.';
       this.toastService.error('Error', errorMessage);
     }
 
@@ -218,7 +185,7 @@ export class PolicyAdd implements OnInit {
   }
 
   markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach((control) => {
+    Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
@@ -231,22 +198,10 @@ export class PolicyAdd implements OnInit {
   }
 
   // Helper methods for template
-  get title() {
-    return this.policyForm.get('title');
-  }
-  get description() {
-    return this.policyForm.get('description');
-  }
-  get meta_title() {
-    return this.policyForm.get('meta_title');
-  }
-  get meta_keywords() {
-    return this.policyForm.get('meta_keywords');
-  }
-  get meta_tags() {
-    return this.policyForm.get('meta_tags');
-  }
-  get meta_description() {
-    return this.policyForm.get('meta_description');
-  }
+  get title() { return this.policyForm.get('title'); }
+  get description() { return this.policyForm.get('description'); }
+  get meta_title() { return this.policyForm.get('meta_title'); }
+  get meta_keywords() { return this.policyForm.get('meta_keywords'); }
+  get meta_tags() { return this.policyForm.get('meta_tags'); }
+  get meta_description() { return this.policyForm.get('meta_description'); }
 }

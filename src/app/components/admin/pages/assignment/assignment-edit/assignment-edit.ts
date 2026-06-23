@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AssignmentService } from '../../../../../services/assignment.service';
+import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Course, Assignment } from '../../../../../models/assignment.model';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
@@ -16,19 +17,24 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
   templateUrl: './assignment-edit.html',
   styleUrls: ['./assignment-edit.css'],
 })
-export class AssignmentEdit implements OnInit, OnDestroy {
+export class AssignmentEdit implements OnInit {
+  assignmentId!: number;
   assignmentForm: FormGroup;
-  assignmentId: number | null = null;
-  isLoading = false;
+  isLoading = true;
   isSubmitting = false;
-  courses: Course[] = [];
+  courses: any[] = [];
+  batches: any[] = [];
+  loadingBatches = false;
 
-  existingFile: string | null = null;
   selectedFile: File | null = null;
 
   public Editor: any = ClassicEditor;
   public editorConfig = {
-    toolbar: ['heading', '|', 'bold', 'italic', 'underline', 'link', 'undo', 'redo'],
+    toolbar: [
+      'heading', '|', 'bold', 'italic', 'underline', 'strikethrough',
+      '|', 'link', 'bulletedList', 'numberedList',
+      '|', 'blockQuote', '|', 'undo', 'redo',
+    ],
   };
 
   private routeSub: Subscription | undefined;
@@ -37,12 +43,14 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private assignmentService: AssignmentService,
     private toastService: ToastService,
+    private courseService: CourseService,
     private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
     this.assignmentForm = this.fb.group({
       course_id: [null, Validators.required],
+      batch_id:      ['', Validators.required],
       title: ['', Validators.required],
       description: [''], // CKEditor
       start_date: [''],
@@ -54,35 +62,29 @@ export class AssignmentEdit implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.assignmentId = Number(this.route.snapshot.paramMap.get('id'));
+
     this.loadCourses();
 
-    this.routeSub = this.route.params.subscribe((params) => {
-      const id = params['id'];
-      if (id && !isNaN(id)) {
-        this.assignmentId = +id;
-        this.loadAssignment(this.assignmentId);
-      } else {
-        this.toastService.error('Error', 'Invalid Assignment ID');
-        this.router.navigate(['/admin/assignment/list']);
-      }
-    });
   }
 
   loadCourses(): void {
     this.assignmentService.getCourses().subscribe({
       next: (res: any) => {
-        this.courses = Array.isArray(res.data) ? res.data : [res.data];
+        this.courses = Array.isArray(res.data) ? res.data : res || [];
+        this.loadAssignment();
         this.cdr.detectChanges();
       },
-      error: () => this.toastService.error('Error', 'Failed to load courses'),
+     error: () => {
+        this.toastService.error('Error', 'Failed to load courses');
+        this.isLoading = false;
+      },
     });
   }
 
-  loadAssignment(id: number): void {
-    this.isLoading = true;
-    this.cdr.detectChanges();
+  loadAssignment(): void {
+    this.assignmentService.getAssignment(this.assignmentId).subscribe({
 
-    this.assignmentService.getAssignment(id).subscribe({
       next: (res: any) => {
         const data: Assignment = Array.isArray(res.data) ? res.data[0] : res.data;
 
@@ -92,17 +94,22 @@ export class AssignmentEdit implements OnInit, OnDestroy {
           return;
         }
 
-        this.existingFile = data.assignment_file || null;
+         const assignment = res.data || res;
 
         this.assignmentForm.patchValue({
-          course_id: data.course_id,
-          title: data.title,
-          description: data.description || '',
-          start_date: data.start_date || '',
-          due_date: data.due_date || '',
-          total_marks: data.total_marks || '',
-          active_status: data.active_status === 1 ? 'active' : 'inactive',
+          course_id:     assignment.course_id,
+          batch_id:      assignment.batch_id,
+          title:         assignment.title,
+          description:   assignment.description || '',
+          due_date:      assignment.due_date?.split('T')[0] || assignment.due_date,
+          total_marks:   assignment.total_marks,
+          start_date:    assignment.start_date?.split('T')[0] || assignment.start_date || '',
+          status: assignment.status,
         });
+
+         if (assignment.course_id) {
+          this.loadBatchesForCourse(assignment.course_id);
+        }
 
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -110,8 +117,19 @@ export class AssignmentEdit implements OnInit, OnDestroy {
       error: () => {
         this.toastService.error('Error', 'Failed to load assignment');
         this.isLoading = false;
+        this.router.navigate(['/admin/assignment/list']);
+      },
+    });
+  }
+  loadBatchesForCourse(courseId: number): void {
+    this.loadingBatches = true;
+    this.courseService.getBatchesByCourse(courseId).subscribe({
+      next: (res: any) => {
+        this.batches = res || [];
+        this.loadingBatches = false;
         this.cdr.detectChanges();
       },
+      error: () => { this.loadingBatches = false; }
     });
   }
 
@@ -119,15 +137,20 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
-      this.assignmentForm.patchValue({
-        assignment_file: this.selectedFile.name,
-      });
+      this.assignmentForm.patchValue({ assignment_file: this.selectedFile.name });
     }
+  }
+  onCourseChange(): void {
+    this.assignmentForm.patchValue({ batch_id: '' });
+    this.batches = [];
+    const courseId = this.assignmentForm.value.course_id;
+    if (!courseId) return;
+    this.loadBatchesForCourse(courseId);
   }
 
   onSubmit(): void {
-    if (this.assignmentForm.invalid || !this.assignmentId) {
-      this.markFormGroupTouched(this.assignmentForm);
+    if (this.assignmentForm.invalid) {
+      Object.values(this.assignmentForm.controls).forEach(c => c.markAsTouched());
       this.toastService.error('Validation', 'Please fill all required fields.');
       return;
     }
@@ -135,27 +158,29 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     this.isSubmitting = true;
 
     const formData = new FormData();
-    const value = this.assignmentForm.value;
+    formData.append('_method', 'PUT');
 
-    formData.append('course_id', value.course_id);
-    formData.append('title', value.title);
-    formData.append('description', value.description || '');
-    formData.append('start_date', value.start_date || '');
-    formData.append('due_date', value.due_date);
-    formData.append('total_marks', value.total_marks || '');
-    formData.append('active_status', value.active_status); // will be 'active' or 'inactive'
+    Object.keys(this.assignmentForm.value).forEach((key) => {
+      if (key !== 'assignment_file') {
+        const value = this.assignmentForm.value[key];
+        if (value !== null && value !== undefined && value !== '') {
+          formData.append(key, value);
+        }
+      }
+    });
 
     if (this.selectedFile) {
-      formData.append('assignment_file', this.selectedFile);
+       formData.append('assignment_file', this.selectedFile, this.selectedFile.name);
     }
 
     this.assignmentService.updateAssignment(this.assignmentId, formData).subscribe({
       next: (res: any) => {
-        this.toastService.success('Success', res.message || 'Assignment updated successfully!');
+        this.toastService.success('Success', res.message || 'Assignment updated!');
         this.router.navigate(['/admin/assignment/list']);
       },
       error: (err: any) => {
-        this.toastService.error('Error', err.message || 'Failed to update assignment');
+        const errorMsg = err.error?.message || 'Failed to update';
+        this.toastService.error('Error', errorMsg);
         this.isSubmitting = false;
         this.cdr.detectChanges();
       },
@@ -170,15 +195,5 @@ export class AssignmentEdit implements OnInit, OnDestroy {
     this.router.navigate(['/admin/assignment/list']);
   }
 
-  markFormGroupTouched(formGroup: FormGroup) {
-    Object.values(formGroup.controls).forEach((control) => control.markAsTouched());
-  }
-
-  ngOnDestroy(): void {
-    if (this.routeSub) this.routeSub.unsubscribe();
-  }
-
-  get f() {
-    return this.assignmentForm.controls;
-  }
+  get f() { return this.assignmentForm.controls; }
 }

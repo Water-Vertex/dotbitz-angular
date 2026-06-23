@@ -1,0 +1,81 @@
+<div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Add New Role</h1>
+      <p class="text-gray-600 mt-1">Create a new system role</p>
+    </div>
+    <a routerLink="/admin/roles/list"
+      class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium">
+      <i class="fas fa-arrow-left"></i>
+      <span>Back</span>
+    </a>
+  </div>
+</div>
+
+<div class="space-y-6">
+  <div class="bg-white rounded-lg border border-gray-200 p-6">
+    <form [formGroup]="roleForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+      <!-- Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Role Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          formControlName="name"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          placeholder="e.g. manager, accounts, executive"
+          [class.border-red-300]="name?.invalid && name?.touched"
+        >
+        <div *ngIf="name?.invalid && name?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+          <div *ngIf="name?.errors?.['required']" class="flex items-center space-x-1">
+            <i class="fas fa-exclamation-circle text-xs"></i>
+            <span>Role name is required</span>
+          </div>
+          <div *ngIf="name?.errors?.['minlength']" class="flex items-center space-x-1">
+            <i class="fas fa-exclamation-circle text-xs"></i>
+            <span>Minimum 2 characters required</span>
+          </div>
+          <div *ngIf="name?.errors?.['maxlength']" class="flex items-center space-x-1">
+            <i class="fas fa-exclamation-circle text-xs"></i>
+            <span>Maximum 100 characters allowed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guard Name (readonly) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Guard Name</label>
+        <input
+          type="text"
+          value="web"
+          disabled
+          class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-500 cursor-not-allowed"
+        >
+        <p class="text-xs text-gray-400 mt-1">Guard is always set to "web" by default</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <button type="button" (click)="cancel()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2 disabled:opacity-50"
+          [disabled]="isSubmitting">
+          <i class="fas fa-times"></i>
+          <span>Cancel</span>
+        </button>
+        <button type="submit" [disabled]="roleForm.invalid || isSubmitting"
+          class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!isSubmitting" class="flex items-center space-x-2">
+            <i class="fas fa-save"></i>
+            <span>Create Role</span>
+          </span>
+          <span *ngIf="isSubmitting" class="flex items-center space-x-2">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <span>Creating...</span>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

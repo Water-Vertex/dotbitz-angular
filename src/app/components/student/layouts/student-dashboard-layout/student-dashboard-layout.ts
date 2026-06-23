@@ -12,21 +12,52 @@ import { User } from '../../../../models/user.model';
 })
 export class StudentDashboardLayout {
   currentUser: User | null = null;
-    userInitials: string = '';
+  userInitials: string = '';
+
   constructor(private authService: AuthService, private router: Router) {}
-ngOnInit() {
-    // Subscribe to current user changes
+
+  ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       this.setUserInitials();
     });
 
-    // If you need to force load from storage (in case the subscription doesn't fire immediately)
     if (!this.currentUser) {
       this.currentUser = this.authService.getCurrentUser();
       this.setUserInitials();
     }
+
+    setTimeout(() => {
+      this.initMobileUserMenu();
+    }, 0);
   }
+
+  initMobileUserMenu() {
+    const mobileUserBtn = document.getElementById('mobileUserBtn');
+    const mobileUserDropdown = document.getElementById('mobileUserDropdown');
+
+    mobileUserBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = mobileUserDropdown?.classList.contains('active');
+      if (isActive) {
+        mobileUserDropdown?.classList.remove('active');
+      } else {
+        mobileUserDropdown?.classList.add('active');
+        // mobileOverlay ko bilkul mat chheyna
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        !mobileUserBtn?.contains(target) &&
+        !mobileUserDropdown?.contains(target)
+      ) {
+        mobileUserDropdown?.classList.remove('active');
+      }
+    });
+  }
+
   setUserInitials() {
     if (this.currentUser?.first_name && this.currentUser?.last_name) {
       const name = `${this.currentUser.first_name} ${this.currentUser.last_name}`;
@@ -34,7 +65,7 @@ ngOnInit() {
     } else if (this.currentUser?.email) {
       this.userInitials = this.currentUser.email.charAt(0).toUpperCase();
     } else {
-      this.userInitials = 'A'; // Default fallback
+      this.userInitials = 'A';
     }
   }
 
@@ -44,20 +75,21 @@ ngOnInit() {
     });
   }
 
-navigateToProfile() {
+  navigateToProfile() {
     this.router.navigate(['/student/profile']);
   }
+
   navigateToLogout() {
     this.router.navigate(['/student/logout']);
   }
 
-   // Helper method to get full name
   getFullName(): string {
     if (this.currentUser?.first_name && this.currentUser?.last_name) {
       return `${this.currentUser.first_name} ${this.currentUser.last_name}`;
     }
     return 'Student';
   }
+
   getUsername(): string {
     if (this.currentUser?.first_name) {
       return `${this.currentUser.first_name}`;
@@ -65,9 +97,11 @@ navigateToProfile() {
     return 'Student';
   }
 
-  // Helper method to get email
   getEmail(): string {
     return this.currentUser?.email || 'student@example.com';
   }
 
+  navigateToResetPassword(): void {
+    this.router.navigate(['/student/reset-password']);
+  }
 }

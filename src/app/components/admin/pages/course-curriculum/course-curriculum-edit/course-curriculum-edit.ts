@@ -1,3 +1,4 @@
+
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -5,67 +6,30 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CourseCurriculumService } from '../../../../../services/coursecurriculum.service';
 import { ToastService } from '../../../../../services/toast.service';
-import { CourseCurriculum, Course } from '../../../../../models/coursecurriculum.model';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { Course } from '../../../../../models/coursecurriculum.model';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-course-curriculum-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, CKEditorModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, QuillModule],
   templateUrl: './course-curriculum-edit.html',
-  styleUrls: ['./course-curriculum-edit.css'],  
 })
 export class CourseCurriculumEdit implements OnInit, OnDestroy {
   curriculumForm: FormGroup;
   curriculumId: number | null = null;
-  isLoading = false;
+  isLoading = true;
   isSubmitting = false;
   courses: Course[] = [];
-  existingDocument: string | null = null;
-  selectedFile: File | null = null;
   private routeSub: Subscription | undefined;
 
-  // ✅ CKEditor
-  public Editor: any = ClassicEditor;
-  public editorConfig = {
+  quillModules = {
     toolbar: [
-      'heading',
-      '|',
-      'bold',
-      'italic',
-      'underline',
-      '|',
-      'bulletedList',
-      'numberedList',
-      '|',
-      'indent',
-      'outdent',
-      '|',
-      'link',
-      '|',
-      'blockQuote',
-      '|',
-      'undo',
-      'redo',
+      ['bold', 'italic', 'underline'],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      ['clean'],
     ],
   };
-
-  // ❌ Quill (commented out)
-  // quillModules = {
-  //   toolbar: [
-  //     ['bold', 'italic', 'underline', 'strike'],
-  //     ['blockquote', 'code-block'],
-  //     [{ list: 'ordered' }, { list: 'bullet' }],
-  //     [{ indent: '-1' }, { indent: '+1' }],
-  //     [{ header: [1, 2, 3, 4, 5, 6, false] }],
-  //     [{ color: [] }, { background: [] }],
-  //     [{ font: [] }],
-  //     [{ align: [] }],
-  //     ['link', 'image', 'video'],
-  //     ['clean'],
-  //   ],
-  // };
 
   constructor(
     private fb: FormBuilder,
@@ -75,27 +39,24 @@ export class CourseCurriculumEdit implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {
+   
     this.curriculumForm = this.fb.group({
       course_id: [null, Validators.required],
       title: ['', Validators.required],
-      type: ['', Validators.required],
-      video_url: [''],
-      documents: [''],
+      duration: [''], 
       description: [''],
-      duration: [''],
     });
   }
 
   ngOnInit(): void {
     this.loadCourses();
-
+    
     this.routeSub = this.route.params.subscribe((params) => {
       const id = params['id'];
       if (id && !isNaN(id)) {
         this.curriculumId = +id;
         this.loadCurriculum(this.curriculumId);
       } else {
-        this.toastService.error('Error', 'Invalid Curriculum ID');
         this.router.navigate(['/admin/course-curriculum/list']);
       }
     });
@@ -104,10 +65,9 @@ export class CourseCurriculumEdit implements OnInit, OnDestroy {
   loadCourses(): void {
     this.curriculumService.getCourses().subscribe({
       next: (res: any) => {
-        this.courses = Array.isArray(res.data) ? res.data : [res.data];
+        this.courses = res.data || res || [];
         this.cdr.detectChanges();
-      },
-      error: () => this.toastService.error('Error', 'Failed to load courses'),
+      }
     });
   }
 
@@ -117,99 +77,59 @@ export class CourseCurriculumEdit implements OnInit, OnDestroy {
 
     this.curriculumService.getCurriculum(id).subscribe({
       next: (res: any) => {
-        const data: CourseCurriculum = Array.isArray(res.data) ? res.data[0] : res.data;
+        const data = res.data ? (Array.isArray(res.data) ? res.data[0] : res.data) : res;
 
-        if (!data) {
-          this.toastService.error('Error', 'Curriculum not found');
-          this.router.navigate(['/admin/course-curriculum/list']);
-          return;
+        if (data) {
+        
+          this.curriculumForm.patchValue({
+            course_id: data.course_id,
+            title: data.title,
+            duration: data.duration ? String(data.duration) : '',  
+            description: data.description
+          });
+          console.log("Data Loaded into Form:", data);
         }
 
-        this.existingDocument = data.documents || null;
-
-        this.curriculumForm.patchValue({
-          course_id: data.course_id,
-          title: data.title,
-          type: data.type,
-          video_url: data.type === 'video' ? data.documents : '',
-          documents: '',
-          description: data.description || '',
-          duration: data.duration || '',
-        });
-
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => {
-        this.toastService.error('Error', 'Failed to load curriculum');
+      error: (err) => {
+        console.error("Load Error:", err);
+        this.toastService.error('Error', 'Failed to load details');
         this.isLoading = false;
         this.cdr.detectChanges();
-      },
+      }
     });
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-      this.curriculumForm.patchValue({
-        documents: this.selectedFile.name,
-      });
-    }
-  }
-
   onSubmit(): void {
-    if (this.curriculumForm.invalid || !this.curriculumId) {
-      this.markFormGroupTouched(this.curriculumForm);
-      this.toastService.error('Validation', 'Please fill all required fields.');
-      return;
-    }
-
+    if (this.curriculumForm.invalid || !this.curriculumId) return;
     this.isSubmitting = true;
+    const payload: any = {
+      course_id: this.curriculumForm.value.course_id,
+      title: this.curriculumForm.value.title,
+      duration: this.curriculumForm.value.duration ? String(this.curriculumForm.value.duration) : null,  // ✅ Convert to string
+      description: this.curriculumForm.value.description || ''
+    };
 
-    const formData = new FormData();
-    const value = this.curriculumForm.value;
+    console.log('Updating payload:', payload);  // Debug
 
-    formData.append('course_id', value.course_id);
-    formData.append('title', value.title);
-    formData.append('type', value.type);
-    formData.append('description', value.description || '');
-    formData.append('duration', value.duration || '');
-
-    if (value.type === 'video') {
-      formData.append('documents', value.video_url || '');
-    } else if (this.selectedFile) {
-      formData.append('documents', this.selectedFile);
-    }
-
-    this.curriculumService.updateCurriculum(this.curriculumId, formData).subscribe({
+    this.curriculumService.updateCurriculum(this.curriculumId, payload).subscribe({
       next: (res: any) => {
-        this.toastService.success('Success', res.message || 'Curriculum updated successfully!');
-        this.router.navigate(['/admin/course-curriculum/list']);
+        this.toastService.success('Success', 'Curriculum updated successfully');
+        this.router.navigate(['/admin/course/curriculum/list']);
       },
       error: (err: any) => {
-        this.toastService.error('Error', err.message || 'Failed to update curriculum');
+        console.error('Update Error:', err);
+        this.toastService.error('Error', err.error?.message || 'Update failed');
         this.isSubmitting = false;
         this.cdr.detectChanges();
-      },
-      complete: () => {
-        this.isSubmitting = false;
-        this.cdr.detectChanges();
-      },
+      }
     });
   }
 
   cancel(): void {
-    this.router.navigate(['/admin/course-curriculum/list']);
-  }
-
-  markFormGroupTouched(formGroup: FormGroup) {
-    Object.values(formGroup.controls).forEach((control) => {
-      control.markAsTouched();
-      if ((control as FormGroup).controls) {
-        this.markFormGroupTouched(control as FormGroup);
-      }
-    });
+    this.router.navigate(['/admin/course/curriculum/list']);
   }
 
   ngOnDestroy(): void {

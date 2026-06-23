@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class AnnouncementService {
-  private adminApiUrl = environment.AdminApiUrl + '/announcements';
+  private adminApiUrl      = environment.AdminApiUrl + '/announcements';
   private instructorApiUrl = environment.InstructorApiUrl + '/announcements';
 
   constructor(private http: HttpClient) {}
@@ -45,14 +45,9 @@ export class AnnouncementService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  updateAnnouncement(
-    id: number,
-    payload: Partial<Announcement>,
-  ): Observable<AnnouncementApiResponse> {
+  updateAnnouncement(id: number, payload: Partial<Announcement>): Observable<AnnouncementApiResponse> {
     return this.http
-      .put<AnnouncementApiResponse>(`${this.adminApiUrl}/${id}`, payload, {
-        headers: this.getHeaders(),
-      })
+      .put<AnnouncementApiResponse>(`${this.adminApiUrl}/${id}`, payload, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 
@@ -130,9 +125,7 @@ export class AnnouncementService {
 
   getCourseStudentsCount(courseId: number, batchId: number): Observable<any> {
     return this.http
-      .get<any>(`${this.instructorApiUrl}/courses/${courseId}/students-count?batchId=${batchId}`, {
-        headers: this.getHeaders(),
-      })
+      .get<any>(`${this.instructorApiUrl}/courses/${courseId}/students-count?batchId=${batchId}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
 }

@@ -14,18 +14,7 @@ export interface Announcement {
   sent_at?: string | null;
   created_at?: string;
   updated_at?: string;
-  total_students?: number;
-
-  course?: {
-    course_name: string;
-    course_code: string;
-  };
-  batch?: {
-    name: string;
-  };
 }
-
-
 
 export interface AnnouncementApiResponse {
   success: boolean;

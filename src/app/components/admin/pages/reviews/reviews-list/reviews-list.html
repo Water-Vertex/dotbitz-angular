@@ -1,0 +1,127 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6 flex items-center justify-between shadow-sm">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Reviews Management</h1>
+      <p class="text-gray-500 mt-1 text-sm">Approve or reject student and guardian reviews</p>
+    </div>
+    <button (click)="loadReviews()" [disabled]="loading"
+      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center
+             gap-2 text-sm font-medium disabled:opacity-50">
+      <i class="fas fa-sync-alt" [class.animate-spin]="loading"></i> Refresh
+    </button>
+  </div>
+
+  <!-- Filter -->
+  <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+    <div class="flex items-center gap-3">
+      <label class="text-sm font-medium text-gray-700">Status:</label>
+      <select [(ngModel)]="selectedStatus" (change)="applyFilter()"
+        class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50
+               focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[160px]">
+        <option value="">All Reviews</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <span class="text-sm text-gray-500 ml-2">
+        {{ reviews.length }} of {{ allReviews.length }} reviews
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2 text-sm">Loading reviews...</p>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && reviews.length === 0"
+    class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <i class="fas fa-star text-4xl text-gray-300 mb-3 block"></i>
+    <p class="text-gray-500">No reviews found.</p>
+  </div>
+
+  <!-- Reviews List -->
+  <div *ngIf="!loading && reviews.length > 0" class="space-y-4">
+    <div *ngFor="let review of reviews"
+      class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm
+             hover:border-blue-200 transition-colors">
+
+      <div class="flex items-start gap-4">
+
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-full bg-[#073a89]/10 flex items-center justify-center
+                    text-[#073a89] font-bold shrink-0">
+          {{ review.reviewer_name?.charAt(0) }}
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <p class="font-semibold text-gray-900">{{ review.reviewer_name }}</p>
+              <div class="flex items-center gap-2 mt-1">
+                <!-- Stars -->
+                <div class="flex items-center gap-0.5">
+                  <ng-container *ngFor="let s of getStars(review.rating)">
+                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                  </ng-container>
+                  <ng-container *ngFor="let s of getEmptyStars(review.rating)">
+                    <i class="far fa-star text-gray-300 text-sm"></i>
+                  </ng-container>
+                </div>
+                <span class="text-xs text-gray-500">{{ review.rating }}/5</span>
+                <span class="text-xs px-1.5 py-0.5 rounded-full font-medium capitalize"
+                  [ngClass]="review.user_type === 'student'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-purple-100 text-purple-700'">
+                  {{ review.user_type }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Status badge -->
+            <span class="px-2 py-1 rounded-full text-xs font-medium capitalize"
+              [ngClass]="getStatusClass(review.status)">
+              {{ review.status }}
+            </span>
+          </div>
+
+          <p class="text-sm text-gray-700 mt-2 leading-relaxed">{{ review.review }}</p>
+
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-xs text-gray-400">
+              {{ review.course_name }} • {{ review.created_at }}
+            </span>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2 mt-3">
+            <button *ngIf="review.status !== 'approved'"
+              (click)="updateStatus(review.id, 'approved')"
+              class="px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg
+                     hover:bg-green-100 text-xs font-medium">
+              <i class="fas fa-check mr-1"></i> Approve
+            </button>
+            <button *ngIf="review.status !== 'rejected'"
+              (click)="updateStatus(review.id, 'rejected')"
+              class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg
+                     hover:bg-red-100 text-xs font-medium">
+              <i class="fas fa-times mr-1"></i> Reject
+            </button>
+            <button (click)="onDelete(review.id)" [disabled]="deleting === review.id"
+              class="px-3 py-1.5 bg-gray-50 text-gray-600 border border-gray-200 rounded-lg
+                     hover:bg-gray-100 text-xs font-medium disabled:opacity-50">
+              <i class="fas fa-trash mr-1"></i>
+              {{ deleting === review.id ? 'Deleting...' : 'Delete' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

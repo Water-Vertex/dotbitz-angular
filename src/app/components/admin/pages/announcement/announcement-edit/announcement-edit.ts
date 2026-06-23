@@ -39,7 +39,7 @@ export class AnnouncementEdit implements OnInit {
     private announcementService: AnnouncementService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -59,12 +59,12 @@ export class AnnouncementEdit implements OnInit {
       next: (res: any) => {
         this.form = { ...res.data };
         this.alreadySent = this.form.status === 'sent';
-
+        
         // If it's a course_batch type and has course_id, load batches
         if (this.form.target_type === 'course_batch' && this.form.course_id) {
           this.loadBatchesForCourse(this.form.course_id);
         }
-
+        
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -72,7 +72,7 @@ export class AnnouncementEdit implements OnInit {
         this.loading = false;
         this.errorMsg = err.error?.message || 'Failed to load announcement';
         console.error('Load announcement error:', err);
-      },
+      }
     });
   }
 
@@ -82,7 +82,7 @@ export class AnnouncementEdit implements OnInit {
         this.instructors = res.data || [];
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Instructors error:', err),
+      error: (err) => console.error('Instructors error:', err)
     });
   }
 
@@ -92,7 +92,7 @@ export class AnnouncementEdit implements OnInit {
         this.courses = res.data || [];
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Courses error:', err),
+      error: (err) => console.error('Courses error:', err)
     });
   }
 
@@ -102,7 +102,7 @@ export class AnnouncementEdit implements OnInit {
         this.batches = res.data || [];
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Batches error:', err),
+      error: (err) => console.error('Batches error:', err)
     });
   }
 
@@ -117,7 +117,7 @@ export class AnnouncementEdit implements OnInit {
   onTargetTypeChange(): void {
     // Don't allow target type change if already sent
     if (this.alreadySent) return;
-
+    
     // Reset target fields on type change
     this.form.course_id = null;
     this.form.batch_id = null;
@@ -127,13 +127,13 @@ export class AnnouncementEdit implements OnInit {
 
   toggleInstructor(id: number): void {
     if (this.alreadySent) return;
-
+    
     const ids = this.form.target_instructor_ids || [];
     const idx = ids.indexOf(id);
     if (idx === -1) {
       this.form.target_instructor_ids = [...ids, id];
     } else {
-      this.form.target_instructor_ids = ids.filter((i) => i !== id);
+      this.form.target_instructor_ids = ids.filter(i => i !== id);
     }
   }
 
@@ -143,7 +143,7 @@ export class AnnouncementEdit implements OnInit {
 
   selectAllInstructors(): void {
     if (this.alreadySent) return;
-    this.form.target_instructor_ids = this.instructors.map((i) => i.id);
+    this.form.target_instructor_ids = this.instructors.map(i => i.id);
   }
 
   clearInstructors(): void {
@@ -164,7 +164,7 @@ export class AnnouncementEdit implements OnInit {
       this.errorMsg = 'Title and message are required.';
       return;
     }
-
+    
     if (this.form.target_type === 'course_batch' && (!this.form.course_id || !this.form.batch_id)) {
       this.errorMsg = 'Please select a course and batch.';
       return;
@@ -190,7 +190,7 @@ export class AnnouncementEdit implements OnInit {
         this.submitting = false;
         this.errorMsg = err.error?.message || 'Failed to update announcement.';
         console.error('Update error:', err);
-      },
+      }
     });
   }
 }

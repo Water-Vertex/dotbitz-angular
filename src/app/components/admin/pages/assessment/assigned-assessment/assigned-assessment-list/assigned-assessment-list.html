@@ -1,0 +1,140 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Header Section -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6 shadow-sm">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Assigned Assessments</h1>
+        <p class="text-gray-600 mt-1">Detailed evaluation tracking</p>
+      </div>
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+        <button (click)="refreshData()" [disabled]="isLoading"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium disabled:opacity-50">
+          <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
+          <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Box -->
+  <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-4 mb-6 shadow-sm">
+    <div class="relative">
+      <div class="flex items-center bg-gray-100 rounded-lg px-3 py-2 w-full border border-transparent focus-within:border-blue-300 focus-within:bg-white transition-all">
+        <i class="fas fa-search text-gray-400 mr-2"></i>
+        <input type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()"
+          placeholder="Search by student name, email, or course title..."
+          class="bg-transparent border-none focus:outline-none focus:ring-0 w-full text-sm">
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-12 shadow-sm">
+    <div class="flex flex-col items-center justify-center">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-green-500 mx-auto"></div>
+      <p class="text-gray-400 mt-4 text-xs uppercase tracking-widest font-bold">Loading assessments...</p>
+    </div>
+  </div>
+
+  <!-- No Results State -->
+  <div *ngIf="!isLoading && filteredAssessments.length === 0" class="bg-white rounded-lg border border-gray-200 p-12 text-center shadow-sm">
+    <i class="fas fa-inbox text-gray-300 text-5xl mb-4"></i>
+    <p class="text-gray-500 text-base">No assessments found matching your criteria.</p>
+  </div>
+
+  <!-- Table Section -->
+  <div *ngIf="!isLoading && filteredAssessments.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full table-auto text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider text-xs">Student</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider text-xs">Email</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider text-xs">Course</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider text-xs">Assessment</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider text-xs">Duration</th>
+            <th class="px-3 py-2 text-center font-medium text-gray-500 uppercase tracking-wider text-xs">Total Marks</th>
+            <th class="px-3 py-2 text-center font-medium text-gray-500 uppercase tracking-wider text-xs">Obtained</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider text-xs max-w-xs">Remarks</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider text-xs">Status</th>
+            <th class="px-3 py-2 text-center font-medium text-gray-500 uppercase tracking-wider text-xs">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngFor="let item of filteredAssessments; trackBy: trackById" class="hover:bg-blue-50/40 transition-colors">
+            <!-- Student Name -->
+            <td class="px-3 py-2 text-gray-900 font-medium">
+              {{ item.assessment_query?.full_name || '---' }}
+            </td>
+
+            <!-- Email -->
+            <td class="px-3 py-2 text-gray-600 break-words max-w-[150px]">
+              {{ item.assessment_query?.email || '---' }}
+            </td>
+
+            <!-- Course -->
+            <td class="px-3 py-2 text-gray-600 whitespace-nowrap">
+              {{ item.assessment_query?.course?.course_name || '---' }}
+            </td>
+
+            <!-- Assessment Title -->
+            <td class="px-3 py-2 text-gray-900 font-medium">
+              {{ item.assessment?.assessment_title || '---' }}
+            </td>
+
+            <!-- Duration -->
+            <td class="px-3 py-2 text-gray-600 whitespace-nowrap">
+              {{ item.time_to_complete || '---' }} min
+            </td>
+
+            <!-- Total Marks -->
+            <td class="px-3 py-2 text-center text-gray-600">
+              {{ item.total_marks || '---' }}
+            </td>
+
+            <!-- Obtained Marks -->
+            <td class="px-3 py-2 text-center">
+              <span class="font-semibold" [ngClass]="item.obtain_marks ? 'text-green-600' : 'text-gray-500'">
+                {{ item.obtain_marks ?? 'Not graded' }}
+              </span>
+            </td>
+
+            <!-- Remarks -->
+            <td class="px-3 py-2 text-gray-600 break-words max-w-[200px]">
+              {{ item.remarks || 'No remarks' }}
+            </td>
+
+            <!-- Status -->
+            <td class="px-3 py-2">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                [ngClass]="item.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                <span class="w-1.5 h-1.5 rounded-full mr-1.5"
+                  [ngClass]="item.status === 'Completed' ? 'bg-green-400' : 'bg-yellow-400'"></span>
+                {{ item.status || 'Pending' }}
+              </span>
+            </td>
+
+            <!-- Action Button -->
+            <td class="px-3 py-2 text-center whitespace-nowrap">
+              <button (click)="openAssessment(item.id)"
+                class="px-3 py-1 rounded text-xs font-medium transition-colors bg-green-100 text-green-700 hover:bg-green-200 border border-green-200">
+                <i class="fas fa-eye mr-1"></i> View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+      <div class="flex justify-between items-center">
+        <p class="text-sm text-gray-600">
+          Showing <span class="font-semibold text-green-600">{{ filteredAssessments.length }}</span> assessment(s)
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

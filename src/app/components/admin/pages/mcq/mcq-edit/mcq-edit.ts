@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { McqService } from '../../../../../services/mcq.service';
 import { Course } from '../../../../../models/course.model';
 import { Mcq } from '../../../../../models/mcq.model';
 
 @Component({
-  selector: 'app-mcq-edit',
+  selector: 'app-mcqs-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './mcq-edit.html',
   styleUrls: ['./mcq-edit.css']
 })
@@ -19,6 +19,8 @@ export class McqsEdit implements OnInit {
   loading = false;
   coursesLoading = false;
   mcqId!: number;
+  answerError: boolean = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -36,16 +38,13 @@ export class McqsEdit implements OnInit {
 
   initForm() {
     this.mcqForm = this.fb.group({
-      question: ['', [Validators.required, Validators.minLength(10)]],
-      course_id: ['', Validators.required],
-      status: ['active', Validators.required],
-      issingle: [true, Validators.required],
-      options: this.fb.array([]),
-      correctAnswers: this.fb.array([])
-    });
-
-    this.mcqForm.get('issingle')?.valueChanges.subscribe(() => {
-      this.correctAnswers.clear();
+      question:   ['', [Validators.required, Validators.minLength(10)]],
+      answer:     ['', Validators.required],   // ✅ answer field add
+      course_id:  ['', Validators.required],
+      status:     ['active', Validators.required],
+      issingle:   [true, Validators.required],
+      options:    this.fb.array([]),
+      marks:      ['', Validators.required],
     });
   }
 
@@ -59,9 +58,17 @@ export class McqsEdit implements OnInit {
     return this.mcqForm.get('options') as FormArray;
   }
 
-  get correctAnswers(): FormArray {
-    return this.mcqForm.get('correctAnswers') as FormArray;
+  get isSingle() {
+    return this.mcqForm.get('issingle')?.value;
   }
+
+validateAnswer(): boolean {
+  const formValue = this.mcqForm.value;
+  const opts = formValue.options.map((o: any) => o.value.trim().toLowerCase());
+  const answers = formValue.answer.split(',').map((a: string) => a.trim().toLowerCase());
+  this.answerError = !answers.every((ans: string) => opts.includes(ans));
+  return !this.answerError;
+}
 
   loadCourses() {
     this.coursesLoading = true;
@@ -83,19 +90,17 @@ export class McqsEdit implements OnInit {
     this.mcqService.getMcq(this.mcqId).subscribe({
       next: (mcq) => {
         this.mcqForm.patchValue({
-          question: mcq.question,
+          question:  mcq.question,
+          answer:    mcq.answer,     // ✅ answer autofill
           course_id: mcq.course_id,
-          status: mcq.status,
-          issingle: mcq.issingle
+          status:    mcq.status,
+          issingle:  mcq.issingle,
+          marks:     mcq.marks
         });
 
-        // Load options
+        // Options load karo
         this.options.clear();
         mcq.options.forEach(opt => this.options.push(this.createOption(opt)));
-
-        // Load correct answers
-        const correctIndexes = this.getCorrectIndexes(mcq);
-        correctIndexes.forEach(i => this.correctAnswers.push(this.fb.control(i)));
 
         this.loading = false;
       },
@@ -108,42 +113,16 @@ export class McqsEdit implements OnInit {
     });
   }
 
-  // Determine correct answer indexes from stored answer string
-  getCorrectIndexes(mcq: Mcq): number[] {
-    if (!mcq.answer) return [];
-    const answers = mcq.answer.split(',');
-    return mcq.options
-      .map((opt, idx) => answers.includes(opt) ? idx : -1)
-      .filter(idx => idx !== -1);
-  }
-
   addOption() {
-    if (this.options.length < 10) this.options.push(this.createOption());
+    if (this.options.length < 10) {
+      this.options.push(this.createOption());
+    }
   }
 
   removeOption(index: number) {
     if (this.options.length > 2) {
       this.options.removeAt(index);
-      const idx = this.correctAnswers.controls.findIndex(x => x.value === index);
-      if (idx !== -1) this.correctAnswers.removeAt(idx);
     }
-  }
-
-  onCorrectAnswerChange(index: number, event: any) {
-    const checked = event.target.checked;
-    if (checked) this.correctAnswers.push(this.fb.control(index));
-    else {
-      const idx = this.correctAnswers.controls.findIndex(x => x.value === index);
-      if (idx !== -1) this.correctAnswers.removeAt(idx);
-    }
-  }
-
-  isCorrectAnswer(index: number): boolean {
-    return this.correctAnswers.controls.some(x => x.value === index);
-  }
-
-  get isSingle() {
-    return this.mcqForm.get('issingle')?.value;
   }
 
   onSubmit() {
@@ -156,47 +135,28 @@ export class McqsEdit implements OnInit {
       return;
     }
 
+    if (!this.validateAnswer()) {
+      alert('Answer must match one of the options.');
+      return;
+  }
     const formValue = this.mcqForm.value;
     const options = formValue.options.map((opt: any) => opt.value);
 
-    let answer: string;
-    if (formValue.issingle) {
-      const selectedRadio = document.querySelector(
-        'input[name="correctAnswer"]:checked'
-      ) as HTMLInputElement;
-
-      if (!selectedRadio) {
-        alert('Please select the correct answer');
-        return;
-      }
-
-      answer = options[parseInt(selectedRadio.value, 10)];
-    } else {
-      if (formValue.correctAnswers.length === 0) {
-        alert('Please select at least one correct answer');
-        return;
-      }
-
-      answer = formValue.correctAnswers
-        .sort((a: number, b: number) => a - b)
-        .map((i: number) => options[i])
-        .join(',');
-    }
-
     const mcqData: Mcq = {
-      question: formValue.question,
-      options: options,
-      answer: answer,
+      question:  formValue.question,
+      options:   options,
+      answer:    formValue.answer,         // ✅ seedha answer field se
       course_id: Number(formValue.course_id),
-      status: formValue.status === 'active' ? 'active' : 'inactive',
-      issingle: Boolean(formValue.issingle)
+      status:    formValue.status,
+      issingle:  Boolean(formValue.issingle),
+      marks:     formValue.marks
     };
 
     this.loading = true;
     this.mcqService.updateMcq(this.mcqId, mcqData).subscribe({
-      next: (res) => {
+      next: () => {
         alert('MCQ updated successfully!');
-        this.router.navigate(['/admin/mcqs']);
+        this.router.navigate(['/admin/mcqs/list']);
       },
       error: (err) => {
         console.error('Error updating MCQ:', err);

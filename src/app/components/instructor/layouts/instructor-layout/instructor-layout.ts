@@ -17,17 +17,45 @@ export class InstructorLayout implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    // Subscribe to current user changes
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       this.setUserInitials();
     });
 
-    // If you need to force load from storage (in case the subscription doesn't fire immediately)
     if (!this.currentUser) {
       this.currentUser = this.authService.getCurrentUser();
       this.setUserInitials();
     }
+
+    setTimeout(() => {
+      this.initMobileUserMenu();
+    }, 0);
+  }
+
+  initMobileUserMenu() {
+    const mobileUserBtn = document.getElementById('mobileUserBtn');
+    const mobileUserDropdown = document.getElementById('mobileUserDropdown');
+
+    mobileUserBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = mobileUserDropdown?.classList.contains('active');
+      if (isActive) {
+        mobileUserDropdown?.classList.remove('active');
+      } else {
+        mobileUserDropdown?.classList.add('active');
+        // mobileOverlay ko bilkul mat chheyna
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        !mobileUserBtn?.contains(target) &&
+        !mobileUserDropdown?.contains(target)
+      ) {
+        mobileUserDropdown?.classList.remove('active');
+      }
+    });
   }
 
   setUserInitials() {
@@ -37,14 +65,13 @@ export class InstructorLayout implements OnInit {
     } else if (this.currentUser?.email) {
       this.userInitials = this.currentUser.email.charAt(0).toUpperCase();
     } else {
-      this.userInitials = 'A'; // Default fallback
+      this.userInitials = 'A';
     }
   }
 
   logout() {
     this.authService.Instructorlogout().subscribe({
       next: () => {
-        // Navigation is handled in the service
         console.log('Logout successful');
       },
       error: (error) => {
@@ -61,13 +88,13 @@ export class InstructorLayout implements OnInit {
     this.logout();
   }
 
-  // Helper method to get full name
   getFullName(): string {
     if (this.currentUser?.first_name && this.currentUser?.last_name) {
       return `${this.currentUser.first_name} ${this.currentUser.last_name}`;
     }
     return 'Instructor';
   }
+
   getUsername(): string {
     if (this.currentUser?.first_name) {
       return `${this.currentUser.first_name}`;
@@ -75,8 +102,11 @@ export class InstructorLayout implements OnInit {
     return 'Instructor';
   }
 
-  // Helper method to get email
   getEmail(): string {
     return this.currentUser?.email || 'instructor@example.com';
+  }
+
+  navigateToPasswordReset(): void {
+    this.router.navigate(['/instructor/password-reset']);
   }
 }

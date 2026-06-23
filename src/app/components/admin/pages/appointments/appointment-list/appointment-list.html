@@ -1,0 +1,123 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Appointment Management</h1>
+          <p class="text-gray-600 mt-1">Manage student appointments and view course details</p>
+        </div>
+        <div>
+          <button
+            (click)="loadAppointments()"
+            [disabled]="isLoading"
+            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
+          >
+            <svg class="w-4 h-4" [class.animate-spin]="isLoading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+      <p class="text-gray-500 mt-2">Loading appointments...</p>
+    </div>
+  </div>
+
+  <!-- Search + Filter Bar -->
+  <div *ngIf="!isLoading" class="max-w-7xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <!-- Search Input -->
+        <div class="flex-1 relative">
+          <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilters()"
+            placeholder="Search by name, email, phone or course..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#073a89] focus:ring-1 focus:ring-[#073a89]"
+          />
+        </div>
+
+        <!-- Course Filter Dropdown -->
+        <div class="w-full sm:w-64">
+          <select
+            [(ngModel)]="selectedCourseId"
+            (ngModelChange)="applyFilters()"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 focus:outline-none focus:border-[#073a89] focus:ring-1 focus:ring-[#073a89] bg-white"
+          >
+            <option value="">All Courses</option>
+            <option *ngFor="let course of uniqueCourses" [value]="course.id">
+              {{ course.name }} 
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointments Table -->
+  <div *ngIf="!isLoading" class="max-w-7xl mx-auto px-4 pb-12">
+    <div *ngIf="filteredAppointments.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full table-auto text-sm">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Course</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider max-w-xs">Message</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let apt of filteredAppointments; trackBy: trackById" class="hover:bg-blue-50/40 transition-colors">
+              <td class="px-3 py-2 whitespace-nowrap text-gray-900 font-medium">#{{ apt.id }}</td>
+              <td class="px-3 py-2 text-gray-900">{{ apt.name }}</td>
+              <td class="px-3 py-2 text-gray-600 break-words max-w-[150px]">{{ apt.email }}</td>
+              <td class="px-3 py-2 text-gray-600 break-words max-w-[120px]">{{ apt.phone }}</td>
+              <td class="px-3 py-2 text-gray-600 whitespace-nowrap">{{ apt.course?.course_name || 'N/A' }}</td>
+              <td class="px-3 py-2 whitespace-nowrap">
+                <div>{{ formatDate(apt.appointment_date) }}</div>
+                <div class="text-xs text-gray-400">{{ formatTime(apt.appointment_time) }}</div>
+              </td>
+              <td class="px-3 py-2 text-gray-600 break-words max-w-[200px]">{{ apt.message || 'No message' }}</td>
+              <td class="px-3 py-2 text-center whitespace-nowrap">
+                <button
+                  (click)="deleteAppointment(apt.id)"
+                  class="px-3 py-1 rounded text-xs font-medium transition-colors bg-red-100 text-red-700 hover:bg-red-200 border border-red-200"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredAppointments.length === 0" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+      <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No appointments found</h3>
+      <p class="text-gray-500">Try adjusting your search or filter.</p>
+    </div>
+  </div>
+</div>

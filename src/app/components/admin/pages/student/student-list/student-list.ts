@@ -6,6 +6,7 @@ import { RouterModule, Router } from '@angular/router';
 import { Student } from '../../../../../models/student.model';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-student-list',
@@ -25,6 +26,7 @@ export class StudentList implements OnInit, OnDestroy {
   private toast = inject(ToastService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  public auth = inject(AuthService);
 
   ngOnInit(): void {
     this.loadStudents();
@@ -50,7 +52,9 @@ export class StudentList implements OnInit, OnDestroy {
     }
   });
 }
-
+can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
 
   refreshData() {
     this.loadStudents();

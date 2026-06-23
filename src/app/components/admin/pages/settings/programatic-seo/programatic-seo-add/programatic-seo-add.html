@@ -1,0 +1,377 @@
+<div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">
+                Add New Programatic SEO Record
+            </h1>
+            <p class="text-gray-600 mt-1">
+                Create a new programatic SEO record with complete metadata and content
+            </p>
+        </div>
+
+        <a (click)="cancel()" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium cursor-pointer">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to List</span>
+        </a>
+    </div>
+</div>
+
+<!-- Form Content -->
+<div class="space-y-6">
+    <!-- Form Card -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <form [formGroup]="seoForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+            <!-- Basic Information Section -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">Basic Information</h3>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Title -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Title <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            formControlName="title"
+                            (blur)="generateSlug()"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="Enter SEO record title"
+                            [class.border-red-300]="title?.invalid && title?.touched"
+                        >
+                        <div *ngIf="title?.invalid && title?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+                            <div *ngIf="title?.errors?.['required']" class="flex items-center space-x-1">
+                                <i class="fas fa-exclamation-circle text-xs"></i>
+                                <span>Title is required</span>
+                            </div>
+                            <div *ngIf="title?.errors?.['minlength']" class="flex items-center space-x-1">
+                                <i class="fas fa-exclamation-circle text-xs"></i>
+                                <span>Title must be at least 3 characters</span>
+                            </div>
+                            <div *ngIf="title?.errors?.['maxlength']" class="flex items-center space-x-1">
+                                <i class="fas fa-exclamation-circle text-xs"></i>
+                                <span>Title cannot exceed 255 characters</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slug -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Slug <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex space-x-2">
+                            <input
+                                type="text"
+                                formControlName="slug"
+                                class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                placeholder="url-friendly-slug"
+                                [class.border-red-300]="slug?.invalid && slug?.touched"
+                            >
+                            <button
+                                type="button"
+                                (click)="generateSlug()"
+                                class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-200 transition-colors"
+                                title="Generate slug from title"
+                            >
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">URL-friendly version of the title. Auto-generated but can be edited.</p>
+                        <div *ngIf="slug?.invalid && slug?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+                            <div *ngIf="slug?.errors?.['required']" class="flex items-center space-x-1">
+                                <i class="fas fa-exclamation-circle text-xs"></i>
+                                <span>Slug is required</span>
+                            </div>
+                            <div *ngIf="slug?.errors?.['pattern']" class="flex items-center space-x-1">
+                                <i class="fas fa-exclamation-circle text-xs"></i>
+                                <span>Slug can only contain lowercase letters, numbers, and hyphens</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Focus Keyword -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Focus Keyword <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            formControlName="focus_keyword"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="Main focus keyword for SEO"
+                            [class.border-red-300]="focus_keyword?.invalid && focus_keyword?.touched"
+                        >
+                        <div *ngIf="focus_keyword?.invalid && focus_keyword?.touched" class="mt-2 text-xs text-red-600">
+                            <div *ngIf="focus_keyword?.errors?.['required']" class="flex items-center space-x-1">
+                                <i class="fas fa-exclamation-circle text-xs"></i>
+                                <span>Focus keyword is required</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- H1 Heading -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">H1 Heading</label>
+                        <input
+                            type="text"
+                            formControlName="h1_heading"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="Main heading for the page">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meta Information Section -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">SEO Settings</h3>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Meta Title -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meta Title</label>
+                        <input
+                            type="text"
+                            formControlName="meta_title"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="SEO title (leave empty to use title)"
+                        >
+                        <p class="mt-1 text-xs text-gray-500">Recommended length: 50-60 characters.</p>
+                    </div>
+
+                    <!-- Meta Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meta Description</label>
+                        <textarea
+                            formControlName="meta_description"
+                            rows="3"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="Brief description for search results"
+                        ></textarea>
+                        <p class="mt-1 text-xs text-gray-500">Recommended length: 150-160 characters.</p>
+                    </div>
+
+                    <!-- Meta Keywords -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meta Keywords</label>
+                        <input
+                            type="text"
+                            formControlName="meta_keywords"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="keyword1, keyword2, keyword3">
+                    </div>
+
+                    <!-- Meta Tags -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meta Tags</label>
+                        <input
+                            type="text"
+                            formControlName="meta_tags"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="tag1, tag2, tag3">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">Content</h3>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Main Content -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Main Content</label>
+                        <ckeditor
+                            [editor]="Editor"
+                            [config]="editorConfig"
+                            formControlName="content"
+                            class="w-full"
+                        ></ckeditor>
+                    </div>
+
+                    <!-- Section Content Left & Right -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Section Content Left</label>
+                            <ckeditor
+                                [editor]="Editor"
+                                [config]="editorConfig"
+                                formControlName="section_content_left"
+                                class="w-full"
+                            ></ckeditor>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Section Content Right</label>
+                            <ckeditor
+                                [editor]="Editor"
+                                [config]="editorConfig"
+                                formControlName="section_content_right"
+                                class="w-full"
+                            ></ckeditor>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images Section -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">Images</h3>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Main Image -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Main Image</label>
+                        <div class="space-y-3">
+                            <div *ngIf="imagePreview" class="relative inline-block">
+                                <img [src]="imagePreview" alt="Preview" class="h-32 w-auto rounded-lg border border-gray-200 object-cover">
+                                <button type="button" (click)="removeImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input type="file" (change)="onImageSelected($event)" accept="image/*" class="hidden" #mainFileInput name="mainImage">
+                                <button type="button" (click)="mainFileInput.click()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    Choose Main Image
+                                </button>
+                                <span class="text-xs text-gray-500">Recommended: 1200x630px, Max 2MB</span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Main Image Alt Text</label>
+                            <input type="text" formControlName="image_alt" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Image description for SEO">
+                        </div>
+                    </div>
+
+                    <!-- Left Image -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Left Image</label>
+                        <div class="space-y-3">
+                            <div *ngIf="imageLeftPreview" class="relative inline-block">
+                                <img [src]="imageLeftPreview" alt="Preview" class="h-32 w-auto rounded-lg border border-gray-200 object-cover">
+                                <button type="button" (click)="removeImageLeft()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input type="file" (change)="onImageLeftSelected($event)" accept="image/*" class="hidden" #leftFileInput name="leftImage">
+                                <button type="button" (click)="leftFileInput.click()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    Choose Left Image
+                                </button>
+                                <span class="text-xs text-gray-500">Max 2MB</span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Left Image Alt Text</label>
+                            <input type="text" formControlName="image_left_alt" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Left image description">
+                        </div>
+                    </div>
+
+                    <!-- Right Image -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Right Image</label>
+                        <div class="space-y-3">
+                            <div *ngIf="imageRightPreview" class="relative inline-block">
+                                <img [src]="imageRightPreview" alt="Preview" class="h-32 w-auto rounded-lg border border-gray-200 object-cover">
+                                <button type="button" (click)="removeImageRight()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input type="file" (change)="onImageRightSelected($event)" accept="image/*" class="hidden" #rightFileInput name="rightImage">
+                                <button type="button" (click)="rightFileInput.click()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    Choose Right Image
+                                </button>
+                                <span class="text-xs text-gray-500">Max 2MB</span>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Right Image Alt Text</label>
+                            <input type="text" formControlName="image_right_alt" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Right image description">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schema Section -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">Advanced Configuration</h3>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Page Schema -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Page Schema (JSON-LD)</label>
+                        <textarea
+                            formControlName="page_schema"
+                            rows="6"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder='{"@context":"https://schema.org","@type":"WebPage"}'
+                        ></textarea>
+                        <p class="mt-1 text-xs text-gray-500">Valid JSON-LD structured data for rich snippets.</p>
+                    </div>
+                     <!-- FAQs -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">FAQs (JSON format)</label>
+            <textarea 
+                      formControlName="faqs"
+                      rows="4"
+                      class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      placeholder='[{"question":"What is this about?","answer":"This is the answer"},{"question":"Another question?","answer":"Another answer"}]'></textarea>
+          </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <button type="button" (click)="cancel()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="isSubmitting">
+                    <span class="flex items-center space-x-2">
+                        <i class="fas fa-times"></i>
+                        <span>Cancel</span>
+                    </span>
+                </button>
+                <button type="submit" [disabled]="seoForm.invalid || isSubmitting" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span *ngIf="!isSubmitting" class="flex items-center space-x-2">
+                        <i class="fas fa-save"></i>
+                        <span>Create SEO Record</span>
+                    </span>
+                    <span *ngIf="isSubmitting" class="flex items-center space-x-2">
+                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>Creating...</span>
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Information -->
+    <div class="bg-orange-50 rounded-lg border border-orange-100 p-6">
+        <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-orange-500 text-lg"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-orange-800 mb-1">Tips for creating effective SEO records</h3>
+                <ul class="text-xs text-orange-700 space-y-1">
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Use descriptive titles that include your focus keyword</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Keep slugs short, descriptive, and URL-friendly</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Write meta descriptions between 150-160 characters</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Add alt text to all images for better accessibility and SEO</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Use JSON-LD schema markup for rich snippets</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

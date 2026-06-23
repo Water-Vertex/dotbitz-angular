@@ -1,107 +1,149 @@
 <div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Assessment Management</h1>
-        <p class="text-gray-600 mt-1">Manage assessments and questions</p>
-      </div>
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-        <button
-          (click)="refreshData()"
-          [disabled]="isLoading"
-          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
-          <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
-        </button>
-        <a routerLink="/admin/assessments/add"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 text-sm font-medium">
-          <i class="fas fa-plus"></i>
-          <span>Add New Assessment</span>
-        </a>
-      </div>
+  <!-- Header - fixed for small screens -->
+  <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+    <div>
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Assessment Management</h1>
+      <p class="text-gray-600 mt-1 text-sm sm:text-base">Manage assessments and questions</p>
+    </div>
+    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+      <button
+        *ngIf="can('view_assessments')"
+        (click)="refreshData()"
+        [disabled]="isLoading"
+        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none justify-center"
+      >
+        <i class="fas fa-sync-alt mr-1 sm:mr-2" [class.animate-spin]="isLoading"></i>
+        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+      <a
+        *ngIf="can('create_assessments')"
+        routerLink="/admin/assessments/add"
+        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-xs sm:text-sm font-medium flex-1 sm:flex-none text-center"
+      >
+        <i class="fas fa-plus mr-1 sm:mr-2"></i> Add Assessment
+      </a>
     </div>
   </div>
 
+  <!-- Loading -->
   <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
-    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
     <p class="text-gray-500 mt-2">Loading Assessments...</p>
   </div>
 
-  <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-    <div class="flex items-center bg-gray-100 rounded-lg px-3 py-2">
+  <!-- Search -->
+  <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6">
+    <div class="flex items-center bg-gray-100 rounded-lg px-3 py-2 w-full">
       <i class="fas fa-search text-gray-400 mr-2"></i>
       <input
         type="text"
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearch()"
-        placeholder="Search assessments..."
-        class="bg-transparent border-none focus:outline-none w-full text-sm"
+        [formControl]="searchControl"
+        placeholder="Search assessments by title or course..."
+        class="bg-transparent border-none focus:outline-none focus:ring-0 w-full text-sm"
       />
     </div>
   </div>
 
-  <div *ngIf="!isLoading && assessments.length === 0"
-       class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+  <!-- No Data -->
+  <div *ngIf="!isLoading && assessments.length === 0" class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i class="fas fa-file-alt text-gray-400 text-2xl"></i>
+    </div>
     <h3 class="text-lg font-medium text-gray-900 mb-2">No Assessments Found</h3>
-    <p class="text-gray-600">Start by adding your first assessment</p>
+    <p class="text-gray-600 mb-4">Start by adding your first assessment</p>
+    <a
+      *ngIf="can('create_assessments')"
+      routerLink="/admin/assessments/add"
+      class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium"
+    >
+      <i class="fas fa-plus mr-2"></i> Add Assessment
+    </a>
   </div>
 
-  <div *ngIf="!isLoading && assessments.length > 0"
-       class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+  <!-- Table -->
+  <div *ngIf="!isLoading && assessments.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
 
-    <div class="md:hidden divide-y">
-      <div *ngFor="let item of assessments; trackBy: trackById" class="p-4">
-        <div class="flex justify-between mb-2">
-          <span class="text-sm text-gray-500">#{{item.id}}</span>
-          <span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-xs font-bold border border-blue-100">
-            {{ item.total_marks || 0 }} Marks
-          </span>
+    <!-- Mobile Card View -->
+    <div class="md:hidden divide-y divide-gray-200">
+      <div *ngFor="let assessment of assessments; trackBy: trackById" class="p-4 hover:bg-gray-50">
+        <div class="flex justify-between items-start mb-3">
+          <span class="text-sm font-medium text-gray-900">#{{ assessment.id }}</span>
           <div class="flex space-x-2">
-            <a [routerLink]="['/admin/assessments/edit', item.id]"
-               class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+            <a
+              *ngIf="can('edit_assessments')"
+              [routerLink]="['/admin/assessments/edit', assessment.id]"
+              class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+            >
               Edit
             </a>
-            <button (click)="deleteAssessment(item.id)"
-                    class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs">
+            <button
+              *ngIf="can('delete_assessments')"
+              (click)="deleteAssessment(assessment.id)"
+              class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+            >
               Delete
             </button>
           </div>
         </div>
-        <p class="font-medium text-gray-900">{{item.assessment_title}}</p>
-        <p class="text-sm text-gray-600 mt-1">Course: {{item.course?.course_name || 'N/A'}}</p>
+
+        <div class="space-y-2">
+          <div>
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Assessment Title</h4>
+            <p class="text-sm font-medium text-gray-900">{{ assessment.assessment_title }}</p>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Course</h4>
+            <p class="text-sm text-gray-600">{{ assessment.course?.course_name || 'N/A' }}</p>
+          </div>
+
+          <div *ngIf="assessment.total_marks">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Marks</h4>
+            <p class="text-sm text-gray-600">{{ assessment.total_marks }}</p>
+          </div>
+
+          <div *ngIf="assessment.due_date">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Due Date</h4>
+            <p class="text-sm text-gray-600">{{ assessment.due_date | date }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Desktop Table View -->
     <div class="hidden md:block overflow-x-auto">
-      <table class="w-full">
+      <table class="w-full min-w-[700px]">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assessment Title</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Marks</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessment Title</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Marks</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y">
-          <tr *ngFor="let item of assessments; trackBy: trackById" class="hover:bg-gray-50">
-            <td class="px-6 py-4 text-gray-600">#{{item.id}}</td>
-            <td class="px-6 py-4 font-medium text-gray-900">{{item.assessment_title}}</td>
-            <td class="px-6 py-4 text-gray-600">{{item.course?.course_name || 'N/A'}}</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {{ item.total_marks || 0 }}
-              </span>
-            </td>
-            <td class="px-6 py-4">
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngFor="let assessment of assessments; trackBy: trackById" class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm text-gray-900">{{ assessment.id }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ assessment.assessment_title }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ assessment.course?.course_name || 'N/A' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ assessment.total_marks || '-' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ assessment.due_date | date }}</td>
+            <td class="px-6 py-4 text-sm whitespace-nowrap">
               <div class="flex space-x-2">
-                <a [routerLink]="['/admin/assessments/edit', item.id]"
-                   class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200">
+                <a
+                  *ngIf="can('edit_assessments')"
+                  [routerLink]="['/admin/assessments/edit', assessment.id]"
+                  class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+                >
                   Edit
                 </a>
-                <button (click)="deleteAssessment(item.id)"
-                        class="px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200">
+                <button
+                  *ngIf="can('delete_assessments')"
+                  (click)="deleteAssessment(assessment.id)"
+                  class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+                >
                   Delete
                 </button>
               </div>
@@ -111,8 +153,14 @@
       </table>
     </div>
 
-    <div class="border-t px-6 py-4 bg-gray-50 text-sm text-gray-700">
-      Showing {{ assessments.length }} of {{ totalItems }} assessments
+    <!-- Footer -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0 text-center sm:text-left">
+      <div class="text-sm text-gray-700">
+        Showing {{ assessments.length }} of {{ totalItems }} assessments
+      </div>
+      <div class="text-sm text-gray-500">
+        <i class="fas fa-file-alt mr-1"></i> Total assessments
+      </div>
     </div>
   </div>
 </div>

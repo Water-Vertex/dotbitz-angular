@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 import { ClassSchedule } from '../models/classschedule.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ClassScheduleService {
   private instructorApiUrl = `${environment.InstructorApiUrl}/class-schedules`;
@@ -20,6 +20,7 @@ export class ClassScheduleService {
   getSchedule(id: number): Observable<any> {
     return this.http.get(`${this.instructorApiUrl}/${id}`);
   }
+
 
   // Get schedules by batch
   getSchedulesByBatch(batchId: number): Observable<any> {
@@ -46,6 +47,7 @@ export class ClassScheduleService {
     return this.http.delete(this.instructorApiUrl, { body: { ids } });
   }
 
+
   getCourses(): Observable<any> {
     return this.http.get(`${environment.InstructorApiUrl}/courses`);
   }
@@ -58,4 +60,21 @@ export class ClassScheduleService {
   getBatchesByCourse(courseId: number): Observable<any> {
     return this.http.get(`${environment.InstructorApiUrl}/courses/${courseId}/batches`);
   }
+
+getStudentCourses(): Observable<any> {
+  return this.http.get(`${environment.StudentApiUrl}/student-courses`);
+}
+  getStudentSchedulesByCourse(courseId: number): Observable<any> {
+  return this.http.get(`${environment.StudentApiUrl}/courses/${courseId}/schedules`);
+}
+getMySchedules(batchId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/class-schedules/batch/${batchId}`
+  );
+}
+getGuardianStudentSchedules(studentId: number): Observable<any> {
+  return this.http.get(`${environment.GuardianApiUrl}/student/${studentId}/schedules`);
+}
+
+
 }

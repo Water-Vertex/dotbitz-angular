@@ -35,6 +35,7 @@ export class InstructorAnnouncementEdit implements OnInit {
     }
   }
 
+
   loadAnnouncement(): void {
     this.announcementService.getInstructorAnnouncement(this.id).subscribe({
       next: (res: any) => {
@@ -70,5 +71,11 @@ export class InstructorAnnouncementEdit implements OnInit {
         this.errorMsg = err.error?.message || 'Failed to update announcement.';
       },
     });
+  }
+  onStatusChange(): void {
+    // Clear scheduled_at if status is not scheduled
+    if (this.form.status !== 'scheduled') {
+      this.form.scheduled_at = null;
+    }
   }
 }

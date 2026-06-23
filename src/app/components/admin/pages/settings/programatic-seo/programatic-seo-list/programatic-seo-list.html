@@ -1,0 +1,119 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Programatic SEO Management</h1>
+        <p class="text-gray-600 mt-1">Manage your SEO records</p>
+      </div>
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+        <button
+          (click)="addNewRecord()"
+          class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center justify-center text-sm font-medium transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Add New Record
+        </button>
+        <button
+          (click)="refreshData()"
+          [disabled]="isLoading"
+          class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center justify-center text-sm font-medium disabled:opacity-50 min-w-[100px]"
+        >
+          <svg class="w-4 h-4 mr-2" [class.animate-spin]="isLoading" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Loading SEO Records...</p>
+  </div>
+
+  <!-- Search -->
+  <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <div class="relative">
+      <div class="flex items-center bg-gray-100 rounded-lg px-3 py-2 w-full border border-gray-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()"
+          placeholder="Search SEO records..."
+          class="bg-transparent border-none focus:outline-none focus:ring-0 w-full text-sm"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="!isLoading && programaticSeos.length === 0" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No SEO Records Found</h3>
+    <p class="text-gray-600 mb-4">Click "Add New Record" to create your first SEO record</p>
+    <button
+      (click)="addNewRecord()"
+      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 inline-flex items-center text-sm font-medium"
+    >
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Add New Record
+    </button>
+  </div>
+
+  <!-- Data Table Card -->
+  <div *ngIf="!isLoading && programaticSeos.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Focus Keyword</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">H1 Heading</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content Preview</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let item of programaticSeos" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.id }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ item.title }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ item.focus_keyword }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ getPreview(item.h1_heading, 50) }}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ getPreview(item.content, 80) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+              <button (click)="viewOnWebsite(item.slug!)" class="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-xs font-medium transition-colors">
+                View
+              </button>
+              <button (click)="editRecord(item.id!)" class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors">
+                Edit
+              </button>
+              <button (click)="deleteRecord(item.id!)" [disabled]="deletingId === item.id" class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors disabled:opacity-50">
+                {{ deletingId === item.id ? 'Deleting...' : 'Delete' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0 text-center sm:text-left">
+      <span class="text-sm text-gray-600">Showing {{ programaticSeos.length }} of {{ totalItems }} records</span>
+    </div>
+  </div>
+</div>

@@ -1,377 +1,300 @@
 <div class="min-h-screen bg-gray-50 p-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p class="text-gray-600 mt-1">Welcome back, Admin! Here's what's happening with your platform.</p>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex items-center justify-center h-64">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
-        <div class="flex items-center gap-3">
-            <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
-                <i class="fas fa-download mr-2"></i>Export Report
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-600 mr-3"></i>
+            <p class="text-red-700">{{ error }}</p>
+            <button (click)="loadDashboardStats()" class="ml-auto text-sm text-red-600 hover:text-red-700 font-medium">
+                Retry
             </button>
-            <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center">
-                <i class="fas fa-plus mr-2"></i>New Course
-            </button>
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- Students Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-users text-blue-600 text-lg"></i>
+    <!-- Dashboard Content -->
+    <div *ngIf="!loading && !error">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Guardian Dashboard</h1>
+                <p class="text-gray-600 mt-1">Welcome back, {{ guardianName }}! Here's an overview of your children's academic progress.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-calendar-alt mr-2"></i>{{ currentDate | date:'fullDate' }}
                 </div>
-                <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                    <i class="fas fa-arrow-up mr-1"></i>24.7%
-                </span>
-            </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">12,847</h3>
-            <p class="text-gray-600 text-sm">Total Students</p>
-            <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/students" class="text-sm text-blue-600 hover:text-blue-700 font-medium inline-flex items-center">
-                    View all students
-                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                </a>
             </div>
         </div>
 
-        <!-- Courses Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-purple-50 rounded-lg">
-                    <i class="fas fa-book-open text-purple-600 text-lg"></i>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Students Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <i class="fas fa-users text-blue-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        <i class="fas fa-user-graduate mr-1"></i>Total
+                    </span>
                 </div>
-                <span class="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full">156 Active</span>
-            </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">156</h3>
-            <p class="text-gray-600 text-sm">Active Courses</p>
-            <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/courses" class="text-sm text-purple-600 hover:text-purple-700 font-medium inline-flex items-center">
-                    Manage courses
-                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- Instructors Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-green-50 rounded-lg">
-                    <i class="fas fa-chalkboard-teacher text-green-600 text-lg"></i>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_students }}</h3>
+                <p class="text-gray-600 text-sm">Children Enrolled</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <!-- <a routerLink="/guardian/students" class="text-sm text-blue-600 hover:text-blue-700 font-medium inline-flex items-center">
+                        View all students
+                        <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                    </a> -->
                 </div>
-                <span class="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">48 Total</span>
             </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">48</h3>
-            <p class="text-gray-600 text-sm">Instructors</p>
-            <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/instructors" class="text-sm text-green-600 hover:text-green-700 font-medium inline-flex items-center">
-                    View instructors
-                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                </a>
-            </div>
-        </div>
 
-        <!-- Revenue Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-amber-50 rounded-lg">
-                    <i class="fas fa-dollar-sign text-amber-600 text-lg"></i>
+            <!-- Courses Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-purple-50 rounded-lg">
+                        <i class="fas fa-book-open text-purple-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                        {{ stats.completed_courses }} Completed
+                    </span>
                 </div>
-                <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                    <i class="fas fa-arrow-up mr-1"></i>18.3%
-                </span>
-            </div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">$48.2K</h3>
-            <p class="text-gray-600 text-sm">Monthly Revenue</p>
-            <div class="mt-4 pt-4 border-t border-gray-100">
-                <a href="/admin/revenue" class="text-sm text-amber-600 hover:text-amber-700 font-medium inline-flex items-center">
-                    View analytics
-                    <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Recent Students -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-semibold text-gray-900">Recent Students</h2>
-                <a href="/admin/students" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                    View all
-                </a>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-left text-xs text-gray-500 uppercase border-b border-gray-100">
-                            <th class="pb-3 px-4">Student</th>
-                            <th class="pb-3 px-4">Course</th>
-                            <th class="pb-3 px-4">Enrolled</th>
-                            <th class="pb-3 px-4">Progress</th>
-                            <th class="pb-3 px-4">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <span class="text-sm font-medium text-blue-600">JD</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">John Doe</p>
-                                        <p class="text-xs text-gray-500">john@example.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-900">Web Development</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-500">2 days ago</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-600">65%</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Active
-                                </span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                        <span class="text-sm font-medium text-purple-600">SJ</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Sarah Johnson</p>
-                                        <p class="text-xs text-gray-500">sarah@example.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-900">UI/UX Design</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-500">1 week ago</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-600 h-2 rounded-full" style="width: 85%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-600">85%</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Active
-                                </span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                                        <span class="text-sm font-medium text-amber-600">MB</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Mike Brown</p>
-                                        <p class="text-xs text-gray-500">mike@example.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-900">Data Science</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="text-sm text-gray-500">3 weeks ago</span>
-                            </td>
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 bg-gray-200 rounded-full h-2">
-                                        <div class="bg-amber-600 h-2 rounded-full" style="width: 45%"></div>
-                                    </div>
-                                    <span class="text-xs text-gray-600">45%</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    Behind
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h2>
-            <div class="space-y-3">
-                <a href="/admin/courses/create" class="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-plus text-blue-600"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-900">Create New Course</p>
-                        <p class="text-sm text-gray-600">Add a new course to catalog</p>
-                    </div>
-                </a>
-
-                <a href="/admin/instructors/create" class="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-user-plus text-purple-600"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-900">Add Instructor</p>
-                        <p class="text-sm text-gray-600">Invite new instructor</p>
-                    </div>
-                </a>
-
-                <a href="/admin/faq/create" class="flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-question-circle text-green-600"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-900">Add FAQ</p>
-                        <p class="text-sm text-gray-600">Create new help article</p>
-                    </div>
-                </a>
-
-                <a href="/admin/analytics" class="flex items-center gap-3 p-4 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors">
-                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-chart-bar text-amber-600"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-900">View Reports</p>
-                        <p class="text-sm text-gray-600">Platform analytics</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Top Courses -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-semibold text-gray-900">Top Courses</h2>
-                <a href="/admin/courses" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                    View all courses
-                </a>
-            </div>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-code text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-gray-900">Web Development Bootcamp</p>
-                            <div class="flex items-center gap-3 mt-1">
-                                <span class="text-sm text-gray-600">2,548 students</span>
-                                <span class="flex items-center text-sm text-amber-600">
-                                    <i class="fas fa-star mr-1"></i>4.9
-                                </span>
-                            </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_courses }}</h3>
+                <p class="text-gray-600 text-sm">Total Courses Enrolled</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-purple-600 h-2 rounded-full"
+                             [style.width]="(stats.completed_courses / stats.total_courses * 100) + '%'">
                         </div>
                     </div>
-                    <span class="font-semibold text-gray-900">$89</span>
+                    <p class="text-xs text-gray-500">{{ stats.completed_courses }} completed, {{ stats.in_progress_courses }} in progress</p>
                 </div>
+            </div>
 
-                <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-paint-brush text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-gray-900">UI/UX Design Masterclass</p>
-                            <div class="flex items-center gap-3 mt-1">
-                                <span class="text-sm text-gray-600">1,892 students</span>
-                                <span class="flex items-center text-sm text-amber-600">
-                                    <i class="fas fa-star mr-1"></i>4.8
-                                </span>
-                            </div>
+            <!-- Assessments Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <i class="fas fa-tasks text-green-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        {{ stats.completed_assessments }} Done
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_assessments }}</h3>
+                <p class="text-gray-600 text-sm">Total Assessments (Quizzes)</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-600">Completion Rate</span>
+                        <span class="font-medium">{{ (stats.completed_assessments / stats.total_assessments * 100) || 0 | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full"
+                             [style.width]="(stats.completed_assessments / stats.total_assessments * 100) + '%'">
                         </div>
                     </div>
-                    <span class="font-semibold text-gray-900">$79</span>
                 </div>
+            </div>
 
-                <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-chart-line text-white"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-gray-900">Data Science Fundamentals</p>
-                            <div class="flex items-center gap-3 mt-1">
-                                <span class="text-sm text-gray-600">1,456 students</span>
-                                <span class="flex items-center text-sm text-amber-600">
-                                    <i class="fas fa-star mr-1"></i>4.7
-                                </span>
-                            </div>
+            <!-- Assignments Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-amber-50 rounded-lg">
+                        <i class="fas fa-file-alt text-amber-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        {{ stats.submitted_assignments }} Submitted
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_assignments }}</h3>
+                <p class="text-gray-600 text-sm">Total Assignments</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-600">Submission Rate</span>
+                        <span class="font-medium">{{ (stats.submitted_assignments / stats.total_assignments * 100) || 0 | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-amber-600 h-2 rounded-full"
+                             [style.width]="(stats.submitted_assignments / stats.total_assignments * 100) + '%'">
                         </div>
                     </div>
-                    <span class="font-semibold text-gray-900">$99</span>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h2>
-            <div class="space-y-4">
-                <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
-                        <i class="fas fa-user-plus text-blue-600 text-sm"></i>
+        <!-- Progress Overview Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Overall Progress Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6">Overall Academic Progress</h2>
+                <div class="text-center mb-6">
+                    <div class="relative inline-block">
+                        <svg class="w-32 h-32">
+                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="56" cx="64" cy="64"/>
+                            <circle class="text-indigo-600" stroke-width="8" stroke="currentColor" fill="transparent" r="56" cx="64" cy="64"
+                                   
+                                    stroke-linecap="round"/>
+                        </svg>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                            <div class="text-3xl font-bold text-gray-900">{{ stats.average_completion_rate }}%</div>
+                            <div class="text-xs text-gray-500">Completion</div>
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900"><span class="font-medium">John Doe</span> enrolled in Web Development</p>
-                        <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
-                    </div>
+                    <p class="mt-4 text-gray-600">Average course completion rate across all children</p>
                 </div>
 
-                <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-1">
-                        <i class="fas fa-graduation-cap text-green-600 text-sm"></i>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Courses Completed</span>
+                        <span class="font-medium">{{ stats.completed_courses }} / {{ stats.total_courses }}</span>
                     </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900"><span class="font-medium">Sarah Johnson</span> completed UI/UX Design</p>
-                        <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Assessments Completed</span>
+                        <span class="font-medium">{{ stats.completed_assessments }} / {{ stats.total_assessments }}</span>
                     </div>
-                </div>
-
-                <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mt-1">
-                        <i class="fas fa-book text-purple-600 text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900">New course <span class="font-medium">"Mobile App Development"</span> published</p>
-                        <p class="text-xs text-gray-500 mt-1">1 day ago</p>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Assignments Submitted</span>
+                        <span class="font-medium">{{ stats.submitted_assignments }} / {{ stats.total_assignments }}</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center mt-1">
-                        <i class="fas fa-chart-line text-amber-600 text-sm"></i>
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h2>
+                <div class="space-y-3">
+                    <a routerLink="/guardian/students" class="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">View All Children</p>
+                            <p class="text-sm text-gray-600">Check progress of all enrolled students</p>
+                        </div>
+                    </a>
+
+                    <a routerLink="/guardian/courses" class="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-book-open text-purple-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">Browse Courses</p>
+                            <p class="text-sm text-gray-600">View course catalog and details</p>
+                        </div>
+                    </a>
+
+                    <a routerLink="/guardian/reports" class="flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">View Reports</p>
+                            <p class="text-sm text-gray-600">Detailed progress reports and analytics</p>
+                        </div>
+                    </a>
+
+                    <a routerLink="/guardian/messages" class="flex items-center gap-3 p-4 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors">
+                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-envelope text-amber-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">Contact Teachers</p>
+                            <p class="text-sm text-gray-600">Communicate with instructors</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Alerts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h2>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3" *ngIf="stats.submitted_assignments > 0">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-file-alt text-green-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">New assignment submissions received</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ stats.submitted_assignments }} assignments submitted</p>
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900">Monthly revenue reached <span class="font-medium">$48,250</span></p>
-                        <p class="text-xs text-gray-500 mt-1">2 days ago</p>
+
+                    <div class="flex items-start gap-3" *ngIf="stats.completed_assessments > 0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-tasks text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">Assessments completed</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ stats.completed_assessments }} quizzes finished</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3" *ngIf="stats.pending_assignments > 0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-clock text-yellow-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">Pending assignments</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ stats.pending_assignments }} assignments need attention</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3" *ngIf="stats.pending_assessments > 0">
+                        <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">Pending assessments</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ stats.pending_assessments }} quizzes not yet attempted</p>
+                        </div>
+                    </div>
+
+                    <div *ngIf="stats.submitted_assignments === 0 && stats.completed_assessments === 0" class="text-center py-8">
+                        <i class="fas fa-inbox text-gray-400 text-4xl mb-3"></i>
+                        <p class="text-gray-500">No recent activity to display</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Tips -->
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Performance Tips</h2>
+                    <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">1</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Encourage regular study habits - 30 minutes daily is more effective than long sessions</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">2</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Review assignment deadlines weekly to avoid last-minute submissions</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">3</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Celebrate small achievements to maintain motivation and engagement</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">4</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Connect with teachers regularly for personalized guidance</p>
                     </div>
                 </div>
             </div>

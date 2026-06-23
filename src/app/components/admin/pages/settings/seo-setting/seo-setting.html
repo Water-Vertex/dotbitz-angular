@@ -1,0 +1,96 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <h1 class="text-2xl font-bold text-gray-900">SEO Settings</h1>
+    <p class="text-gray-500 mt-1 text-sm">Manage SEO for each page</p>
+  </div>
+
+  <div *ngIf="loading" class="bg-white rounded-xl border p-8 text-center">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Loading SEO settings...</p>
+  </div>
+
+  <div *ngIf="!loading" class="bg-white rounded-xl border border-gray-200 shadow-sm">
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200 px-6">
+      <div class="flex space-x-1 overflow-x-auto">
+        <button *ngFor="let tab of tabs" (click)="activeTab = tab"
+          [ngClass]="activeTab === tab
+            ? 'border-b-2 border-blue-600 text-blue-600 font-medium'
+            : 'text-gray-500 hover:text-gray-700'"
+          class="px-4 py-3 text-sm capitalize whitespace-nowrap transition-colors">
+          {{ tab }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="p-6 space-y-4">
+      <ng-container *ngFor="let tab of tabs">
+        <div *ngIf="activeTab === tab" class="space-y-4">
+
+          <!-- Title (not for faq/course) -->
+          <div *ngIf="tab !== 'faq' && tab !== 'course'">
+            <label class="block text-sm font-medium text-gray-700 mb-1 capitalize">{{ tab }} Page Title</label>
+            <input type="text" [(ngModel)]="seo[tab + '_title']"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Focus Keyword 
+            </label>
+            <input type="text" 
+              [(ngModel)]="seo[tab + '_focus_keyword']" 
+              placeholder="e.g., web development course, best online learning"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+            <input type="text" [(ngModel)]="seo[tab + '_meta_title']"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+            <textarea [(ngModel)]="seo[tab + '_meta_description']" rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
+            <input type="text" [(ngModel)]="seo[tab + '_meta_keywords']" placeholder="keyword1, keyword2, keyword3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Meta Tags</label>
+            <textarea [(ngModel)]="seo[tab + '_meta_tags']" rows="2"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+
+          <!-- Schema (not for faq) -->
+          <div *ngIf="tab !== 'faq'">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Page Schema (JSON)</label>
+            <textarea [(ngModel)]="seo[tab + '_page_schema']" rows="4" placeholder='{"@context": "https://schema.org"...}'
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Save -->
+    <div class="flex justify-end px-6 pb-6">
+      <button (click)="saveSeoSettings()" [disabled]="saving"
+        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50">
+        {{ saving ? 'Saving...' : 'Save SEO Settings' }}
+      </button>
+    </div>
+
+  </div>
+</div>

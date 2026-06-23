@@ -4,15 +4,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CouponService } from '../../../../../services/coupon.service';
 import { ToastService } from '../../../../../services/toast.service';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-coupon-add',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, CKEditorModule],
-  templateUrl: './coupon-add.html',
-  styleUrls: ['./coupon-add.css'],  
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  templateUrl: './coupon-add.html'
 })
 export class CouponAdd implements OnInit {
   couponForm: FormGroup;
@@ -21,37 +18,12 @@ export class CouponAdd implements OnInit {
   isLoading = false;
   isSubmitting = false;
 
-  // ✅ CKEditor
-  public Editor: any = ClassicEditor;
-  public editorConfig = {
-    toolbar: [
-      'heading',
-      '|',
-      'bold',
-      'italic',
-      'underline',
-      '|',
-      'bulletedList',
-      'numberedList',
-      '|',
-      'indent',
-      'outdent',
-      '|',
-      'link',
-      '|',
-      'blockQuote',
-      '|',
-      'undo',
-      'redo',
-    ],
-  };
-
   constructor(
     private fb: FormBuilder,
     private couponService: CouponService,
     private toast: ToastService,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {
     this.couponForm = this.fb.group({
       code: ['', [Validators.required, Validators.minLength(2)]],
@@ -61,7 +33,7 @@ export class CouponAdd implements OnInit {
       description: ['', [Validators.required, Validators.minLength(2)]],
       is_active: [true],
       valid_from: ['', Validators.required],
-      valid_until: ['', Validators.required],
+      valid_until: ['', Validators.required]
     });
   }
 
@@ -77,14 +49,14 @@ export class CouponAdd implements OnInit {
   loadCoupon(id: number): void {
     this.isLoading = true;
     this.couponService.getCoupon(id).subscribe({
-      next: (res) => {
+      next: res => {
         this.couponForm.patchValue(res.data);
         this.isLoading = false;
       },
       error: () => {
         this.toast.error('Error', 'Failed to load coupon');
         this.router.navigate(['/admin/coupon/list']);
-      },
+      }
     });
   }
 
@@ -97,18 +69,17 @@ export class CouponAdd implements OnInit {
     this.isSubmitting = true;
     const data = this.couponForm.value;
 
-    const request =
-      this.isEditMode && this.couponId
-        ? this.couponService.updateCoupon(this.couponId, data)
-        : this.couponService.createCoupon(data);
+    const request = this.isEditMode && this.couponId
+      ? this.couponService.updateCoupon(this.couponId, data)
+      : this.couponService.createCoupon(data);
 
     request.subscribe({
-      next: (res) => {
+      next: res => {
         this.toast.success('Success', res.message || 'Coupon saved successfully');
         this.router.navigate(['/admin/coupon/list']);
       },
-      error: (err) => this.handleError(err),
-      complete: () => (this.isSubmitting = false),
+      error: err => this.handleError(err),
+      complete: () => (this.isSubmitting = false)
     });
   }
 
@@ -125,21 +96,27 @@ export class CouponAdd implements OnInit {
     this.router.navigate(['/admin/coupon/list']);
   }
 
+  // Form control getters
   get code() {
     return this.couponForm.get('code');
   }
+
   get discount_type() {
     return this.couponForm.get('discount_type');
   }
+
   get discount_amount() {
     return this.couponForm.get('discount_amount');
   }
+
   get description() {
     return this.couponForm.get('description');
   }
+
   get valid_from() {
     return this.couponForm.get('valid_from');
   }
+
   get valid_until() {
     return this.couponForm.get('valid_until');
   }

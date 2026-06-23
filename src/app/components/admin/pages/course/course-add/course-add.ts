@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -13,13 +12,14 @@ import { Router } from '@angular/router';
 import { CourseService } from '../../../../../services/course.service';
 import { InstructorService } from '../../../../../services/instructor.service';
 import { ToastService } from '../../../../../services/toast.service';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 @Component({
   selector: 'app-course-add',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, CKEditorModule],
   templateUrl: './course-add.html',
-  styleUrls: ['./course-add.css'],
 })
 export class CourseAdd implements OnInit {
   courseForm!: FormGroup;
@@ -29,33 +29,18 @@ export class CourseAdd implements OnInit {
 
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
-
-  
   public Editor: any = ClassicEditor;
-
-  public editorConfig = {
-    toolbar: [
-      'heading',
-      '|',
-      'bold',
-      'italic',
-      'underline',
-      '|',
-      'link',
-      'bulletedList',
-      'numberedList',
-      '|',
-      'blockQuote',
-      '|',
-      'undo',
-      'redo',
-    ],
-  };
+    public editorConfig = {
+      toolbar: [
+        'heading', '|', 'bold', 'italic', 'underline', 'strikethrough',
+        '|', 'link', 'bulletedList', 'numberedList',
+        '|', 'blockQuote', '|', 'undo', 'redo',
+      ],
+    };
 
   constructor(
     private fb: FormBuilder,
     private courseService: CourseService,
-    private instructorService: InstructorService,
     private toast: ToastService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -68,38 +53,32 @@ export class CourseAdd implements OnInit {
       course_description: [''],
       course_duration: [''],
       course_fee: [''],
+      discounted_fee: [''],
       course_level: [''],
       age_limit: [''],
       start_date: [''],
       end_date: [''],
       status: ['active'],
       is_featured: [false],
-      instructor_id: ['', Validators.required],
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
+
+       classes_per_week:  [''],
+      total_classes:     [''],
+      course_hours:      [''],
+      meta_title: [''],
+meta_description: [''],
+meta_keyword: [''],
+meta_tags: [''],
+focus_keyword: [''],
+page_schema: [''],
     });
 
-    this.loadInstructors();
   }
 
-  loadInstructors() {
-    this.instructorService.getInstructors().subscribe({
-      next: (res) => {
-        this.instructors = Array.isArray(res.data) ? res.data : [];
-        this.isLoadingInstructors = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.toast.error('Error', 'Failed to load instructors');
-        this.isLoadingInstructors = false;
-      },
-    });
-  }
 
-  get instructor_id() {
-    return this.courseForm.get('instructor_id');
-  }
+
   get course_name() {
     return this.courseForm.get('course_name');
   }
@@ -107,15 +86,26 @@ export class CourseAdd implements OnInit {
     return this.courseForm.get('course_code');
   }
 
+  calculateTotals(): void {
+  this.courseForm.patchValue(
+    { total_classes: 0, course_hours: '0' },
+    { emitEvent: false }
+  );
+  this.cdr.detectChanges();
+}
+
   onFileSelected(event: any) {
-    const file = event.target.files[0];
+    const file = event.target.files[0]; // Capture it in a local constant
+
     if (file) {
       this.selectedFile = file;
+
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
         this.cdr.detectChanges();
       };
+      // Use the local 'file' constant which TypeScript knows is not null
       reader.readAsDataURL(file);
     }
   }
@@ -129,24 +119,36 @@ export class CourseAdd implements OnInit {
     this.isSubmitting = true;
     const formData = new FormData();
 
+    // Iterate through form controls
     Object.keys(this.courseForm.value).forEach((key) => {
       if (key !== 'thumbnail_image') {
         let value = this.courseForm.value[key];
-        if (typeof value === 'boolean') value = value ? '1' : '0';
-        if (value !== null && value !== undefined) formData.append(key, value);
+
+        // FIX: Convert booleans to '1' or '0'
+        // FormData sends everything as a string; '1'/'0' is the safest format for APIs
+        if (typeof value === 'boolean') {
+          value = value ? '1' : '0';
+        }
+
+        if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
       }
     });
 
+    // Append file safely
     if (this.selectedFile) {
       formData.append('thumbnail_image', this.selectedFile, this.selectedFile.name);
     }
 
+    // Submit
     this.courseService.createCourse(formData).subscribe({
       next: (res) => {
         this.toast.success('Success', res.message || 'Course added successfully');
         this.router.navigate(['/admin/course/list']);
       },
       error: (err) => {
+        // Improved error logging to help you see the "1 more error"
         console.error('Upload error:', err);
         this.toast.error('Error', err.error?.message || 'Failed to add course');
         this.isSubmitting = false;

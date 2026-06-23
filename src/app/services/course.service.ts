@@ -12,7 +12,7 @@ export class CourseService {
   // private apiUrl = 'http://localhost:8000/api/courses';
 
   private apiUrl = environment.AdminApiUrl + '/courses';
-  private StudentApiUrl = environment.StudentApiUrl + '/courses';
+  private StudentApiUrl = environment.StudentApiUrl + '/my-courses';
   private guardianApiUrl = environment.GuardianApiUrl + '/courses';
   private instructorApiUrl = environment.InstructorApiUrl + '/courses';
 
@@ -50,6 +50,7 @@ export class CourseService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
+
   getCourse(id: number): Observable<CourseApiResponse> {
     return this.http
       .get<CourseApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
@@ -86,7 +87,7 @@ export class CourseService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  getStudentCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+   getStudentCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
     let url = `${this.StudentApiUrl}?per_page=${perPage}`;
     if (search) {
       url += `&search=${search}`;
@@ -99,6 +100,12 @@ export class CourseService {
   /**
    * Fetches a single course detail for the Student.
    */
+
+  getCourseDetail(id: number): Observable<CourseApiResponse> {
+    return this.http
+      .get<CourseApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError((err) => throwError(() => err)));
+  }
   getStudentCourseDetail(id: number): Observable<CourseApiResponse> {
     return this.http
       .get<CourseApiResponse>(`${this.StudentApiUrl}/${id}`, { headers: this.getHeaders() })
@@ -124,7 +131,7 @@ export class CourseService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  getInstructorCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
+   getInstructorCourses(search: string = '', perPage: number = 50): Observable<CourseApiResponse> {
     let url = `${this.instructorApiUrl}?per_page=${perPage}`;
     if (search) {
       url += `&search=${search}`;
@@ -142,4 +149,147 @@ export class CourseService {
       .get<CourseApiResponse>(`${this.instructorApiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError((err) => throwError(() => err)));
   }
+  getQuizzesByBatch(batchId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quizzes/batch/${batchId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+checkQuizAttempt(quizId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quiz-attempts/check/${quizId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+startQuiz(quizId: number): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz-attempts/start/${quizId}`,
+    {},
+    { headers: this.getHeaders() }
+  );
+}
+
+submitQuiz(attemptId: number, payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz-attempts/submit/${attemptId}`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+  getBatchesByCourse(courseId: number): Observable<any> {
+    return this.http.get(
+      `${environment.AdminApiUrl}/batches/course/${courseId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+  resumeQuizCheck(quizId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quiz-attempts/resume/${quizId}`,
+    { headers: this.getHeaders() }
+  );
+}
+saveQuizProgress(attemptId: number, answers: any[]): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz-attempts/save-progress/${attemptId}`,
+    { answers },
+    { headers: this.getHeaders() }
+  );
+}
+getMyResultCourses(): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/results/courses`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getQuizResults(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/results/quiz/${courseId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getAssignmentResults(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/results/assignment/${courseId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getCheckedQuizDetail(attemptId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/quiz-attempts/result/${attemptId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+ //  GUARDIAN RESULTS  ✅ NEW
+  // ─────────────────────────────────────────────
+
+  /** Guardian: get enrolled courses for a specific student */
+  getGuardianStudentResultCourses(studentId: number): Observable<any> {
+    return this.http.get(
+      `${environment.GuardianApiUrl}/results/courses/${studentId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  /** Guardian: get quiz results for a specific student + course */
+  getGuardianQuizResults(studentId: number, courseId: number): Observable<any> {
+    return this.http.get(
+      `${environment.GuardianApiUrl}/results/quiz/${studentId}/${courseId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  /** Guardian: get assignment results for a specific student + course */
+  getGuardianAssignmentResults(studentId: number, courseId: number): Observable<any> {
+    return this.http.get(
+      `${environment.GuardianApiUrl}/results/assignment/${studentId}/${courseId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  /** Guardian: get checked quiz detail (reuses same student endpoint — same data) */
+  getGuardianCheckedQuizDetail(attemptId: number): Observable<any> {
+    return this.http.get(
+      `${environment.StudentApiUrl}/quiz-attempts/result/${attemptId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  checkStudentAssessmentCompleted(studentId: number, courseId: number): Observable<any> {
+    return this.http.get(`${environment.StudentApiUrl}/check-assessment/${studentId}/${courseId}`, { headers: this.getHeaders() });
+  }
+  checkGuardianStudentAssessmentCompleted(studentId: number, courseId: number): Observable<any> {
+  return this.http.get(`${environment.GuardianApiUrl}/check-assessment/${studentId}/${courseId}`, { headers: this.getHeaders() });
+}
+
+  enrollStudentInCourse(courseId: number): Observable<any> {
+    return this.http.post(`${environment.StudentApiUrl}/enroll-course`, { course_id: courseId }, { headers: this.getHeaders() });
+  }
+
+    getGuardianStudents(): Observable<any> {
+      return this.http.get(`${environment.GuardianApiUrl}/students`, { headers: this.getHeaders() });
+    }
+    reattemptQuiz(quizId: number): Observable<any> {
+  return this.http.post(
+    `${environment.StudentApiUrl}/quiz/${quizId}/reattempt`,
+    {},
+    { headers: this.getHeaders() }
+  );
+}
+
+// Student side - uses StudentApiUrl
+checkStudentExemption(studentId: number, courseId: number): Observable<any> {
+  return this.http.get(`${environment.StudentApiUrl}/check-exemption/${studentId}/${courseId}`, { headers: this.getHeaders() });
+}
+
+// Guardian side - uses GuardianApiUrl
+checkGuardianExemption(studentId: number, courseId: number): Observable<any> {
+  return this.http.get(`${environment.GuardianApiUrl}/check-exemption/${studentId}/${courseId}`, { headers: this.getHeaders() });
+}
 }

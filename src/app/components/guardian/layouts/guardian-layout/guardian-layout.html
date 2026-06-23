@@ -148,6 +148,12 @@
         <i class="fas fa-user-circle mr-3 text-gray-400 w-5"></i>
         <span>Profile</span>
     </a>
+    <!-- Reset Password Item (Naya Button) -->
+<a (click)="navigateToResetPassword()" class="cursor-pointer flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition-all duration-200">
+    <i class="fas fa-key mr-3 text-gray-400 w-5"></i>
+    <span>Change Password</span>
+</a>
+
 
     <div class="border-t border-gray-100 my-1"></div>
 
@@ -180,11 +186,6 @@
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                        Dashboard
                     </a>
-                    <a routerLink="/guardian/student-assessments" data-nav-item data-href="/guardian/student-assessments"
-   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-   <i class="fas fa-clipboard-list mr-3 w-5 text-center"></i>
-     Assigned Assessments
-</a>
                     <a routerLink="/guardian/courses/list" data-nav-item data-href="/guardian/courses/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                         <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
@@ -196,7 +197,42 @@
                       My Courses
                     </a>
 
+                    <a routerLink="/guardian/class-schedule"
+   data-nav-item
+   data-href="/guardian/class-schedule"
+   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+   <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i>
+   Class Schedule
+</a>
 
+                    <a routerLink="/guardian/student-assessments/" data-nav-item data-href="/guardian/assessments"
+                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                          Assessments
+
+                    </a>
+                    <a routerLink="/guardian/student-results" data-nav-item data-href="/guardian/student-results"
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
+                      Grade Book
+                    </a>
+                     <a routerLink="/guardian/event/list" data-nav-item data-href="/guardian/event/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+  <i class="fas fa-calendar-alt mr-3 w-5"></i> Events
+
+                    </a>
+
+                     <a routerLink="/guardian/my-bills" data-nav-item data-href="/guardian/my-bills"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file-invoice-dollar mr-3 w-5"></i>
+                        Bills
+                    </a>
+
+                     <a routerLink="/guardian/support" data-nav-item data-href="/guardian/support"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+  <i class="fas fa-ticket-alt mr-3 w-5"></i> Tickets
+                        
+                    </a>
 
                 </div>
             </div>
@@ -244,11 +280,6 @@
                         <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                        Dashboard
                     </a>
-                    <a routerLink="/guardian/student-assessments" data-nav-item data-href="/guardian/student-assessments"
-   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
-   <i class="fas fa-clipboard-list mr-3 w-5 text-center"></i>
-    Assigned Assessments
-</a>
                     <a routerLink="/guardian/courses/list" data-nav-item data-href="/guardian/courses/list"
                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                       <i class="fas fa-graduation-cap mr-3 w-5 text-content"></i>
@@ -258,6 +289,38 @@
                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
                       <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
                       My Courses
+                    </a>
+                    <a routerLink="/guardian/class-schedule" data-nav-item data-href="/guardian/class-schedule"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i>
+                        Class Schedule
+                    </a>
+                    <a routerLink="/guardian/student-assessments" data-nav-item data-href="/guardian/student-assessments"
+                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-file-circle-question mr-3 w-5 text-content"></i>
+                          Assessments
+
+                    </a>
+                    <a routerLink="/guardian/student-results" data-nav-item data-href="/guardian/student-results"
+                      class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-graduation-cap mr-3 w-5 text-center"></i>
+                      Grade Book
+                    </a>
+                     <a routerLink="/guardian/event/list" data-nav-item data-href="/guardian/event/list"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+  <i class="fas fa-calendar-alt mr-3 w-5"></i> Events
+
+                    </a>
+
+                    <a routerLink="/guardian/my-bills" data-nav-item data-href="/guardian/my-bills"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                        <i class="fas fa-file-invoice-dollar mr-3 w-5"></i>
+                        Bills
+                    </a>
+                     <a routerLink="/guardian/support" data-nav-item data-href="/guardian/support"
+                       class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                      <i class="fas fa-ticket-alt mr-3 w-5"></i> Tickets
+                        
                     </a>
 
                 </div>
@@ -345,6 +408,11 @@
                                 <span>Profile</span>
                             </a>
 
+<a (click)="navigateToResetPassword()" class="cursor-pointer flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 transition-all duration-200">
+    <i class="fas fa-key mr-3 text-gray-400 w-5"></i>
+    <span>Reset Password</span>
+</a>
+
                             <div class="border-t border-gray-100 my-1"></div>
 
                             <a (click)="navigateToLogout()" class="cursor-pointer flex items-center w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
@@ -370,3 +438,4 @@
         </main>
     </div>
 </div>
+

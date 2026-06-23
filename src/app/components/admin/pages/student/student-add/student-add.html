@@ -1,12 +1,12 @@
 
   <!-- Decorative blur -->
-    <div class="absolute top-0 right-0 w-64 h-64 bg-[#ffd500] opacity-10 blur-3xl rounded-full"></div>
+<div class="absolute top-0 right-0 w-64 h-64 bg-[#ffd500] opacity-10 blur-3xl rounded-lg border border-gray-200 p-6 mb-6"></div>
 <div class="mt-12 relative z-1 bg-white p-6 sm:p-0">
   <div class="relative flex  w-full flex-col justify-center sm:p-0 lg:flex-row">
     <!-- Form Section -->
     <div class="flex w-full flex-1 flex-col lg:w-1/2">
 
-      <div class="mx-auto w-full max-w-4xl px-4 flex flex-1 flex-col justify-center"> <!-- Changed max-w-md to max-w-4xl and added px-4 -->
+      <div class="mx-auto w-full  px-4 flex flex-1 flex-col justify-center"> <!-- Changed max-w-md to max-w-4xl and added px-4 -->
         <div class="w-full">
 
           <!-- Progress Steps -->
@@ -15,7 +15,7 @@
               <div *ngFor="let step of [1, 2, 3]; let i = index" class="flex items-center">
                 <div
                   [class]="'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ' +
-                  (currentStep === i + 1 ? 'bg-[#161950] text-white' :
+                  (currentStep === i + 1 ? 'bg-[#FF6D00] text-white' :
                    currentStep > i + 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600')"
                 >
                   <span *ngIf="currentStep <= i + 1" class="text-sm font-bold">{{i + 1}}</span>
@@ -74,7 +74,6 @@
                     <!-- Last Name -->
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
-
                         Student Last Name<span class="text-red-500">*</span>
                       </label>
                       <input
@@ -98,7 +97,6 @@
                   <!-- Username -->
                   <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
-
                       Student Username<span class="text-red-500">*</span>
                     </label>
                     <input
@@ -122,7 +120,6 @@
                     <!-- Email -->
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
-
                         Student Email<span class="text-red-500">*</span>
                       </label>
                       <input
@@ -170,7 +167,6 @@
                     <!-- Date of Birth -->
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
-
                         Student Date of Birth<span class="text-red-500">*</span>
                       </label>
                       <input
@@ -191,7 +187,7 @@
                       <div *ngIf="age !== null" class="mt-2 flex items-center gap-2">
                         <span class="text-sm text-gray-600">
                           Age: {{age}} years
-                          <span *ngIf="age < 18" class="text-blue-600 ml-2">(Guardian information will be required)</span>
+                          <span *ngIf="age < 18" class="text-orange-600 ml-2">(Guardian information will be required)</span>
                         </span>
                       </div>
                     </div>
@@ -382,12 +378,12 @@
 
                   <!-- Guardian Information (Only for under 18) -->
                   <div *ngIf="showGuardianInfo">
-                    <div class="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
+                    <div class="bg-orange-50 p-4 rounded-lg mb-4 border border-orange-200">
                       <div class="flex">
-                        <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-orange-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <p class="text-sm text-blue-700">
+                        <p class="text-sm text-orange-700">
                           Since you're under 18, guardian information is required.
                         </p>
                       </div>
@@ -519,7 +515,7 @@
                     Previous
                   </button>
 
-                  <div [class.justify-end]="currentStep === 1" class="flex-1 flex">
+                  <div [class.justify-end]="currentStep === 1" class="">
                     <button type="button" *ngIf="currentStep < 3" (click)="nextStep()" [disabled]="!isStepValid(currentStep)"
                       [class]="'px-6 py-3 bg-[#161950] text-white rounded-lg hover:bg-[#1a1f6e] transition flex items-center text-sm ' +
                       (!isStepValid(currentStep) ? 'opacity-50 cursor-not-allowed' : '')">
@@ -542,14 +538,7 @@
                 </div>
               </div>
             </form>
-            <div class="mt-5">
-              <p class="text-center text-sm font-normal text-gray-700 sm:text-start">
-                Already have an account?
-                <a [routerLink]="['/login']" class="text-[#161950] hover:text-[#1a1f6e] font-medium">
-                  Sign In
-                </a>
-              </p>
-            </div>
+
           </div>
         </div>
       </div>
@@ -594,17 +583,4 @@
   </div>
 </div>
 
-<!-- Submit Button (Same as before) -->
-<button type="submit" *ngIf="currentStep === 3" [disabled]="registrationForm.invalid || isLoading"
-  [class]="'px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center text-sm ' +
-  (registrationForm.invalid || isLoading ? 'opacity-50 cursor-not-allowed' : '')">
-  <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-  </svg>
-  <span>{{ isLoading ? 'Processing...' : 'Complete Registration' }}</span>
-  <svg *ngIf="!isLoading" class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-  </svg>
-</button>
 </div>

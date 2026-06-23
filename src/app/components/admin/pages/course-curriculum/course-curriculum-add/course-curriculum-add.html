@@ -5,8 +5,8 @@
       <p class="text-gray-600 mt-1">Create new course curriculum</p>
     </div>
     <a
-      routerLink="/admin/course-curriculum/list"
-      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2 text-sm font-medium"
+      routerLink="/admin/course/curriculum/list"
+      class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center space-x-2 text-sm font-medium"
     >
       <i class="fas fa-arrow-left"></i> <span>Back</span>
     </a>
@@ -14,19 +14,20 @@
 </div>
 
 <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
-  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
   <p class="text-gray-500 mt-2">Loading courses...</p>
 </div>
 
-<div *ngIf="!isLoading" class="space-y-6 bg-white rounded-lg border border-gray-200 p-6">
-  <form [formGroup]="curriculumForm" (ngSubmit)="onSubmit()" class="space-y-6">
+<div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-6">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-2">
-        Course <span class="text-red-500">*</span>
+        Course Name <span class="text-red-500">*</span>
       </label>
       <select
         formControlName="course_id"
-        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
       >
         <option value="" disabled selected hidden>Select Course</option>
         <option *ngFor="let course of courses" [value]="course.id">
@@ -34,116 +35,91 @@
         </option>
       </select>
     </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">
-        Title <span class="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        formControlName="title"
-        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-        placeholder="Enter curriculum title"
-      />
-    </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">
-        Type <span class="text-red-500">*</span>
-      </label>
-      <select
-        formControlName="type"
-        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+    <hr class="border-gray-200" />
+
+    <div formArrayName="items" class="space-y-8">
+      <div
+        *ngFor="let item of items.controls; let i = index"
+        [formGroupName]="i"
+        class="relative pb-8 border-b border-gray-100 last:border-0"
       >
-        <option value="" disabled hidden>Select type</option>
-        <option value="video">Video</option>
-        <option value="reading">Reading</option>
-        <option value="assignment">Assignment</option>
-      </select>
-    </div>
+        <div class="flex justify-end mb-2">
+          <button
+            type="button"
+            *ngIf="items.length > 1"
+            (click)="removeItem(i)"
+            class="text-red-500 hover:text-red-700 text-xs flex items-center gap-1 font-medium"
+          >
+            <i class="fas fa-trash"></i> Remove Item
+          </button>
+        </div>
 
-    <!-- Reading / Assignment → File Upload -->
-    <div
-      *ngIf="
-        curriculumForm.get('type')?.value === 'reading' ||
-        curriculumForm.get('type')?.value === 'assignment'
-      "
-    >
-      <label class="block text-sm font-medium text-gray-700 mb-2">Documents</label>
-      <input
-        type="file"
-        (change)="onFileSelected($event)"
-        accept=".pdf,.doc,.docx,.ppt,.pptx"
-        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm"
-      />
-      <p class="text-xs text-gray-500 mt-1">Allowed files: PDF, DOC, DOCX, PPT</p>
-    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Course Title <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="title"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
+              placeholder="Enter curriculum title"
+            />
+          </div>
 
-    <!-- Video → URL Input -->
-    <div *ngIf="curriculumForm.get('type')?.value === 'video'">
-      <label class="block text-sm font-medium text-gray-700 mb-2">Video URL</label>
-      <input
-        type="text"
-        formControlName="documents"
-        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm"
-        placeholder="Enter video URL"
-      />
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
-      <input
-        type="number"
-        formControlName="duration"
-        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm"
-        placeholder="e.g. 30"
-      />
-    </div>
-<!-- description  -->
-   <div>
-  <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-
-  <!-- ✅ CKEditor -->
-  <div class="w-full rounded-lg border border-gray-300 overflow-hidden">
-    <ckeditor
-      [editor]="Editor"
-      [config]="editorConfig"
-      formControlName="description"
-      class="w-full"
-    ></ckeditor>
+        <div>
+  <div class="flex justify-between items-center mb-2">
+    <label class="block text-sm font-medium text-gray-700">Duration (Weeks)</label>
+    <span *ngIf="item.get('duration')?.value" class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-100">
+      Week: {{ item.get('duration')?.value }}
+    </span>
   </div>
-
-  <!-- ❌ Quill (commented out) -->
-  <!--
-  <quill-editor
-    formControlName="description"
-    [styles]="{ height: '150px' }"
-    [modules]="quillModules"
-    placeholder="Optional description"
-    class="w-full bg-gray-50 border border-gray-300 rounded-lg"
-  >
-  </quill-editor>
-  -->
+  <!-- ✅ Type "number" se "text" mein change karo -->
+  <input
+    type="text"
+    formControlName="duration"
+    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500"
+    placeholder="e.g., 2, 2-4, 3-5 weeks"
+  />
 </div>
+        </div>
 
-    <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <quill-editor
+            formControlName="description"
+            [styles]="{ height: '130px' }"
+            [modules]="quillModules"
+            placeholder="Optional description"
+            class="w-full bg-gray-50 border border-gray-300 rounded-lg"
+          ></quill-editor>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-4">
       <button
         type="button"
-        (click)="cancel()"
-        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+        (click)="addItem()"
+        class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium flex items-center gap-2 transition-colors"
       >
-        <i class="fas fa-times"></i> Cancel
+        <i class="fas fa-plus"></i>
+        <span>Add More </span>
+      </button>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
+      <button type="button" (click)="cancel()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Cancel
       </button>
       <button
         type="submit"
-        [disabled]="curriculumForm.invalid || isSubmitting"
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium flex items-center space-x-2"
+        [disabled]="!canSave || isSubmitting"
+        class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <i *ngIf="!isSubmitting" class="fas fa-save"></i>
-        <span
-          *ngIf="isSubmitting"
-          class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-        ></span>
-        <span>{{ isSubmitting ? 'Creating...' : 'Create Curriculum' }}</span>
+        <span *ngIf="isSubmitting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+        <span>{{ isSubmitting ? 'Saving...' : 'Save Curriculum' }}</span>
       </button>
     </div>
   </form>

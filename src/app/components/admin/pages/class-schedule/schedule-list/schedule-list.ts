@@ -8,11 +8,14 @@ import { catchError } from 'rxjs/operators';
 import { ClassScheduleService } from '../../../../../services/classschedule.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { ClassSchedule } from '../../../../../models/classschedule.model';
+import { AuthService } from '../../../../../services/auth.service';
+import { GoogleCalendarService } from '../../../../../services/google-calendar.service';
 
 // Add these interfaces if not already defined in your models
 interface Course {
   id: number;
   course_name?: string;
+  course_code?: string;
   name?: string;
   title?: string;
 }
@@ -50,9 +53,16 @@ export class AdminClassScheduleList implements OnInit {
     private scheduleService: ClassScheduleService,
     private toastService: ToastService,
     private router: Router,
+   
+   public auth: AuthService,  
+    private googleCalendar: GoogleCalendarService,
     private cdr: ChangeDetectorRef
   ) {}
 
+ 
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   ngOnInit(): void {
     this.loadInitialData();
   }
@@ -240,21 +250,39 @@ export class AdminClassScheduleList implements OnInit {
     return statusClasses[status] || 'bg-gray-100 text-gray-800';
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) return 'N/A';
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString();
-    } catch (e) {
-      return dateString;
-    }
+  // formatDate(dateString: string): string {
+  //   if (!dateString) return 'N/A';
+  //   try {
+  //     const date = new Date(dateString);
+  //     return date.toLocaleString();
+  //   } catch (e) {
+  //     return dateString;
+  //   }
+  // }
+
+ formatDate(dateString: string): string {
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }); // e.g., "Apr 10, 2026"
+  } catch (e) {
+    return dateString;
   }
+}
 
   formatDay(day: string): string {
     if (!day) return 'N/A';
     // Capitalize first letter
     return day.charAt(0).toUpperCase() + day.slice(1);
   }
+
 
   getCourseName(courseId: number): string {
     if (!courseId) return 'N/A';
@@ -270,6 +298,25 @@ export class AdminClassScheduleList implements OnInit {
 
     if (course) {
       return course.course_name || course.name || course.title || `Course #${courseId}`;
+    }
+
+    return `Course #${courseId}`;
+  }
+
+  getCourseCode(courseId: number): string {
+    if (!courseId) return 'N/A';
+
+    // Try to get from map first (faster)
+    if (this.courseMap.has(courseId)) {
+      return this.courseMap.get(courseId) || `Course #${courseId}`;
+    }
+
+    // Fallback to array search
+    if (!this.courses || this.courses.length === 0) return `Course #${courseId}`;
+    const course = this.courses.find(c => c.id === courseId);
+
+    if (course) {
+      return course.course_code  || `Course #${courseId}`;
     }
 
     return `Course #${courseId}`;
@@ -330,4 +377,103 @@ export class AdminClassScheduleList implements OnInit {
     if (!day) return 'N/A';
     return day.charAt(0).toUpperCase() + day.slice(1);
   }
+
+  // Add these properties to your component class
+expandedSchedule: number | null = null;
+
+// Add these helper methods
+toggleSchedule(index: number): void {
+  this.expandedSchedule = this.expandedSchedule === index ? null : index;
 }
+
+getActiveSchedulesCount(): number {
+  return this.filteredSchedules.filter(s => s.status === 'ongoing' || s.status === 'scheduled').length;
+}
+
+getThisWeekSchedulesCount(): number {
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+  return this.filteredSchedules.filter(schedule => {
+    const scheduleDate = new Date(schedule.start_time);
+    return scheduleDate >= startOfWeek && scheduleDate <= endOfWeek;
+  }).length;
+}
+
+getDayNumber(dateString: string): string {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.getDate().toString();
+}
+
+formatTimeRange(startTime: string, endTime: string): string {
+  if (!startTime || !endTime) return 'N/A';
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  return `${start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })} - ${end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
+}
+
+formatFullDate(dateString: string): string {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
+
+addToCalendar(schedule: any): void {
+  const title = `${schedule.course?.course_name || 'Class'} — ${
+    schedule.day
+      ? schedule.day.charAt(0).toUpperCase() + schedule.day.slice(1)
+      : 'Class'
+  }`;
+
+  this.googleCalendar.addToGoogleCalendar({
+    title,
+    startTime:   schedule.start_time,
+    endTime:     schedule.end_time,
+    location:    schedule.meeting_link || '',
+    description: [
+      `Course: ${schedule.course?.course_name || '-'}`,
+      `Batch: ${schedule.batch?.name || '-'}`,
+      `Instructor: ${schedule.instructor?.first_name || ''} ${schedule.instructor?.last_name || ''}`,
+      `Day: ${schedule.day || '-'}`,
+      schedule.note ? `Note: ${schedule.note}` : '',
+    ].filter(Boolean).join('\n'),
+    day: schedule.day,
+  });
+}
+
+addAllToCalendar(): void {
+  const calSchedules = this.schedules.map(s => ({
+    title: `${s.course?.course_name || 'Class'} — ${
+      s.day ? s.day.charAt(0).toUpperCase() + s.day.slice(1) : 'Class'
+    }`,
+    startTime:   s.start_time,
+    endTime:     s.end_time,
+    location:    s.meeting_link || '',
+    description: [
+      `Course: ${s.course?.course_name || '-'}`,
+      `Batch: ${s.batch?.name || '-'}`,
+      `Day: ${s.day || '-'}`,
+      s.note ? `Note: ${s.note}` : '',
+    ].filter(Boolean).join('\n'),
+    day: s.day,
+  }));
+
+  this.googleCalendar.addMultipleToGoogleCalendar(calSchedules);
+}
+}
+
+
+

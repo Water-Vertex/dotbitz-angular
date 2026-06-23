@@ -13,29 +13,29 @@ import { Announcement } from '../../../../../models/announcement.model';
 })
 export class AnnouncementAdd implements OnInit {
   form: Announcement = {
-    title: '',
-    message: '',
-    status: 'draft',
-    priority: 'normal',
-    target_type: 'overall',
-    course_id: null,
-    batch_id: null,
+    title:                 '',
+    message:               '',
+    status:                'draft',
+    priority:              'normal',
+    target_type:           'overall',
+    course_id:             null,
+    batch_id:              null,
     target_instructor_ids: [],
-    scheduled_at: null,
+    scheduled_at:          null,
   };
 
   instructors: any[] = [];
-  courses: any[] = [];
-  batches: any[] = [];
+  courses:     any[] = [];
+  batches:     any[] = [];
 
   submitting = false;
   successMsg = '';
-  errorMsg = '';
+  errorMsg   = '';
 
   constructor(
     private announcementService: AnnouncementService,
     private router: Router,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -49,7 +49,7 @@ export class AnnouncementAdd implements OnInit {
         this.instructors = res.data || [];
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Instructors error:', err),
+      error: (err) => console.error('Instructors error:', err)
     });
   }
 
@@ -59,7 +59,7 @@ export class AnnouncementAdd implements OnInit {
         this.courses = res.data || [];
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Courses error:', err),
+      error: (err) => console.error('Courses error:', err)
     });
   }
 
@@ -72,15 +72,15 @@ export class AnnouncementAdd implements OnInit {
           this.batches = res.data || [];
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Batches error:', err),
+        error: (err) => console.error('Batches error:', err)
       });
     }
   }
 
   onTargetTypeChange(): void {
     // Reset target fields on type change
-    this.form.course_id = null;
-    this.form.batch_id = null;
+    this.form.course_id             = null;
+    this.form.batch_id              = null;
     this.form.target_instructor_ids = [];
     this.batches = [];
   }
@@ -91,7 +91,7 @@ export class AnnouncementAdd implements OnInit {
     if (idx === -1) {
       this.form.target_instructor_ids = [...ids, id];
     } else {
-      this.form.target_instructor_ids = ids.filter((i) => i !== id);
+      this.form.target_instructor_ids = ids.filter(i => i !== id);
     }
   }
 
@@ -100,7 +100,7 @@ export class AnnouncementAdd implements OnInit {
   }
 
   selectAllInstructors(): void {
-    this.form.target_instructor_ids = this.instructors.map((i) => i.id);
+    this.form.target_instructor_ids = this.instructors.map(i => i.id);
   }
 
   clearInstructors(): void {
@@ -118,7 +118,7 @@ export class AnnouncementAdd implements OnInit {
     }
 
     this.submitting = true;
-    this.errorMsg = '';
+    this.errorMsg   = '';
     this.successMsg = '';
 
     this.announcementService.createAnnouncement(this.form).subscribe({
@@ -129,8 +129,8 @@ export class AnnouncementAdd implements OnInit {
       },
       error: (err) => {
         this.submitting = false;
-        this.errorMsg = err.error?.message || 'Failed to create announcement.';
-      },
+        this.errorMsg   = err.error?.message || 'Failed to create announcement.';
+      }
     });
   }
 

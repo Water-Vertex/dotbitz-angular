@@ -7,6 +7,7 @@ import { ToastService } from '../../../../../services/toast.service';
 import { Course } from '../../../../../models/assignment.model';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CourseService } from '../../../../../services/course.service';
 
 @Component({
   selector: 'app-assignment-add',
@@ -14,52 +15,43 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
   imports: [CommonModule, ReactiveFormsModule, RouterLink, CKEditorModule],
   templateUrl: './assignment-add.html',
   styleUrls: ['./assignment-add.css'],
- 
 })
 export class AssignmentAdd implements OnInit {
+
   assignmentForm: FormGroup;
   isLoading = true;
   isSubmitting = false;
   courses: Course[] = [];
+  batches: any[] = [];
+  loadingBatches = false;
   selectedFile: File | null = null;
 
-  // CKEditor
   public Editor: any = ClassicEditor;
   public editorConfig = {
     toolbar: [
-      'heading',
-      '|',
-      'bold',
-      'italic',
-      'underline',
-      'strikethrough',
-      '|',
-      'link',
-      'bulletedList',
-      'numberedList',
-      '|',
-      'blockQuote',
-      '|',
-      'undo',
-      'redo',
+      'heading', '|', 'bold', 'italic', 'underline', 'strikethrough',
+      '|', 'link', 'bulletedList', 'numberedList',
+      '|', 'blockQuote', '|', 'undo', 'redo',
     ],
   };
 
   constructor(
     private fb: FormBuilder,
     private assignmentService: AssignmentService,
+    private courseService: CourseService,
     private toastService: ToastService,
     public router: Router,
     private cdr: ChangeDetectorRef,
   ) {
     this.assignmentForm = this.fb.group({
-      course_id: ['', Validators.required],
-      title: ['', Validators.required],
-      description: [''],
+      course_id:    ['', Validators.required],
+      batch_id:     ['', Validators.required],  // ✅ add
+      title:        ['', Validators.required],
+      description:  [''],
       assignment_file: [''],
-      due_date: ['', Validators.required],
-      total_marks: [''],
-      start_date: ['', Validators.required], // ✅ added
+      due_date:     ['', Validators.required],
+      total_marks:  [''],
+      start_date:   ['', Validators.required],
       active_status: ['active', Validators.required],
     });
   }
@@ -68,7 +60,6 @@ export class AssignmentAdd implements OnInit {
     this.loadCourses();
   }
 
-  /** ---------- LOAD COURSES ---------- */
   loadCourses(): void {
     this.isLoading = true;
     this.assignmentService.getCourses().subscribe({
@@ -85,18 +76,33 @@ export class AssignmentAdd implements OnInit {
     });
   }
 
-  /** ---------- FILE SELECTION ---------- */
+  // ✅ Course change hone par batches load karo
+  onCourseChange(): void {
+    this.assignmentForm.patchValue({ batch_id: '' });
+    this.batches = [];
+
+    const courseId = this.assignmentForm.value.course_id;
+    if (!courseId) return;
+
+    this.loadingBatches = true;
+    this.courseService.getBatchesByCourse(courseId).subscribe({
+      next: (res: any) => {
+        this.batches = res || [];
+        this.loadingBatches = false;
+        this.cdr.detectChanges();
+      },
+      error: () => { this.loadingBatches = false; }
+    });
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
-      this.assignmentForm.patchValue({
-        assignment_file: this.selectedFile.name,
-      });
+      this.assignmentForm.patchValue({ assignment_file: this.selectedFile.name });
     }
   }
 
-  /** ---------- SUBMIT ---------- */
   onSubmit(): void {
     if (this.assignmentForm.invalid) {
       this.markFormGroupTouched(this.assignmentForm);

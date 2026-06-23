@@ -1,6 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// import { QuillModule } from 'ngx-quill';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -12,75 +11,31 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { CourseApiResponse, Instructor } from '../../../../../models/course.model';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 @Component({
   selector: 'app-course-edit',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterModule,
-    // QuillModule,
-    CKEditorModule,
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, CKEditorModule],
   templateUrl: './course-edit.html',
-  styleUrls: ['./course-edit.css'],
-  encapsulation: ViewEncapsulation.None, // ✅ Important
 })
 export class CourseEdit implements OnInit {
   courseForm!: FormGroup;
   isSubmitting: boolean = false;
   isLoading: boolean = true;
   courseId!: number;
-  instructors: Instructor[] = [];
   selectedFile: File | null = null;
   isEditMode: boolean = true;
-
-  // ✅ CKEditor
-  public Editor: any = ClassicEditor;
-
-  public editorConfig = {
-    toolbar: [
-      'heading',
-      '|',
-      'bold',
-      'italic',
-      'underline',
-      '|',
-      'link',
-      'bulletedList',
-      'numberedList',
-      '|',
-      'blockQuote',
-      '|',
-      'undo',
-      'redo',
-    ],
-  };
-
-  /*
-  // 🔹 Old Quill Config (DO NOT REMOVE)
-  quillModules = {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ header: 1 }, { header: 2 }],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      [{ script: 'sub' }, { script: 'super' }],
-      [{ indent: '-1' }, { indent: '+1' }],
-      [{ direction: 'rtl' }],
-      [{ size: ['small', false, 'large', 'huge'] }],
-      [{ color: [] }, { background: [] }],
-      [{ font: [] }],
-      [{ align: [] }],
-      ['clean'],
-      ['link', 'image', 'video'],
-    ],
-  };
-  */
+   public Editor: any = ClassicEditor;
+      public editorConfig = {
+        toolbar: [
+          'heading', '|', 'bold', 'italic', 'underline', 'strikethrough',
+          '|', 'link', 'bulletedList', 'numberedList',
+          '|', 'blockQuote', '|', 'undo', 'redo', '|','codeBlock'
+        ],
+      };
+private curriculums: { duration?: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -89,12 +44,12 @@ export class CourseEdit implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
+
   ) {}
 
   ngOnInit(): void {
     this.courseId = Number(this.route.snapshot.paramMap.get('id'));
     this.initForm();
-    this.loadInstructors();
     this.loadCourse();
   }
 
@@ -106,19 +61,29 @@ export class CourseEdit implements OnInit {
       course_description: [''],
       course_duration: [''],
       course_fee: [''],
+      discounted_fee: [''],
       course_level: [''],
       age_limit: [''],
       start_date: [''],
       end_date: [''],
       status: ['active', Validators.required],
       is_featured: [false],
-      instructor_id: ['', Validators.required],
       thumbnail_image: [''],
       benefits: [''],
       short_description: [''],
+        classes_per_week:  [''],
+    total_classes:     [''],
+    course_hours:      [''],
+      meta_title: [''],
+meta_description: [''],
+meta_keyword: [''],
+meta_tags: [''],
+focus_keyword: [''],
+page_schema: [''],
     });
   }
 
+  // Helper function: Path se ganda naam hatane ke liye
   getFileName(fullPath: any): string {
     if (!fullPath || typeof fullPath !== 'string') return 'No file selected';
     const name = fullPath.split(/[\\/]/).pop();
@@ -136,24 +101,61 @@ export class CourseEdit implements OnInit {
     }
   }
 
-  loadInstructors() {
-    this.courseService.getInstructors().subscribe({
-      next: (res) => {
-        this.instructors = res.data;
-        this.cdr.detectChanges();
-      },
-      error: () => this.toast.error('Error', 'Failed to load instructors'),
-    });
+
+
+private parseWeeks(duration?: string): number {
+  if (!duration || duration.trim() === '') return 0;
+  const d = duration.trim();
+
+  const rangeMatch = d.match(/^(\d+)\s*-\s*(\d+)$/);
+  if (rangeMatch) {
+    return Math.max(0, parseInt(rangeMatch[2], 10) - parseInt(rangeMatch[1], 10) + 1);
   }
 
-  loadCourse(): void {
+  if (/^\d+$/.test(d)) return 1;
+
+  return 0;
+}
+
+calculateTotals(): void {
+  const classesPerWeek = Number(this.courseForm.get('classes_per_week')?.value);
+  const hoursPerClass  = Number(this.courseForm.get('course_duration')?.value);
+
+  const totalWeeks = this.curriculums.reduce(
+    (sum, c) => sum + this.parseWeeks(c.duration), 0
+  );
+
+  const totalClasses = (classesPerWeek > 0 && totalWeeks > 0)
+    ? totalWeeks * classesPerWeek
+    : 0;
+
+  const totalHours = (hoursPerClass > 0 && totalClasses > 0)
+    ? totalClasses * hoursPerClass
+    : 0;
+
+  this.courseForm.patchValue(
+    { total_classes: totalClasses, course_hours: totalHours.toString() },
+    { emitEvent: false }
+  );
+  this.cdr.detectChanges();
+}
+
+ loadCourse(): void {
     this.courseService.getCourse(this.courseId).subscribe({
       next: (res: CourseApiResponse) => {
         const course = res.data as any;
+
+        // Curriculum rows save karo calculation ke liye
+        this.curriculums = course.curriculums ?? [];
+
         this.courseForm.patchValue({
           ...course,
           is_featured: !!course.is_featured,
         });
+
+        // Ab curriculum se calculate karo
+        this.calculateTotals();
+
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -164,7 +166,8 @@ export class CourseEdit implements OnInit {
     });
   }
 
-  onSubmit(): void {
+
+onSubmit(): void {
     if (this.courseForm.invalid) return;
 
     this.isSubmitting = true;
@@ -195,6 +198,5 @@ export class CourseEdit implements OnInit {
       },
     });
   }
-
   cancel = () => this.router.navigate(['/admin/course/list']);
 }

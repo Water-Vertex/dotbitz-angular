@@ -65,3 +65,34 @@ export interface AssessmentListResponse {
   };
   message?: string;
 }
+// ===== Assessment Result Interfaces =====
+
+export interface AnswerDetail {
+  question_id: number;
+  question: string;
+  assessment_type: string;
+  options: string[];
+  correct_answer: string | null;
+  student_answer: string;
+  is_correct: boolean;
+  marks: number;
+}
+
+export interface ResultItem {
+  attempt_id: number;
+  assign_assessment_id: number;
+  assessment_title: string;
+  course_name: string;
+  total_marks: number;
+  obtain_marks: number | null;
+  remarks: string | null;
+  status: string;
+  answers?: AnswerDetail[];
+}
+
+// Optional: Response wrapper agar aap use karna chahen
+export interface AssessmentResultResponse {
+  success: boolean;
+  data: ResultItem[];
+  message?: string;
+}

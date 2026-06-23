@@ -1,0 +1,27 @@
+:host ::ng-deep ul {
+  list-style: disc !important;
+  padding-left: 1.5rem !important;
+  margin: 0.5rem 0 !important;
+}
+
+:host ::ng-deep li {
+  display: list-item !important;
+  margin-bottom: 0.25rem !important;
+}
+
+:host ::ng-deep ul {
+  list-style: disc !important;
+  padding-left: 1.5rem !important;
+  margin: 0.5rem 0 !important;
+}
+
+:host ::ng-deep ol {
+  list-style: decimal !important;
+  padding-left: 1.5rem !important;
+  margin: 0.5rem 0 !important;
+}
+
+:host ::ng-deep li {
+  display: list-item !important;
+  margin-bottom: 0.25rem !important;
+}

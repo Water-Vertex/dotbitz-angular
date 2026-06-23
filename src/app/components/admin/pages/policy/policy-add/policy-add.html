@@ -9,7 +9,7 @@
             </p>
         </div>
 
-        <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium"
+        <a routerLink="/admin/policy/list" data-nav-item data-href="/admin/policy/list" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium"
       >
            <i class="fas fa-arrow-left"></i>
             <span>Back</span>
@@ -19,7 +19,7 @@
 
 <!-- Loading State -->
 <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
-    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
     <p class="text-gray-500 mt-2">Loading Policy details...</p>
 </div>
 
@@ -37,7 +37,7 @@
                 <input
                     type="text"
                     formControlName="title"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                     placeholder="Enter the Title"
                     [class.border-red-300]="title?.invalid && title?.touched"
                     [class.focus:ring-red-500]="title?.invalid && title?.touched"
@@ -58,44 +58,37 @@
                 </div>
             </div>
 
-        <!-- Description -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-2">
-        Description <span class="text-red-500">*</span>
-    </label>
-
-    <!-- ✅ CKEditor -->
-    <div class="w-full rounded-lg border border-gray-300 overflow-hidden">
-        <ckeditor
-            [editor]="Editor"
-            [config]="editorConfig"
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Description <span class="text-red-500">*</span>
+                </label>
+                <!-- <textarea
+                    formControlName="description"
+                    rows="6"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                    placeholder="Provide a detailed description to the policy"
+                    [class.border-red-300]="description?.invalid && description?.touched"
+                    [class.focus:ring-red-500]="description?.invalid && description?.touched"
+                ></textarea> -->
+                <quill-editor
             formControlName="description"
-            class="w-full"
-        ></ckeditor>
-    </div>
-
-    <!-- ❌ Quill Editor (commented out) -->
-    <!--
-    <quill-editor
-        formControlName="description"
-        [style]="{ height: '200px' }"
-        [modules]="quillModules"
-        placeholder="Enter description"
-    >
-    </quill-editor>
-    -->
-
-    <div *ngIf="description?.invalid && description?.touched" class="mt-2 text-xs text-red-600 space-y-1">
-        <div *ngIf="description?.errors?.['required']" class="flex items-center space-x-1">
-            <i class="fas fa-exclamation-circle text-xs"></i>
-            <span>Description is required</span>
-        </div>
-        <div *ngIf="description?.errors?.['minlength']" class="flex items-center space-x-1">
-            <i class="fas fa-exclamation-circle text-xs"></i>
-            <span>Description must be at least 10 characters</span>
-        </div>
-    </div>
-</div>
+            [style]="{ height: '200px' }"
+            [modules]="quillModules"
+            placeholder="Enter  description"
+          >
+          </quill-editor>
+                <div *ngIf="description?.invalid && description?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+                    <div *ngIf="description?.errors?.['required']" class="flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle text-xs"></i>
+                        <span>Description is required</span>
+                    </div>
+                    <div *ngIf="description?.errors?.['minlength']" class="flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle text-xs"></i>
+                        <span>Description must be at least 10 characters</span>
+                    </div>
+                </div>
+            </div>
 
              <!-- Meta Title -->
             <div>
@@ -105,7 +98,7 @@
                 <input
                     type="text"
                     formControlName="meta_title"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                     placeholder="Enter the Meta Title"
                     [class.border-red-300]="meta_title?.invalid && meta_title?.touched"
                     [class.focus:ring-red-500]="meta_title?.invalid && meta_title?.touched"
@@ -120,7 +113,7 @@
                 <textarea
                     formControlName="meta_keywords"
                     rows="6"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                     placeholder="Provide a meta keywords to the policy"
                     [class.border-red-300]="meta_keywords?.invalid && meta_keywords?.touched"
                     [class.focus:ring-red-500]="meta_keywords?.invalid && meta_keywords?.touched"
@@ -135,7 +128,7 @@
                 <textarea
                     formControlName="meta_tags"
                     rows="6"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                     placeholder="Provide a meta tags to the policy"
                     [class.border-red-300]="meta_tags?.invalid && meta_tags?.touched"
                     [class.focus:ring-red-500]="meta_tags?.invalid && meta_tags?.touched"
@@ -150,7 +143,7 @@
                 <textarea
                     formControlName="meta_description"
                     rows="6"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                     placeholder="Provide a meta description to the policy"
                     [class.border-red-300]="meta_description?.invalid && meta_description?.touched"
                     [class.focus:ring-red-500]="meta_description?.invalid && meta_description?.touched"
@@ -176,7 +169,7 @@
                 <button
                     type="submit"
                     [disabled]="policyForm.invalid || isSubmitting"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <span *ngIf="!isSubmitting" class="flex items-center space-x-2">
                         <i class="fas fa-save"></i>

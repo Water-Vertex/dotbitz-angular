@@ -1,7 +1,6 @@
-// components/class-schedule/class-schedule-edit/class-schedule-edit.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ClassScheduleService } from '../../../../../services/classschedule.service';
 import { AuthService } from '../../../../../services/auth.service';
@@ -11,7 +10,7 @@ import { ToastService } from '../../../../../services/toast.service';
   selector: 'app-class-schedule-edit',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './schedule-edit.html', // You can create a separate template or reuse the existing one
+  templateUrl: './schedule-edit.html',
 })
 export class ClassScheduleEdit implements OnInit {
   scheduleForm: FormGroup;
@@ -22,6 +21,10 @@ export class ClassScheduleEdit implements OnInit {
   courses: any[] = [];
   batches: any[] = [];
   instructorId: number | null = null;
+  instructorName: string | null = null;
+
+  selectedDay: string = '';
+  selectedDayLabel: string = '';
 
   daysOfWeek = [
     { value: 'monday', label: 'Monday' },
@@ -34,7 +37,6 @@ export class ClassScheduleEdit implements OnInit {
   ];
 
   statusOptions = ['scheduled', 'ongoing', 'completed', 'cancelled'];
-  selectionMode: 'single' | 'multiple' | 'all' = 'single';
 
   constructor(
     private fb: FormBuilder,
@@ -42,24 +44,26 @@ export class ClassScheduleEdit implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
-    this.scheduleId = this.route.snapshot.params['id'];
-    
+    this.scheduleId = Number(this.route.snapshot.params['id']);
+
     this.scheduleForm = this.fb.group({
       course_id: ['', Validators.required],
-      batch_id: ['', Validators.required],
+      batch_id: ['', Validators.required], // ✅ ADD THIS
       start_time: ['', Validators.required],
       end_time: ['', Validators.required],
       meeting_link: ['', [Validators.required, Validators.pattern('https?://.+')]],
-      days: this.fb.array([]),
       status: ['scheduled', Validators.required],
       note: ['', [Validators.maxLength(1000)]],
     });
   }
 
   ngOnInit(): void {
-    this.instructorId = this.authService.getCurrentUser()?.id || null;
+    const currentUser = this.authService.getCurrentUser();
+    this.instructorId = currentUser?.id || null;
+    this.instructorName = currentUser ? `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() : null;
 
     if (!this.instructorId) {
       this.toastService.error('Error', 'Instructor not found. Please login again.');
@@ -74,44 +78,21 @@ export class ClassScheduleEdit implements OnInit {
     }
 
     this.loadCourses();
-    this.loadSchedule();
-  }
-
-  get daysArray() {
-    return this.scheduleForm.get('days') as FormArray;
-  }
-
-  addDay(day: string = '') {
-    const dayGroup = this.fb.group({
-      day: [day, Validators.required]
-    });
-    this.daysArray.push(dayGroup);
-  }
-
-  removeDay(index: number) {
-    this.daysArray.removeAt(index);
-  }
-
-  setSelectionMode(mode: 'single' | 'multiple' | 'all') {
-    this.selectionMode = mode;
-    this.daysArray.clear();
-
-    if (mode === 'all') {
-      this.daysOfWeek.forEach(day => {
-        this.addDay(day.value);
-      });
-    } else {
-      this.addDay('');
-    }
   }
 
   loadCourses(): void {
     this.scheduleService.getCourses().subscribe({
       next: (res: any) => {
-        this.courses = Array.isArray(res.data) ? res.data : res || [];
+        console.log('Courses loaded:', res);
+        this.courses = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+        this.cdr.detectChanges();
+        this.loadSchedule();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error loading courses:', err);
         this.toastService.error('Error', 'Failed to load courses');
+        this.cdr.detectChanges();
+        this.loadSchedule();
       }
     });
   }
@@ -120,6 +101,8 @@ export class ClassScheduleEdit implements OnInit {
     const courseId = this.scheduleForm.get('course_id')?.value;
     if (courseId) {
       this.loadBatches(courseId);
+    } else {
+      this.batches = [];
     }
   }
 
@@ -127,6 +110,7 @@ export class ClassScheduleEdit implements OnInit {
     this.scheduleService.getBatchesByCourse(courseId).subscribe({
       next: (res: any) => {
         this.batches = Array.isArray(res.data) ? res.data : res || [];
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toastService.error('Error', 'Failed to load batches');
@@ -134,117 +118,142 @@ export class ClassScheduleEdit implements OnInit {
     });
   }
 
+
+
   loadSchedule(): void {
-    this.isLoading = true;
+    console.log('Loading schedule with ID:', this.scheduleId);
+
     this.scheduleService.getSchedule(this.scheduleId).subscribe({
       next: (res: any) => {
+        console.log('Schedule loaded:', res);
+
         const schedule = res.data || res;
 
-        if (!Array.isArray(schedule)) {
-          // Single schedule
-          this.setSelectionMode('single');
-          this.scheduleForm.patchValue({
-            course_id: schedule.course_id,
-            batch_id: schedule.batch_id,
-            start_time: this.formatDateForInput(schedule.start_time),
-            end_time: this.formatDateForInput(schedule.end_time),
-            meeting_link: schedule.meeting_link,
-            status: schedule.status,
-            note: schedule.note
-          });
-
-          // Load batches for the course
-          this.loadBatches(schedule.course_id);
-          
-          // Set the day
-          this.daysArray.at(0).patchValue({ day: schedule.day });
-        } else if (schedule.length > 0) {
-          // Multiple schedules (recurring)
-          const firstSchedule = schedule[0];
-          
-          if (schedule.length === 7) {
-            this.setSelectionMode('all');
-          } else {
-            this.setSelectionMode('multiple');
-            this.daysArray.clear();
-            schedule.forEach((s: any) => {
-              this.addDay(s.day);
-            });
-          }
-
-          this.scheduleForm.patchValue({
-            course_id: firstSchedule.course_id,
-            batch_id: firstSchedule.batch_id,
-            start_time: this.formatDateForInput(firstSchedule.start_time),
-            end_time: this.formatDateForInput(firstSchedule.end_time),
-            meeting_link: firstSchedule.meeting_link,
-            status: firstSchedule.status,
-            note: firstSchedule.note
-          });
-
-          // Load batches for the course
-          this.loadBatches(firstSchedule.course_id);
+        if (!schedule) {
+          this.toastService.error('Error', 'No schedule data found');
+          this.router.navigate(['/instructor/class-schedule/list']);
+          return;
         }
 
+        this.initializeFormWithSchedule(schedule);
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
-        this.toastService.error('Error', 'Failed to load schedule details');
+        console.error('Error loading schedule:', err);
+        this.toastService.error('Error', err.error?.message || err.message || 'Failed to load schedule details');
+        this.isLoading = false;
+        this.cdr.detectChanges();
         this.router.navigate(['/instructor/class-schedule/list']);
       }
     });
   }
 
+  private initializeFormWithSchedule(schedule: any): void {
+  const scheduleData = Array.isArray(schedule) ? schedule[0] : schedule;
+
+  this.selectedDay = scheduleData.day || '';
+  this.selectedDayLabel = this.getDayLabel(this.selectedDay);
+
+  this.scheduleForm.patchValue({
+    course_id: Number(scheduleData.course_id),
+    batch_id: Number(scheduleData.batch_id),
+    start_time: this.formatDateForInput(scheduleData.start_time),
+    end_time: scheduleData.end_time
+      ? this.formatDateForInput(scheduleData.end_time)
+      : '',
+    meeting_link: scheduleData.meeting_link || '',
+    status: scheduleData.status || 'scheduled',
+    note: scheduleData.note || ''
+  });
+
+  // ✅ VERY IMPORTANT
+  if (scheduleData.course_id) {
+    this.loadBatches(Number(scheduleData.course_id));
+  }
+}
+
+  getDayLabel(dayValue: string): string {
+    if (!dayValue) return '';
+    const day = this.daysOfWeek.find(d => d.value.toLowerCase() === dayValue.toLowerCase());
+    return day ? day.label : dayValue;
+  }
+
   formatDateForInput(dateString: string): string {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toISOString().slice(0, 16);
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch (e) {
+      console.error('Error formatting date:', e);
+      return '';
+    }
   }
 
   onSubmit(): void {
     if (this.scheduleForm.invalid) {
       this.markFormGroupTouched(this.scheduleForm);
-      this.toastService.error('Validation', 'Please fill all required fields correctly.');
+
+      const errors = [];
+      if (this.scheduleForm.get('course_id')?.invalid) errors.push('Course');
+      if (this.scheduleForm.get('batch_id')?.invalid) errors.push('Batch');
+      if (this.scheduleForm.get('start_time')?.invalid) errors.push('Start time');
+      if (this.scheduleForm.get('end_time')?.invalid) errors.push('End time');
+      if (this.scheduleForm.get('meeting_link')?.invalid) errors.push('Meeting link');
+
+      const errorMsg = errors.length > 0
+        ? `Please fill required fields: ${errors.join(', ')}`
+        : 'Please fill all required fields correctly.';
+
+      this.toastService.error('Validation', errorMsg);
       return;
     }
 
-    if (this.daysArray.length === 0) {
-      this.toastService.error('Validation', 'Please select at least one day.');
+    if (!this.selectedDay) {
+      this.toastService.error('Validation', 'Day information is missing.');
       return;
     }
 
     this.isSubmitting = true;
+    this.cdr.detectChanges();
 
-    const baseFormData = { ...this.scheduleForm.value };
-    const schedules = [];
-    const days = baseFormData.days.map((d: any) => d.day);
+    const formData = this.scheduleForm.value;
 
-    for (const day of days) {
-      schedules.push({
-        course_id: baseFormData.course_id,
-        instructor_id: this.instructorId,
-        batch_id: baseFormData.batch_id,
-        start_time: baseFormData.start_time,
-        end_time: baseFormData.end_time,
-        meeting_link: baseFormData.meeting_link,
-        day: day,
-        status: baseFormData.status,
-        note: baseFormData.note
-      });
-    }
+    const scheduleData = {
+      course_id: formData.course_id,
+      instructor_id: this.instructorId,
+      batch_id: formData.batch_id,
+      start_time: formData.start_time,
+      end_time: formData.end_time,
+      meeting_link: formData.meeting_link,
+      day: this.selectedDay,
+      status: formData.status,
+      note: formData.note
+    };
 
-    this.scheduleService.updateSchedules(this.scheduleId, schedules).subscribe({
+    console.log('Updating schedule:', scheduleData);
+
+    // If your API expects an array for updates
+    this.scheduleService.updateSchedules(this.scheduleId, [scheduleData]).subscribe({
       next: (res: any) => {
-        this.toastService.success('Success', res.message || 'Class schedules updated successfully');
+        this.toastService.success('Success', res.message || 'Class schedule updated successfully');
+        this.cdr.detectChanges();
         this.router.navigate(['/instructor/class-schedule/list']);
       },
       error: (err: any) => {
-        const errorMsg = err.error?.message || err.message || 'Failed to update schedules';
+        console.error('Error updating schedule:', err);
+        const errorMsg = err.error?.message || err.message || 'Failed to update schedule';
         this.toastService.error('Error', errorMsg);
         this.isSubmitting = false;
-      },
-      complete: () => {
-        this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -260,6 +269,7 @@ export class ClassScheduleEdit implements OnInit {
         this.markFormGroupTouched(control);
       }
     });
+    this.cdr.detectChanges();
   }
 
   get f() {

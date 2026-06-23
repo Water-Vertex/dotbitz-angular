@@ -1,443 +1,389 @@
-<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[70vh] space-y-4">
-  <div class="relative">
-    <div class="animate-spin rounded-full h-16 w-16 border-4 border-[#073a89]/20 border-t-[#073a89]"></div>
-    <div class="absolute inset-0 flex items-center justify-center">
-      <div class="h-8 w-8 bg-[#073a89]/10 rounded-full animate-pulse"></div>
+<div *ngIf="loading" class="max-w-7xl mx-auto px-4">
+  <div class="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <div class="inline-block">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
     </div>
+    <p class="text-gray-500 mt-4">Loading Checkout...</p>
   </div>
-  <p class="text-gray-600 font-medium">Loading your checkout...</p>
 </div>
 
-<div *ngIf="!loading" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+<div *ngIf="!loading" class="bg-gray-50 min-h-screen py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
-    <!-- Header -->
-    <div class="mb-10">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">
-          <span class="bg-gradient-to-r from-[#073a89] to-[#0a4baf] bg-clip-text text-transparent">
-            Complete Your Enrollment
-          </span>
-        </h1>
-        <div class="hidden sm:flex items-center space-x-2">
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-[#073a89] text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
-            <span class="ml-2 text-sm font-medium text-gray-600">Details</span>
-          </div>
-          <div class="w-12 h-0.5 bg-gray-300"></div>
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-sm font-bold">2</div>
-            <span class="ml-2 text-sm font-medium text-gray-400">Payment</span>
-          </div>
-        </div>
+    <!-- Already Enrolled Warning -->
+    <div *ngIf="isAlreadyEnrolled" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+      <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
+      <div>
+        <p class="font-semibold text-red-700">Already Enrolled</p>
+        <p class="text-sm text-red-600">You are already enrolled in this course. You cannot enroll again.</p>
       </div>
-      <nav class="flex items-center space-x-2 text-sm text-gray-500">
-        <a routerLink="/student/courses" class="hover:text-[#073a89] transition-colors">Courses</a>
-        <i class="fas fa-chevron-right text-xs"></i>
-        <span class="text-gray-900 font-medium">Checkout</span>
-      </nav>
     </div>
 
-    <div class="grid lg:grid-cols-3 gap-8">
-      <div class="lg:col-span-2 space-y-6">
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+        <a routerLink="/student/courses" class="hover:text-orange-500">Courses</a>
+        <span>/</span>
+        <span class="text-gray-900">Checkout</span>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900">Checkout</h1>
+    </div>
 
-        <!-- Student Details Card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden hover:shadow-md transition-shadow">
-          <div class="bg-gradient-to-r from-[#073a89]/5 to-transparent px-8 py-5 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-              <div class="w-8 h-8 bg-[#073a89]/10 rounded-lg flex items-center justify-center">
-                <i class="fas fa-user-circle text-[#073a89]"></i>
-              </div>
-              Student Information
-            </h2>
+    <div class="grid lg:grid-cols-3 gap-6">
+
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-4">
+
+        <!-- Student Info Card -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Student Information</h2>
           </div>
-          <div *ngIf="student" class="p-8">
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</p>
-                <p class="text-base font-semibold text-gray-900">{{ student.first_name }} {{ student.last_name }}</p>
+          <div *ngIf="student" class="p-5">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Full Name</p>
+                <p class="font-medium text-gray-900">{{ student.first_name }} {{ student.last_name }}</p>
               </div>
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Username</p>
-                <p class="text-base font-semibold text-gray-900">{{ student.user_name }}</p>
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Email</p>
+                <p class="font-medium text-gray-900">{{ student.email }}</p>
               </div>
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Email Address</p>
-                <p class="text-base font-semibold text-gray-900">{{ student.email }}</p>
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Phone</p>
+                <p class="font-medium text-gray-900">{{ student.phone || 'Not provided' }}</p>
               </div>
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</p>
-                <p class="text-base font-semibold text-gray-900">{{ student.phone }}</p>
-              </div>
-              <div class="space-y-1 md:col-span-2">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Location</p>
-                <p class="text-base font-semibold text-gray-900">{{ student.city || 'Not specified' }}</p>
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Location</p>
+                <p class="font-medium text-gray-900">{{ student.city || 'Not specified' }}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Course Details Card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden hover:shadow-md transition-shadow">
-          <div class="bg-gradient-to-r from-[#073a89]/5 to-transparent px-8 py-5 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-              <div class="w-8 h-8 bg-[#073a89]/10 rounded-lg flex items-center justify-center">
-                <i class="fas fa-book-open text-[#073a89]"></i>
-              </div>
-              Course Details
-            </h2>
+        <!-- Course Info Card -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Course Details</h2>
           </div>
-          <div *ngIf="course" class="p-8">
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="md:col-span-2 space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Course Name</p>
-                <p class="text-lg font-semibold text-gray-900">{{ course.course_name }}</p>
-              </div>
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Level</p>
-                <span class="px-3 py-1 bg-[#073a89]/10 text-[#073a89] text-sm font-medium rounded-full">
-                  {{ course.course_level }}
-                </span>
-              </div>
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</p>
-                <p class="text-base font-semibold text-gray-900">{{ course.course_duration }} Weeks</p>
-              </div>
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</p>
-                <p class="text-base font-semibold text-gray-900">{{ course.start_date | date: 'MMMM d, yyyy' }}</p>
-              </div>
-              <div class="space-y-1">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Age Limit</p>
-                <p class="text-base font-semibold text-gray-900">{{ course.age_limit }}+ Years</p>
+          <div *ngIf="course" class="p-5">
+            <div class="flex gap-4">
+              <img *ngIf="course.thumbnail_image"
+                   [src]="'https://dotbitz.com/public/assets/images/courses/' + course.thumbnail_image"
+                   class="w-24 h-24 object-cover rounded"
+                   [alt]="course.course_name" />
+              <div class="flex-1">
+                <h3 class="font-semibold text-gray-900 mb-1">{{ course.course_name }}</h3>
+                <div class="flex flex-wrap gap-3 text-xs text-gray-500">
+                  <span>{{ course.course_level }}</span>
+                  <span>•</span>
+                  <span>{{ course.course_duration }} weeks</span>
+                  <span>•</span>
+                  <span>Starts {{ course.start_date | date: 'MMM d, yyyy' }}</span>
+                  <span>•</span>
+                  <span>Ends {{ course.end_date | date: 'MMM d, yyyy' }}</span>
+                </div>
+                <div *ngIf="totalMonths > 0" class="mt-2 text-xs text-gray-500">
+                  <i class="fas fa-calendar-alt mr-1"></i>
+                  Course Duration: {{ totalMonths }} month{{ totalMonths > 1 ? 's' : '' }}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Batch Selection Card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden hover:shadow-md transition-shadow">
-          <div class="bg-gradient-to-r from-[#073a89]/5 to-transparent px-8 py-5 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-              <div class="w-8 h-8 bg-[#073a89]/10 rounded-lg flex items-center justify-center">
-                <i class="fas fa-layer-group text-[#073a89]"></i>
-              </div>
-              Select Batch <span class="text-red-500 ml-1">*</span>
-            </h2>
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Select Batch</h2>
           </div>
-
-          <div class="p-8 space-y-6">
-
-            <!-- Batch Dropdown -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-3">
-                Available Batches
-              </label>
-
-              <div *ngIf="loadingBatches" class="flex items-center gap-2 text-gray-500 text-sm py-3">
-                <i class="fas fa-spinner fa-spin text-[#073a89]"></i>
-                <span>Loading batches...</span>
-              </div>
-
-              <select
-                *ngIf="!loadingBatches"
-                [(ngModel)]="batchId"
-                (change)="onBatchChange()"
-                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#073a89]/20 focus:border-[#073a89] transition-all bg-white text-gray-700">
-                <option [ngValue]="null">-- Select a Batch --</option>
-                <option *ngFor="let batch of batches" [value]="batch.id">
-                  {{ batch.name }}
-                </option>
-              </select>
-
-              <p *ngIf="!loadingBatches && batches.length === 0" class="text-sm text-gray-400 mt-2">
-                <i class="fas fa-info-circle mr-1"></i> No batches available for this course.
-              </p>
+          <div class="p-5">
+            <div *ngIf="loadingBatches" class="flex items-center gap-2 text-sm text-gray-500">
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-gray-200 border-t-orange-500"></div>
+              <span>Loading batches...</span>
             </div>
 
-            <!-- ✅ Batch Full Warning -->
-            <div *ngIf="batchFull" class="flex items-center gap-3 bg-red-50 border border-red-200 px-4 py-3 rounded-xl">
-              <i class="fas fa-exclamation-circle text-red-500 text-lg"></i>
-              <div>
-                <p class="text-sm font-semibold text-red-600">This batch is full!</p>
-                <p class="text-xs text-red-400 mt-0.5">Please select another available batch to continue.</p>
-              </div>
-            </div>
+            <select *ngIf="!loadingBatches"
+              [(ngModel)]="batchId"
+              (change)="onBatchChange()"
+              [disabled]="loadingSchedules"
+              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 disabled:bg-gray-50 disabled:cursor-wait transition-colors">
+              <option [ngValue]="null">Select a batch</option>
+              <option *ngFor="let batch of batches" [value]="batch.id">
+                {{ batch.name }} - {{ formatBatchDateRange(batch) }}
+                {{ batch.is_full ? '(Full)' : '(' + (batch.enrolled_count || 0) + '/' + (batch.students || 0) + ' seats)' }}
+              </option>
+            </select>
 
-            <!-- Selected Batch Info -->
-            <div *ngIf="selectedBatch && !batchFull" class="p-4 bg-blue-50 rounded-xl border border-blue-200">
-              <p class="text-sm font-semibold text-[#073a89]">
-                <i class="fas fa-check-circle mr-2"></i>{{ selectedBatch.name }}
-              </p>
-              <p class="text-xs text-gray-500 mt-1">
-                <i class="fas fa-calendar mr-1"></i>
-                {{ selectedBatch.start_date | date: 'MMM d, yyyy' }} — {{ selectedBatch.end_date | date: 'MMM d, yyyy' }}
-              </p>
-            </div>
-
-            <!-- Schedules / Timings -->
-            <div *ngIf="selectedBatch && !batchFull">
-              <p class="text-sm font-semibold text-gray-700 mb-3">
-                <i class="fas fa-clock text-gray-400 mr-2"></i>Class Timings
-              </p>
-
-              <div *ngIf="loadingSchedules" class="flex items-center gap-2 text-gray-500 text-sm">
-                <i class="fas fa-spinner fa-spin text-[#073a89]"></i>
-                <span>Loading schedule...</span>
-              </div>
-
-              <div *ngIf="!loadingSchedules && batchSchedules.length > 0" class="space-y-3">
-                <div
-                  *ngFor="let schedule of batchSchedules"
-                  class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#073a89]/30 transition-all">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-[#073a89]/10 rounded-lg flex items-center justify-center">
-                      <i class="fas fa-calendar-day text-[#073a89] text-sm"></i>
-                    </div>
-                    <div>
-                      <p class="text-sm font-semibold text-gray-900 capitalize">{{ schedule.day }}</p>
-                      <p class="text-xs text-gray-500">
-                        {{ schedule.start_time | date: 'hh:mm a' }} — {{ schedule.end_time | date: 'hh:mm a' }}
-                      </p>
+            <!-- Loading Indicator for Schedule -->
+            <div *ngIf="loadingSchedules" class="mt-4">
+              <div class="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                <div class="flex items-center gap-3">
+                  <div class="relative">
+                    <div class="animate-spin rounded-full h-5 w-5 border-2 border-orange-200 border-t-orange-500"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <div class="h-2 w-2 bg-orange-500 rounded-full animate-pulse"></div>
                     </div>
                   </div>
-                  <span class="text-xs px-3 py-1 rounded-full font-medium"
-                    [ngClass]="{
-                      'bg-green-100 text-green-700': schedule.status === 'scheduled',
-                      'bg-blue-100 text-blue-700': schedule.status === 'ongoing',
-                      'bg-gray-100 text-gray-500': schedule.status === 'completed',
-                      'bg-red-100 text-red-500': schedule.status === 'cancelled'
-                    }">
-                    {{ schedule.status | titlecase }}
-                  </span>
+                  <div>
+                    <p class="text-sm font-medium text-orange-500">Loading schedule...</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Please wait while we fetch class timings</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p *ngIf="!loadingBatches && batches.length === 0" class="text-sm text-gray-400 mt-2">
+              No batches available
+            </p>
+
+            <!-- Enhanced Schedule Display -->
+            <div *ngIf="selectedBatch && !batchFull && batchSchedules.length > 0 && !loadingSchedules" class="mt-4">
+              <div class="bg-gradient-to-r from-orange-500/5 to-transparent p-3 rounded-lg mb-3">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-xs font-medium text-gray-500">Selected Batch</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ selectedBatch.name }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-xs font-medium text-gray-500">Batch Duration</p>
+                    <p class="text-sm text-gray-700">{{ formatBatchDateRange(selectedBatch) }}</p>
+                  </div>
                 </div>
               </div>
 
-              <div *ngIf="!loadingSchedules && batchSchedules.length === 0" class="text-sm text-gray-400 py-2">
-                <i class="fas fa-info-circle mr-1"></i> No schedule found for this batch.
+              <!-- Complete Schedule Table -->
+              <div class="mt-3">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-xs font-semibold text-gray-700">Class Schedule</p>
+                  <span class="text-xs text-gray-500">{{ batchSchedules.length }} sessions</span>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                  <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Day</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Time</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr *ngFor="let schedule of batchSchedules" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-3 py-2 text-sm text-gray-900">
+                          <span class="font-medium capitalize">{{ schedule.day }}</span>
+                          <span class="text-xs text-gray-400 ml-1">({{ getShortDay(schedule.day) }})</span>
+                        </td>
+                        <td class="px-3 py-2 text-sm text-gray-600">
+                          {{ formatTime(schedule.start_time) }} - {{ formatTime(schedule.end_time) }}
+                        </td>
+                        <td class="px-3 py-2">
+                          <span class="text-xs px-2 py-0.5 rounded-full"
+                            [ngClass]="{
+                              'bg-green-100 text-green-700': schedule.status === 'scheduled',
+                              'bg-orange-100 text-orange-700': schedule.status === 'ongoing',
+                              'bg-gray-100 text-gray-500': schedule.status === 'completed',
+                              'bg-red-100 text-red-500': schedule.status === 'cancelled'
+                            }">
+                            {{ schedule.status | titlecase }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Schedule Loaded Successfully Indicator -->
+                <div class="mt-3 flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                  <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1">
+                      <i class="fas fa-check-circle text-green-500 text-xs"></i>
+                      <span>Schedule loaded successfully</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <i class="fas fa-clock text-gray-400 text-xs"></i>
+                      <span>All times are in local timezone</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <i class="fas fa-calendar-alt text-gray-400 text-xs"></i>
+                    <span>Starts {{ selectedBatch.start_date | date: 'MMM d, yyyy' }}</span>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <!-- No Schedule -->
+            <div *ngIf="selectedBatch && !batchFull && batchSchedules.length === 0 && !loadingSchedules" class="mt-4 p-3 bg-gray-50 rounded-lg text-center">
+              <i class="fas fa-calendar-times text-gray-400 text-lg mb-1"></i>
+              <p class="text-sm text-gray-500">Schedule not yet available</p>
+              <p class="text-xs text-gray-400 mt-1">Please check back later or contact support</p>
+            </div>
+
+            <div *ngIf="batchFull && batchId" class="mt-3 text-xs text-red-600 bg-red-50 px-3 py-2 rounded">
+              <i class="fas fa-exclamation-circle mr-1"></i>
+              This batch is full. Please select another batch.
             </div>
           </div>
         </div>
 
-        <!-- Order Form -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
-          <div class="bg-gradient-to-r from-[#073a89]/5 to-transparent px-8 py-5 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-              <div class="w-8 h-8 bg-[#073a89]/10 rounded-lg flex items-center justify-center">
-                <i class="fas fa-clipboard-list text-[#073a89]"></i>
-              </div>
-              Order Details
-            </h2>
+        <!-- Payment Method Card -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Payment Method</h2>
           </div>
-
-          <div class="p-8 space-y-8">
-
-            <!-- Coupon Code -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-3">
-                <i class="fas fa-tag text-gray-400 mr-2"></i>Have a coupon code?
+          <div class="p-5">
+            <div class="grid grid-cols-3 gap-2">
+              <label class="flex items-center gap-2 p-2 border border-gray-200 rounded cursor-pointer hover:border-orange-500 transition-colors"
+                     [class.border-orange-500 bg-orange-500/5]="paymentMethod === 'stripe'">
+                <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="stripe" class="w-3.5 h-3.5">
+                <span class="text-sm">Card / Stripe</span>
               </label>
-              <div class="flex flex-col sm:flex-row gap-3">
-                <div class="flex-1 relative">
-                  <input type="text" [(ngModel)]="couponCode" [disabled]="couponApplied"
-                    placeholder="Enter coupon code"
-                    class="w-full border border-gray-300 rounded-xl px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-[#073a89]/20 focus:border-[#073a89] disabled:bg-gray-50 disabled:text-gray-500 transition-all" />
-                  <i class="fas fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                </div>
-                <button *ngIf="!couponApplied" (click)="applyCoupon()" [disabled]="couponChecking"
-                  class="px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-[#0a4baf] transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
-                  {{ couponChecking ? 'Applying...' : 'Apply Coupon' }}
-                </button>
-                <button *ngIf="couponApplied" (click)="removeCoupon()"
-                  class="px-6 py-3 bg-red-50 text-red-600 rounded-xl font-semibold hover:bg-red-100 transition-all border border-red-200">
-                  <i class="fas fa-times mr-2"></i>Remove
-                </button>
-              </div>
-              <div *ngIf="couponApplied" class="mt-3 flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
-                <i class="fas fa-check-circle text-green-500"></i>
-                <span class="text-sm font-medium">
-                  Coupon applied!
-                  <span *ngIf="discountType === 'percentage'">{{ discount }}% discount</span>
-                  <span *ngIf="discountType === 'fixed'">${{ discount }} off</span>
-                </span>
-              </div>
-              <p *ngIf="couponError" class="mt-3 flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg border border-red-200">
-                <i class="fas fa-exclamation-circle"></i>
-                <span class="text-sm">{{ couponError }}</span>
-              </p>
             </div>
 
-            <!-- Payment Method -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-3">
-                <i class="fas fa-credit-card text-gray-400 mr-2"></i>
-                Payment Method <span class="text-red-500">*</span>
-              </label>
-              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <label class="relative">
-                  <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="credit_card" class="peer sr-only">
-                  <div class="p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#073a89]/50 peer-checked:border-[#073a89] peer-checked:bg-[#073a89]/5 transition-all text-center">
-                    <i class="fab fa-cc-visa text-2xl text-gray-600 mb-2"></i>
-                    <span class="block text-sm font-medium text-gray-700">Credit Card</span>
-                  </div>
-                </label>
-                <label class="relative">
-                  <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="debit_card" class="peer sr-only">
-                  <div class="p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#073a89]/50 peer-checked:border-[#073a89] peer-checked:bg-[#073a89]/5 transition-all text-center">
-                    <i class="fas fa-credit-card text-2xl text-gray-600 mb-2"></i>
-                    <span class="block text-sm font-medium text-gray-700">Debit Card</span>
-                  </div>
-                </label>
-                <label class="relative">
-                  <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="paypal" class="peer sr-only">
-                  <div class="p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#073a89]/50 peer-checked:border-[#073a89] peer-checked:bg-[#073a89]/5 transition-all text-center">
-                    <i class="fab fa-paypal text-2xl text-gray-600 mb-2"></i>
-                    <span class="block text-sm font-medium text-gray-700">PayPal</span>
-                  </div>
-                </label>
-                <label class="relative">
-                  <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="bank_transfer" class="peer sr-only">
-                  <div class="p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#073a89]/50 peer-checked:border-[#073a89] peer-checked:bg-[#073a89]/5 transition-all text-center">
-                    <i class="fas fa-university text-2xl text-gray-600 mb-2"></i>
-                    <span class="block text-sm font-medium text-gray-700">Bank Transfer</span>
-                  </div>
-                </label>
-                <label class="relative">
-                  <input type="radio" name="paymentMethod" [(ngModel)]="paymentMethod" value="cash" class="peer sr-only">
-                  <div class="p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#073a89]/50 peer-checked:border-[#073a89] peer-checked:bg-[#073a89]/5 transition-all text-center">
-                    <i class="fas fa-money-bill-wave text-2xl text-gray-600 mb-2"></i>
-                    <span class="block text-sm font-medium text-gray-700">Cash</span>
-                  </div>
-                </label>
-              </div>
+            <div *ngIf="paymentMethod === 'stripe'" class="mt-3 text-xs text-gray-500 flex items-center gap-2">
+              <i class="fas fa-credit-card"></i>
+              <span>Pay securely with credit/debit card via Stripe</span>
             </div>
+          </div>
+        </div>
 
-            <!-- Note -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-3">
-                <i class="fas fa-pen text-gray-400 mr-2"></i>Additional Notes
-              </label>
-              <textarea [(ngModel)]="note" rows="4"
-                placeholder="Any special instructions or notes..."
-                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#073a89]/20 focus:border-[#073a89] resize-none transition-all">
-              </textarea>
+        <!-- Coupon Card -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Coupon Code</h2>
+          </div>
+          <div class="p-5">
+            <div class="flex gap-2">
+              <input type="text" [(ngModel)]="couponCode" [disabled]="couponApplied"
+                placeholder="Enter coupon code"
+                class="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 disabled:bg-gray-50" />
+              <button *ngIf="!couponApplied" (click)="applyCoupon()" [disabled]="couponChecking"
+                class="px-4 py-1.5 text-sm border border-orange-500 text-orange-500 rounded hover:bg-orange-500/5 transition-colors disabled:opacity-50">
+                {{ couponChecking ? '...' : 'Apply' }}
+              </button>
+              <button *ngIf="couponApplied" (click)="removeCoupon()"
+                class="px-4 py-1.5 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors">
+                Remove
+              </button>
             </div>
+            <div *ngIf="couponApplied" class="mt-2 text-xs text-green-600">
+              ✓ Coupon applied successfully
+            </div>
+            <div *ngIf="couponError" class="mt-2 text-xs text-red-600">
+              {{ couponError }}
+            </div>
+          </div>
+        </div>
 
-            <!-- Is Financed -->
-            <div class="border-t border-gray-200 pt-6">
-              <label class="flex items-center gap-4 cursor-pointer group">
-                <input type="checkbox" [(ngModel)]="isFinanced"
-                  class="w-5 h-5 rounded border-gray-300 text-[#073a89] focus:ring-[#073a89]/20 focus:ring-offset-0 transition-all" />
-                <span class="text-sm font-semibold text-gray-700 group-hover:text-[#073a89] transition-colors">
-                  This order will be financed
-                </span>
-              </label>
-              <div *ngIf="isFinanced" class="mt-6 grid md:grid-cols-2 gap-4 p-6 bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-xl border border-blue-200">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Finance ID <span class="text-red-500">*</span></label>
-                  <div class="relative">
-                    <i class="fas fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" [(ngModel)]="financeId" placeholder="Enter Finance ID"
-                      class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#073a89]/20 focus:border-[#073a89] transition-all" />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Finance Provider <span class="text-red-500">*</span></label>
-                  <div class="relative">
-                    <i class="fas fa-building-columns absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" [(ngModel)]="financeProvider" placeholder="e.g. Bank Al Habib"
-                      class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#073a89]/20 focus:border-[#073a89] transition-all" />
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!-- Additional Notes -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div class="px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Additional Notes</h2>
+          </div>
+          <div class="p-5">
+            <textarea [(ngModel)]="note" rows="2"
+              placeholder="Any special instructions..."
+              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 resize-none">
+            </textarea>
           </div>
         </div>
       </div>
 
       <!-- Right Column - Order Summary -->
       <div class="lg:col-span-1">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/80 sticky top-6">
-          <div class="bg-orange-500 px-6 py-5 text-white rounded-t-2xl">
-            <h3 class="text-lg font-semibold flex items-center gap-2">
-              <i class="fas fa-receipt"></i> Order Summary
-            </h3>
+        <div class="bg-white rounded-lg border border-gray-200 sticky top-20">
+          <div class="px-5 py-3 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900">Order Summary</h2>
           </div>
 
-          <div class="p-6 space-y-4">
-            <div class="flex justify-between items-center py-2">
-              <span class="text-gray-600">Course Fee</span>
-              <span class="font-semibold text-gray-900">${{ subAmount }}</span>
-            </div>
+          <div class="p-5 space-y-3">
+            <!-- Monthly Payment Option -->
+            <div class="pb-2 border-b border-gray-100">
+              <label class="flex items-center justify-between cursor-pointer">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox"
+                         [checked]="isMonthlyPayment"
+                         (change)="toggleMonthlyPayment($event)"
+                         [disabled]="isAlreadyEnrolled"
+                         class="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500">
+                  <span class="text-sm font-medium text-gray-700">Pay Monthly</span>
+                </div>
+                <div *ngIf="isMonthlyPayment && monthlyFee" class="text-xs text-green-600">
+                  <i class="fas fa-calendar-alt mr-1"></i>
+                  {{ totalMonths }} months
+                </div>
+              </label>
 
-            <div *ngIf="couponApplied" class="flex justify-between items-center py-2 bg-green-50/50 px-3 rounded-lg">
-              <span class="text-green-600 flex items-center gap-2">
-                <i class="fas fa-tag text-xs"></i> Discount
-                <span class="text-xs bg-green-100 px-2 py-0.5 rounded-full">
-                  <span *ngIf="discountType === 'percentage'">{{ discount }}%</span>
-                  <span *ngIf="discountType === 'fixed'">Fixed</span>
-                </span>
-              </span>
-              <span class="font-semibold text-green-600">- ${{ discountAmount }}</span>
-            </div>
-
-            <!-- Selected Batch Summary -->
-            <div *ngIf="selectedBatch && !batchFull" class="flex justify-between items-center py-2 bg-blue-50/50 px-3 rounded-lg">
-              <span class="text-blue-600 flex items-center gap-2">
-                <i class="fas fa-layer-group text-xs"></i> Batch
-              </span>
-              <span class="font-semibold text-blue-700 text-sm">{{ selectedBatch.name }}</span>
-            </div>
-
-            <div class="border-t border-gray-200 my-4"></div>
-
-            <div class="flex justify-between items-center">
-              <span class="text-base font-semibold text-gray-900">Total Amount</span>
-              <div class="text-right">
-                <span class="text-2xl font-bold text-[#073a89]">${{ totalAmount }}</span>
-                <span class="block text-xs text-gray-500">Including all taxes</span>
+              <div *ngIf="isMonthlyPayment && monthlyFee" class="mt-2 p-2 bg-orange-50 rounded-lg">
+                <div class="text-xs text-gray-600 mb-1">Monthly Payment Plan</div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-semibold text-gray-900">${{ monthlyFee | number:'1.2-2' }}/month</span>
+                  <span class="text-xs text-gray-500">for {{ totalMonths }} months</span>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  You'll be charged ${{ monthlyFee | number:'1.2-2' }} today
+                </div>
               </div>
             </div>
 
-            <div *ngIf="paymentMethod" class="mt-4 p-3 bg-gray-50 rounded-lg">
-              <p class="text-xs text-gray-500 mb-1">Payment Method</p>
-              <p class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <i class="fas fa-check-circle text-green-500 text-xs"></i>
-                {{ paymentMethod.replace('_', ' ') | titlecase }}
-              </p>
+            <!-- Price Breakdown -->
+            <div *ngIf="!isMonthlyPayment && course" class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Original Price</span>
+                <span class="text-gray-400 line-through">${{ originalTotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Discounted Price</span>
+                <span class="font-medium text-gray-900">${{ discountedTotal | number:'1.2-2' }}</span>
+              </div>
             </div>
 
-            <div class="space-y-3 pt-4">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600">{{ isMonthlyPayment ? 'Monthly Fee' : 'Course Fee' }}</span>
+              <span class="font-medium text-gray-900">${{ subAmount | number:'1.2-2' }}</span>
+            </div>
 
-              <!-- ✅ Batch Full ho to button disabled + message -->
-              <div *ngIf="batchFull" class="text-center p-3 bg-red-50 rounded-xl border border-red-200">
-                <p class="text-xs font-semibold text-red-500">
-                  <i class="fas fa-ban mr-1"></i> Cannot proceed — selected batch is full
-                </p>
+            <div *ngIf="couponApplied" class="flex justify-between text-sm text-green-600">
+              <span>Discount</span>
+              <span>-${{ discountAmount | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="pt-3 border-t border-gray-200">
+              <div class="flex justify-between">
+                <span class="font-semibold text-gray-900">Total Today</span>
+                <span class="text-lg font-bold text-orange-500">${{ totalAmount | number:'1.2-2' }}</span>
               </div>
+            </div>
 
+            <div *ngIf="isMonthlyPayment && totalMonths > 1" class="text-xs text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              Remaining {{ totalMonths - 1 }} payments of ${{ monthlyFee | number:'1.2-2' }} will be charged monthly
+            </div>
+
+            <div class="text-xs text-gray-500 flex items-center gap-1">
+              <i class="fas fa-lock text-gray-400 text-xs"></i>
+              <span>Secure checkout</span>
+            </div>
+
+            <div class="pt-3 space-y-2">
               <button (click)="proceedToPay()"
-                [disabled]="submitting || batchFull || !batchId"
-                class="w-full px-6 py-4 bg-orange-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg">
-                <span *ngIf="!submitting" class="flex items-center justify-center gap-2">
-                  Proceed to Payment <i class="fas fa-arrow-right"></i>
+                [disabled]="submitting || batchFull || !batchId || !paymentMethod || isAlreadyEnrolled"
+                class="w-full py-2 bg-orange-500 text-white text-sm font-medium rounded hover:bg-[#052b63] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <span *ngIf="!submitting">
+                  {{ isMonthlyPayment ? 'Pay $' + (totalAmount | number:'1.2-2') + ' Today' : 'Complete Checkout' }}
                 </span>
                 <span *ngIf="submitting" class="flex items-center justify-center gap-2">
-                  <i class="fas fa-spinner fa-spin"></i> Processing...
+                  <div class="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+                  Processing...
                 </span>
               </button>
 
               <button routerLink="/student/courses/list"
-                class="w-full px-6 py-3 border-2 border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold transition-all hover:border-gray-300">
+                class="w-full py-2 border border-gray-300 text-gray-600 text-sm font-medium rounded hover:bg-gray-50 transition-colors">
                 Cancel
               </button>
-            </div>
-
-            <div class="mt-4 text-center">
-              <p class="text-xs text-gray-400 flex items-center justify-center gap-2">
-                <i class="fas fa-lock text-gray-300"></i> Secure checkout powered by SSL encryption
-              </p>
             </div>
           </div>
         </div>
@@ -445,3 +391,45 @@
     </div>
   </div>
 </div>
+
+<!-- Toast Notification -->
+<div *ngIf="showBatchChangeToast"
+     class="fixed bottom-4 right-4 z-50 animate-fade-in-up"
+     [ngClass]="{
+       'bg-green-600': toastType === 'success',
+       'bg-red-600': toastType === 'error',
+       'bg-blue-600': toastType === 'info',
+       'bg-yellow-600': toastType === 'warning'
+     }">
+  <div class="px-4 py-2 rounded-lg shadow-lg text-white text-sm flex items-center gap-2">
+    <i class="fas"
+       [ngClass]="{
+         'fa-check-circle': toastType === 'success',
+         'fa-exclamation-circle': toastType === 'error',
+         'fa-info-circle': toastType === 'info',
+         'fa-exclamation-triangle': toastType === 'warning'
+       }"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>
+
+<style>
+  input[type="radio"] {
+    accent-color: #073a89;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.3s ease-out;
+  }
+</style>

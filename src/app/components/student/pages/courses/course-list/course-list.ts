@@ -40,7 +40,7 @@ export class StudentCourseList implements OnInit, OnDestroy {
   loadCourses(): void {
     this.isLoading = true;
 
-    this.courseService.getStudentCourses('', 50).subscribe({
+    this.courseService.getCourses('', 50).subscribe({
       next: (res: any) => {
         let rawData: Course[] = [];
 
@@ -122,3 +122,5 @@ export class StudentCourseList implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
+
+

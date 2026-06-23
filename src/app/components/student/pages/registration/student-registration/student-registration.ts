@@ -1,4 +1,3 @@
-// student-registration.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -26,7 +25,7 @@ export class StudentRegistration implements OnInit {
     private fb: FormBuilder,
     private studentService: StudentService,
     private router: Router,
-    private toastService: ToastService // Inject toast service
+    private toastService: ToastService
   ) {
     this.registrationForm = this.createForm();
   }
@@ -296,18 +295,17 @@ export class StudentRegistration implements OnInit {
     this.studentService.registerStudent(formData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        // Show success message and redirect
         // Show success toast
-        this.toastService.success('Registration Successful', 'Your account has been created successfully! Please login with your credentials.');
-         // Redirect to login after a short delay
+        this.toastService.success('Registration Successful', 'Your account has been created successfully!');
+        // Redirect to login after a short delay
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/student/login']);
         }, 2000);
       },
       error: (error) => {
         this.isLoading = false;
         this.apiError = error.error?.message || 'Registration failed. Please try again.';
-        this.toastService.error('Registration Failed', error.error?.message);
+        this.toastService.error('Registration Failed', error.error?.message || 'An error occurred during registration');
 
         console.error('Registration error:', error);
       }
