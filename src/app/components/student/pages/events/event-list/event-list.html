@@ -1,16 +1,16 @@
 <div class="space-y-6">
 
-  <!-- Header -->
-  <div class="bg-white rounded-xl border border-gray-200 p-6 flex items-center justify-between shadow-sm">
+  <!-- Header - Responsive fix for small screens -->
+  <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Events</h1>
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Events</h1>
       <p class="text-gray-500 mt-1 text-sm">Upcoming events and activities</p>
     </div>
     <button (click)="loadEvents()" [disabled]="loading"
       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center
-             gap-2 text-sm font-medium disabled:opacity-50">
+             gap-2 text-sm font-medium disabled:opacity-50 justify-center w-full sm:w-auto">
       <i class="fas fa-sync-alt" [class.animate-spin]="loading"></i>
-      Refresh
+      {{ loading ? 'Refreshing...' : 'Refresh' }}
     </button>
   </div>
 

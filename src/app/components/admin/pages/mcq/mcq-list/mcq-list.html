@@ -1,39 +1,44 @@
 <div class="min-h-screen bg-gray-50">
-  <!-- Header -->
-  <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">MCQ Management</h1>
-          <p class="text-sm text-gray-500 mt-1">Manage multiple choice questions for courses</p>
-        </div>
-        <div class="flex gap-3">
-          <button
-           *ngIf="can('view_mcqs')"
-            (click)="loadMcqs()"
-            [disabled]="loading"
-            class="px-4 py-2 bg-green-600 text-gray-700 rounded-lg hover:bg-green-700 text-white transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
-          >
-            <svg class="w-4 h-4" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            <span>{{ loading ? 'Refreshing...' : 'Refresh' }}</span>
-          </button>
-          <a
-            *ngIf="can('create_mcqs')"
-            routerLink="/admin/mcqs/add"
-            class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>Add MCQ</span>
-          </a>
-        </div>
+<!-- Header -->
+<div class="bg-white border-b border-gray-200 sticky top-0 z-10">
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Stack title and buttons on small screens, row on medium+ -->
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">MCQ Management</h1>
+        <p class="text-sm text-gray-500 mt-1">Manage multiple choice questions for courses</p>
+      </div>
+
+      <!-- Buttons container: stack on mobile, row on sm+ -->
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+        <!-- Refresh Button -->
+        <button
+          *ngIf="can('view_mcqs')"
+          (click)="loadMcqs()"
+          [disabled]="loading"
+          class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium disabled:opacity-50"
+        >
+          <svg class="w-4 h-4" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>{{ loading ? 'Refreshing...' : 'Refresh' }}</span>
+        </button>
+
+        <!-- Add MCQ Button -->
+        <a
+          *ngIf="can('create_mcqs')"
+          routerLink="/admin/mcqs/add"
+          class="w-full sm:w-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 text-sm font-semibold shadow-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add MCQ</span>
+        </a>
       </div>
     </div>
   </div>
-
+</div>
   <!-- Filters Bar - All in One Row -->
   <div class="max-w-7xl mx-auto px-4 py-6">
     <div class="bg-white rounded-lg border border-gray-200 p-4">

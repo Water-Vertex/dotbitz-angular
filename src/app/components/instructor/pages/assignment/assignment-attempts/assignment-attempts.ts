@@ -214,7 +214,7 @@ export class InstructorAssignmentAttempts implements OnInit {
   getBaseUrl(): string {
     return window.location.hostname === 'localhost'
       ? 'http://localhost:8000'
-      : 'https://dotbitz.com/public';
+      :  'https://dotbitz.com';
   }
 
   getDaysLate(submittedAt: string, dueDate: string): string {

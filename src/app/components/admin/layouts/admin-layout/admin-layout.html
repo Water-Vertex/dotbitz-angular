@@ -516,9 +516,31 @@
                         <i class="fas fa-quote-left mr-3 w-5 text-center"></i> MCQs
                     </a>
 
-                    <a *ngIf="can('view_quizzes')" routerLink="/admin/quiz/list" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-white hover:bg-gray-50 hover:text-gray-900">
-                        <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i> Quiz List
-                    </a>
+                   
+                    <!-- Quiz Submenu -->
+                    <div *ngIf="can('view_quizzes')" class="courses-menu-item" data-has-submenu="true">
+                        <button class="menu-toggle-btn flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900 w-full">
+                            <div class="flex items-center">
+                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
+                                Quiz
+                            </div>
+                            <i class="fas fa-chevron-down text-xs text-gray-300 ml-auto transform transition-transform duration-200"></i>
+                        </button>
+
+                        <div class="submenu mt-1 space-y-1 hidden">
+                            <a *ngIf="can('view_quizzes')" routerLink="/admin/quiz/list" data-nav-item data-href="/admin/quiz/list"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-clipboard-question mr-3 w-5 text-center"></i>
+                                Quiz List
+                            </a>
+                            <a *ngIf="can('view_quizzes')" routerLink="/admin/quiz/attempts" data-nav-item data-href="/admin/quiz/attempts"
+                               class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">
+                                <i class="fas fa-tasks mr-3 w-5 text-center"></i>
+                                Attempted Quizzes
+                            </a>
+                        </div>
+                    </div>
+
 
                     <a routerLink="/admin/event/list" data-nav-item data-href="/admin/event/list"
                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-white hover:bg-gray-50 hover:text-gray-900">

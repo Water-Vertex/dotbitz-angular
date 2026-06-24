@@ -1,19 +1,22 @@
 <!-- components/class-schedule/class-schedule-list/class-schedule-list.html -->
-<div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-  <div class="flex justify-between items-center">
+<div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6">
+  <!-- Stack on small screens: flex-col, revert to row on sm -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Class Schedules</h1>
       <p class="text-gray-600 mt-1">Manage your class schedules</p>
     </div>
+    <!-- Button adapts width on mobile -->
     <a
       routerLink="/instructor/class-schedule/add"
-      class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center space-x-2 text-sm font-medium"
+      class="w-full sm:w-auto px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 flex items-center justify-center space-x-2 text-sm font-medium"
     >
       <i class="fas fa-plus"></i> <span>Add New Schedule</span>
     </a>
   </div>
 </div>
 
+<!-- Rest of the page unchanged -->
 <!-- Stats Cards -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
   <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
@@ -232,29 +235,25 @@
             </div>
           </div>
         </div>
-
-
       </div>
 
       <!-- Quick Actions -->
-      <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end space-x-3">
-
+      <div class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap justify-end gap-2">
         <button
           (click)="onEdit(schedule.id!)"
           class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
         >
           Edit Schedule
         </button>
-<!-- Existing Edit/Delete buttons ke saath -->
-<button (click)="addToCalendar(schedule)"
-  class="px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg
-         hover:bg-blue-100 text-xs font-medium flex items-center gap-1"
-  title="Add to Google Calendar">
-  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-  </svg>
-  Add to Calendar
-</button>
+        <button (click)="addToCalendar(schedule)"
+          class="px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg
+                 hover:bg-blue-100 text-xs font-medium flex items-center gap-1"
+          title="Add to Google Calendar">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+          </svg>
+          Add to Calendar
+        </button>
         <a
           *ngIf="schedule.meeting_link"
           [href]="schedule.meeting_link"

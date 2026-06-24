@@ -54,38 +54,38 @@
     </div>
   </div>
 
-  <!-- Tabs Section - Full Width -->
-  <div class="border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="flex gap-8">
-        <button (click)="setTab('curriculum')"
-          [class]="'py-4 text-base font-medium transition-all relative ' +
-            (activeTab === 'curriculum' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
-          Curriculum
-          <div *ngIf="activeTab === 'curriculum'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
-        </button>
-        <button (click)="setTab('assignment')"
-          [class]="'py-4 text-base font-medium transition-all relative ' +
-            (activeTab === 'assignment' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
-          Assignments
-          <div *ngIf="activeTab === 'assignment'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
-        </button>
-        <button (click)="setTab('quiz')"
-          [class]="'py-4 text-base font-medium transition-all relative ' +
-            (activeTab === 'quiz' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
-          Quizzes
-          <div *ngIf="activeTab === 'quiz'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
-        </button>
-         <button (click)="setTab('review')"
-  [class]="'py-4 text-base font-medium transition-all relative ' +
-    (activeTab === 'review' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
-  Reviews
-  <div *ngIf="activeTab === 'review'"
-    class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
-</button>
-      </div>
+ <!-- Tabs Section - Full Width -->
+<div class="border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- flex-wrap + responsive gap -->
+    <div class="flex flex-wrap gap-2 sm:gap-8">
+      <button (click)="setTab('curriculum')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'curriculum' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Curriculum
+        <div *ngIf="activeTab === 'curriculum'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
+      <button (click)="setTab('assignment')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'assignment' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Assignments
+        <div *ngIf="activeTab === 'assignment'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
+      <button (click)="setTab('quiz')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'quiz' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Quizzes
+        <div *ngIf="activeTab === 'quiz'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
+      <button (click)="setTab('review')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'review' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Reviews
+        <div *ngIf="activeTab === 'review'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
     </div>
   </div>
+</div>
 
   <!-- Tab Content - Full Width -->
   <div class="max-w-7xl mx-auto px-6 py-8">
