@@ -1,0 +1,222 @@
+<div class="min-h-screen bg-gray-50 p-6">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex items-center justify-center h-64">
+        <div class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-600 mr-3"></i>
+            <p class="text-red-700">{{ error }}</p>
+            <button (click)="loadDashboardStats()" class="ml-auto text-sm text-red-600 hover:text-red-700 font-medium">
+                Retry
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div *ngIf="!loading && !error">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Student Dashboard</h1>
+                <p class="text-gray-600 mt-1">Welcome back, {{ studentName }}! Track your learning progress here.</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Courses Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <i class="fas fa-book-open text-blue-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        {{ stats.completed_courses }} Completed
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_courses }}</h3>
+                <p class="text-gray-600 text-sm">Total Courses Enrolled</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-blue-600 h-2 rounded-full"
+                             [style.width]="(stats.completed_courses / stats.total_courses * 100) + '%'">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500">{{ stats.completed_courses }} completed, {{ stats.in_progress_courses }} in progress</p>
+                </div>
+            </div>
+
+            <!-- Assessments Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <i class="fas fa-tasks text-green-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        {{ stats.completed_assessments }} Done
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_assessments }}</h3>
+                <p class="text-gray-600 text-sm">Total Assessments (Quizzes)</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-600">Completion Rate</span>
+                        <span class="font-medium">{{ (stats.completed_assessments / stats.total_assessments * 100) || 0 | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full"
+                             [style.width]="(stats.completed_assessments / stats.total_assessments * 100) + '%'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignments Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-purple-50 rounded-lg">
+                        <i class="fas fa-file-alt text-purple-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                        {{ stats.submitted_assignments }} Submitted
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.total_assignments }}</h3>
+                <p class="text-gray-600 text-sm">Total Assignments</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-600">Submission Rate</span>
+                        <span class="font-medium">{{ (stats.submitted_assignments / stats.total_assignments * 100) || 0 | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full"
+                             [style.width]="(stats.submitted_assignments / stats.total_assignments * 100) + '%'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall Progress Card -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-amber-50 rounded-lg">
+                        <i class="fas fa-chart-line text-amber-600 text-lg"></i>
+                    </div>
+                    <span class="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                        Achievement
+                    </span>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.average_completion_rate }}%</h3>
+                <p class="text-gray-600 text-sm">Overall Completion Rate</p>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-amber-600 h-2 rounded-full"
+                             [style.width]="stats.average_completion_rate + '%'">
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Based on course completion</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Tips -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h2>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3" *ngIf="stats.submitted_assignments > 0">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-file-alt text-green-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">You have submitted {{ stats.submitted_assignments }} assignment(s)</p>
+                            <p class="text-xs text-gray-500 mt-1">Keep up the good work!</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3" *ngIf="stats.completed_assessments > 0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-tasks text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">You have completed {{ stats.completed_assessments }} assessment(s)</p>
+                            <p class="text-xs text-gray-500 mt-1">Great progress!</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3" *ngIf="stats.pending_assignments > 0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-clock text-yellow-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">{{ stats.pending_assignments }} assignment(s) pending submission</p>
+                            <p class="text-xs text-gray-500 mt-1">Don't forget to submit before deadline</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3" *ngIf="stats.pending_assessments > 0">
+                        <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-1">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900">{{ stats.pending_assessments }} assessment(s) not yet attempted</p>
+                            <p class="text-xs text-gray-500 mt-1">Try to complete them soon</p>
+                        </div>
+                    </div>
+
+                    <div *ngIf="stats.submitted_assignments === 0 && stats.completed_assessments === 0" class="text-center py-8">
+                        <i class="fas fa-inbox text-gray-400 text-4xl mb-3"></i>
+                        <p class="text-gray-500">No recent activity to display</p>
+                        <a routerLink="/student/courses/list" class="text-sm text-blue-600 hover:text-blue-700 mt-2 inline-block">
+                            Browse courses to get started
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Tips -->
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Study Tips</h2>
+                    <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">1</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Set a regular study schedule - 30 minutes daily is more effective than long sessions</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">2</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Take short breaks every 45 minutes to maintain focus</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">3</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Review your notes within 24 hours of each lesson</p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-xs font-bold text-indigo-600">4</span>
+                        </div>
+                        <p class="text-sm text-gray-700">Stay organized with deadlines using a study planner</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

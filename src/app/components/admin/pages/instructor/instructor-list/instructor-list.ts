@@ -5,6 +5,7 @@ import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil, filter } from 'rxjs';
 import { InstructorService } from '../../../../../services/instructor.service';
 import { ToastService } from '../../../../../services/toast.service';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-instructor-list',
@@ -27,7 +28,8 @@ export class InstructorList implements OnInit, OnDestroy {
     private instructorService: InstructorService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth : AuthService
   ) {
     // Reload when navigating back
     this.router.events.pipe(
@@ -80,7 +82,9 @@ loadInstructors(): void {
 }
 
 
-
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
   refreshData(): void {
     this.loadInstructors();
   }

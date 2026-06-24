@@ -1,0 +1,73 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Header - responsive stacking -->
+  <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Guardian Management</h1>
+      <p class="text-gray-600 mt-1 text-sm sm:text-base">Manage guardians and their details</p>
+    </div>
+    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+      <button (click)="refreshData()" [disabled]="isLoading" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs sm:text-sm font-medium disabled:opacity-50 flex-1 sm:flex-none">
+        <i class="fas fa-sync-alt mr-1 sm:mr-2" [class.animate-spin]="isLoading"></i>
+        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+      <!-- Add button if needed (not in original, but you can add later) -->
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Loading Guardians...</p>
+  </div>
+
+  <!-- Search -->
+  <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6">
+    <div class="flex items-center bg-gray-100 rounded-lg px-3 py-2 w-full">
+      <i class="fas fa-search text-gray-400 mr-2"></i>
+      <input type="text" [formControl]="searchControl" placeholder="Search guardians by name or email..." class="bg-transparent border-none focus:outline-none focus:ring-0 w-full text-sm" />
+    </div>
+  </div>
+
+  <!-- Table - REMOVED 'hidden md:block' to show on mobile, added horizontal scroll and responsive padding -->
+  <div *ngIf="!isLoading && guardians.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[480px]">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+            <!-- Actions column if needed, but you didn't have any action buttons so keep it hidden or remove -->
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngFor="let guardian of guardians; trackBy: trackById" class="hover:bg-gray-50">
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-900">{{ guardian.id }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium text-gray-900">{{ guardian.first_name }} {{ guardian.last_name }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-600 break-all sm:break-normal">{{ guardian.email }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-600">{{ guardian.phone || '-' }}</td>
+            <!-- If no actions, you can keep an empty td or remove; I'll keep for consistency but hide on mobile if needed -->
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm whitespace-nowrap">
+              <div class="flex space-x-1 sm:space-x-2">
+                <!-- No actions defined in original, but you can add later -->
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="!isLoading && guardians.length === 0" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+    <i class="fas fa-users text-gray-300 text-5xl mb-3"></i>
+    <p class="text-gray-500">No guardians found</p>
+    <a routerLink="/admin/guardian/add" class="inline-block mt-3 text-orange-600 hover:text-orange-700 text-sm font-medium">
+      <i class="fas fa-plus mr-1"></i> Add your first guardian
+    </a>
+  </div>
+</div>
+
+<!-- Add Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

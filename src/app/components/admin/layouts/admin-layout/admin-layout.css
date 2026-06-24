@@ -1,0 +1,29 @@
+/* Add these styles to your existing CSS */
+[data-has-submenu="true"] .menu-toggle-btn.active {
+    background-color: rgb(249 115 22 / 0.1) !important;
+    color: rgb(249 115 22) !important;
+    border-left: 4px solid rgb(249 115 22) !important;
+}
+
+[data-has-submenu="true"] .menu-toggle-btn.active .bg-blue-100 {
+    background-color: rgb(249 115 22 / 0.2) !important;
+}
+
+[data-has-submenu="true"] .menu-toggle-btn.active i.text-blue-600 {
+    color: rgb(249 115 22) !important;
+}
+
+[data-has-submenu="true"] .menu-toggle-btn.active .fa-chevron-down {
+    color: rgb(249 115 22) !important;
+}
+
+/* Active state for submenu items */
+.submenu [data-nav-item].active {
+    background-color: rgb(249 115 22 / 0.1) !important;
+    color: rgb(249 115 22) !important;
+    border-left: 4px solid rgb(249 115 22) !important;
+}
+
+.submenu [data-nav-item].active .text-blue-500 {
+    color: rgb(249 115 22) !important;
+}

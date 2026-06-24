@@ -1,0 +1,596 @@
+<!-- student-registration.html -->
+<section class="bg-gradient-to-br from-[#073a89] to-[#0091b9] text-white py-12 md:py-16 relative">
+  <div class="container mx-auto px-4 md:px-6">
+    <!-- Breadcrumb -->
+    <nav class="text-sm mb-4 md:mb-6 opacity-90">
+      <ol class="flex items-center space-x-2 flex-wrap">
+        <li><a href="/" class="hover:text-[#ffd500] transition">Home</a></li>
+        <li>/</li>
+        <li class="text-[#ffd500] font-semibold">Registration</li>
+      </ol>
+    </nav>
+
+    <!-- Heading -->
+    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4">Student Registration</h1>
+    <p class="max-w-2xl text-base md:text-lg opacity-90">
+      Join DotBitz and start your programming journey!
+    </p>
+  </div>
+
+  <!-- Decorative blur -->
+  <div class="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-[#ffd500] opacity-10 blur-3xl rounded-full"></div>
+</section>
+
+<div class="mt-8 md:mt-12 relative z-1 bg-white p-4 sm:p-6 lg:p-0">
+  <div class="relative flex w-full flex-col justify-center lg:flex-row">
+    <!-- Form Section -->
+    <div class="flex w-full flex-1 flex-col lg:w-1/2">
+      <div class="mx-auto w-full max-w-4xl px-2 sm:px-4 flex flex-1 flex-col justify-center">
+        <div class="w-full">
+
+          <!-- Progress Steps -->
+          <div class="mb-6 md:mb-8">
+            <div class="flex items-center justify-between">
+              <div *ngFor="let step of [1, 2, 3]; let i = index" class="flex items-center flex-1">
+                <div class="flex items-center min-w-0">
+                  <div [class]="'w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all duration-300 flex-shrink-0 ' +
+                    (currentStep === i + 1 ? 'bg-[#161950] text-white' :
+                     currentStep > i + 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600')">
+                    <span *ngIf="currentStep <= i + 1" class="text-xs md:text-sm font-bold">{{i + 1}}</span>
+                    <svg *ngIf="currentStep > i + 1" class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                  <div class="ml-2 md:ml-3 hidden sm:block">
+                    <p class="text-xs md:text-sm font-medium text-gray-700">
+                      <span *ngIf="i === 0">Personal</span>
+                      <span *ngIf="i === 1">Education</span>
+                      <span *ngIf="i === 2">{{showGuardianInfo ? 'Guardian' : 'Security'}}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 hidden md:block">
+                      <span *ngIf="i === 0">Basic details</span>
+                      <span *ngIf="i === 1">Academic info</span>
+                      <span *ngIf="i === 2">{{showGuardianInfo ? 'Parent/Guardian' : 'Password & Terms'}}</span>
+                    </p>
+                  </div>
+                </div>
+                <div *ngIf="i < 2" [class]="'flex-1 h-0.5 mx-2 md:mx-4 ' + (currentStep > i + 1 ? 'bg-green-500' : 'bg-gray-200')"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-full">
+            <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+              <div class="space-y-4 md:space-y-5">
+
+                <!-- ==================== STEP 1: PERSONAL INFORMATION ==================== -->
+                <div *ngIf="currentStep === 1" class="space-y-4 md:space-y-5">
+
+                  <!-- Helper text for Student Information -->
+                  <div class="bg-blue-50 p-2 md:p-3 rounded-lg mb-2 border-l-4 border-blue-500">
+                    <p class="text-xs md:text-sm text-blue-700 flex items-center gap-2">
+                      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span><strong>Student Information:</strong> Please provide the student's personal details as they appear on official documents.</span>
+                    </p>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                    <!-- First Name -->
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                        First Name<span class="text-red-500">*</span>
+                      </label>
+                      <input type="text" formControlName="firstName" placeholder="John"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                        [class.border-red-300]="f['firstName'].invalid && f['firstName'].touched"/>
+                      <p class="text-xs text-gray-500 mt-1 hidden md:block">Student's legal first name</p>
+                      <div *ngIf="f['firstName'].invalid && f['firstName'].touched" class="mt-1 flex items-center gap-2">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-red-600 text-xs md:text-sm">First name is required</span>
+                      </div>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                        Last Name<span class="text-red-500">*</span>
+                      </label>
+                      <input type="text" formControlName="lastName" placeholder="Doe"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                        [class.border-red-300]="f['lastName'].invalid && f['lastName'].touched"/>
+                      <p class="text-xs text-gray-500 mt-1 hidden md:block">Student's legal last name / surname</p>
+                      <div *ngIf="f['lastName'].invalid && f['lastName'].touched" class="mt-1 flex items-center gap-2">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-red-600 text-xs md:text-sm">Last name is required</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Username -->
+                  <div>
+                    <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                      Username<span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" formControlName="userName" placeholder="johndoe123"
+                      class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                      [class.border-red-300]="f['userName'].invalid && f['userName'].touched"/>
+                    <p class="text-xs text-gray-500 mt-1">Choose a unique username (letters, numbers, underscores)</p>
+                    <div *ngIf="f['userName'].invalid && f['userName'].touched" class="mt-1 flex items-center gap-2">
+                      <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span class="text-red-600 text-xs md:text-sm">
+                        <span *ngIf="f['userName'].errors?.['required']">Username is required</span>
+                        <span *ngIf="f['userName'].errors?.['usernameExists']">Username already taken</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                    <!-- Email -->
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                        Email<span class="text-red-500">*</span>
+                      </label>
+                      <input type="email" formControlName="email" placeholder="info@gmail.com"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                        [class.border-red-300]="f['email'].invalid && f['email'].touched"/>
+                      <p class="text-xs text-gray-500 mt-1 hidden md:block">Used for account recovery and notifications</p>
+                      <div *ngIf="f['email'].invalid && f['email'].touched" class="mt-1 flex items-center gap-2">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-red-600 text-xs md:text-sm">
+                          <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+                          <span *ngIf="f['email'].errors?.['email']">Please enter a valid email</span>
+                          <span *ngIf="f['email'].errors?.['emailExists']">Email already registered</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                        Phone<span class="text-red-500">*</span>
+                      </label>
+                      <input type="tel" formControlName="phone" placeholder="+1234567890"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                        [class.border-red-300]="f['phone'].invalid && f['phone'].touched"/>
+                      <p class="text-xs text-gray-500 mt-1 hidden md:block">Include country code (e.g., +1 for US)</p>
+                      <div *ngIf="f['phone'].invalid && f['phone'].touched" class="mt-1 flex items-center gap-2">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-red-600 text-xs md:text-sm">Phone number is required</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                    <!-- Date of Birth -->
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                        Date of Birth<span class="text-red-500">*</span>
+                      </label>
+                      <input type="date" formControlName="dateOfBirth" (change)="calculateAge()"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                        [class.border-red-300]="f['dateOfBirth'].invalid && f['dateOfBirth'].touched"/>
+                      <p class="text-xs text-gray-500 mt-1 hidden md:block">Used to calculate age and guardian requirements</p>
+                      <div *ngIf="f['dateOfBirth'].invalid && f['dateOfBirth'].touched" class="mt-1 flex items-center gap-2">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-red-600 text-xs md:text-sm">Date of birth is required</span>
+                      </div>
+                      <div *ngIf="age !== null" class="mt-2 flex items-center gap-2 flex-wrap">
+                        <span class="text-xs md:text-sm text-gray-600">
+                          Age: {{age}} years
+                          <span *ngIf="age < 18" class="text-blue-600 ml-1 md:ml-2 inline-block">(Guardian info required)</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                        Gender<span class="text-red-500">*</span>
+                      </label>
+                      <select formControlName="gender"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                        [class.border-red-300]="f['gender'].invalid && f['gender'].touched">
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <p class="text-xs text-gray-500 mt-1 hidden md:block">Student's gender identity</p>
+                      <div *ngIf="f['gender'].invalid && f['gender'].touched" class="mt-1 flex items-center gap-2">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-red-600 text-xs md:text-sm">Gender is required</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Address -->
+                  <div>
+                    <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">Address</label>
+                    <input type="text" formControlName="address" placeholder="123 Main Street"
+                      class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"/>
+                    <p class="text-xs text-gray-500 mt-1 hidden md:block">Student's residential address (optional)</p>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5">
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">City</label>
+                      <input type="text" formControlName="city" placeholder="New York"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"/>
+                    </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">State</label>
+                      <input type="text" formControlName="state" placeholder="NY"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"/>
+                    </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">Zip Code</label>
+                      <input type="text" formControlName="zipcode" placeholder="10001"
+                        class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ==================== STEP 2: EDUCATION DETAILS ==================== -->
+                <div *ngIf="currentStep === 2" class="space-y-4">
+
+                  <!-- Helper text for Education Information -->
+                  <div class="bg-green-50 p-2 md:p-3 rounded-lg mb-2 border-l-4 border-green-500">
+                    <p class="text-xs md:text-sm text-green-700 flex items-center gap-2">
+                      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                      </svg>
+                      <span><strong>Education Information:</strong> Add your academic background. You can add multiple educational records.</span>
+                    </p>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-2">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-800">Education Details</h3>
+                    <button type="button" (click)="addStudentDetail()"
+                      class="px-3 md:px-4 py-1.5 md:py-2 bg-[#161950] text-white rounded-lg hover:bg-[#1a1f6e] transition flex items-center text-xs md:text-sm w-full sm:w-auto justify-center">
+                      <svg class="w-4 h-4 mr-1 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                      </svg>
+                      Add Education
+                    </button>
+                  </div>
+
+                  <div formArrayName="studentDetails">
+                    <div *ngFor="let education of studentDetails.controls; let i = index"
+                      [formGroupName]="i" class="bg-gray-50 p-4 md:p-6 rounded-lg mb-4 border border-gray-200">
+                      <div class="flex justify-between items-center mb-3 md:mb-4">
+                        <h4 class="font-medium text-gray-700 text-sm md:text-base">Education {{i + 1}}</h4>
+                        <button type="button" (click)="removeStudentDetail(i)" *ngIf="studentDetails.controls.length > 1"
+                          class="text-red-600 hover:text-red-800">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                        <div>
+                          <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                            Institution<span class="text-red-500">*</span>
+                          </label>
+                          <input type="text" formControlName="institution"
+                            [class.border-red-300]="education.get('institution')?.invalid && education.get('institution')?.touched"
+                            class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-white px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                            placeholder="University Name">
+                          <p class="text-xs text-gray-500 mt-1 hidden md:block">Name of the school, college, or university</p>
+                        </div>
+
+                        <div>
+                          <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                            Degree<span class="text-red-500">*</span>
+                          </label>
+                          <input type="text" formControlName="degree"
+                            [class.border-red-300]="education.get('degree')?.invalid && education.get('degree')?.touched"
+                            class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-white px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                            placeholder="Bachelor's Degree">
+                          <p class="text-xs text-gray-500 mt-1 hidden md:block">Type of degree or certification</p>
+                        </div>
+
+                        <div>
+                          <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                            Field of Study
+                          </label>
+                          <input type="text" formControlName="fieldOfStudy"
+                            class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-white px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                            placeholder="Computer Science">
+                          <p class="text-xs text-gray-500 mt-1 hidden md:block">Major or specialization</p>
+                        </div>
+
+                        <div>
+                          <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                            Start Date<span class="text-red-500">*</span>
+                          </label>
+                          <input type="date" formControlName="startDate"
+                            [class.border-red-300]="education.get('startDate')?.invalid && education.get('startDate')?.touched"
+                            class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-white px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden">
+                          <p class="text-xs text-gray-500 mt-1 hidden md:block">When you began this program</p>
+                        </div>
+
+                        <div>
+                          <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                            End Date
+                          </label>
+                          <input type="date" formControlName="endDate"
+                            [disabled]="education.get('isCurrent')?.value"
+                            class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-white px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden">
+                          <p class="text-xs text-gray-500 mt-1 hidden md:block">Completion date (leave blank if currently studying)</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                          <input type="checkbox" [id]="'isCurrent' + i" formControlName="isCurrent"
+                            (change)="onCurrentStudyChange(i)"
+                            class="h-4 w-4 text-[#161950] focus:ring-[#161950] border-gray-300 rounded flex-shrink-0">
+                          <label [for]="'isCurrent' + i" class="text-xs md:text-sm text-gray-700">
+                            Currently studying here
+                          </label>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                          <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                            Description
+                          </label>
+                          <textarea formControlName="description" rows="3"
+                            class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 w-full rounded-lg border border-gray-300 bg-white px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                            placeholder="Additional details about your education..."></textarea>
+                          <p class="text-xs text-gray-500 mt-1 hidden md:block">Any additional information about your studies</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p *ngIf="studentDetails.controls.length === 0" class="text-gray-500 text-center py-4 text-sm">
+                    Add your educational background by clicking "Add Education"
+                  </p>
+                </div>
+
+                <!-- ==================== STEP 3: GUARDIAN OR SECURITY ==================== -->
+                <div *ngIf="currentStep === 3" class="space-y-4 md:space-y-5">
+                  <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-2">
+                    {{showGuardianInfo ? 'Guardian Information' : 'Account Security'}}
+                  </h3>
+
+                  <!-- Guardian Information (Only for under 18) -->
+                  <div *ngIf="showGuardianInfo">
+
+                    <!-- Helper text for Guardian Information -->
+                    <div class="bg-amber-50 p-2 md:p-3 rounded-lg mb-2 border-l-4 border-amber-500">
+                      <p class="text-xs md:text-sm text-amber-700 flex items-center gap-2">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span><strong>Guardian Information Required:</strong> Since the student is under 18, please provide parent or legal guardian contact information.</span>
+                      </p>
+                    </div>
+
+                    <div class="bg-blue-50 p-3 md:p-4 rounded-lg mb-4 border border-blue-200">
+                      <div class="flex">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-xs md:text-sm text-blue-700">
+                          Since you're under 18, guardian information is required. This ensures we have proper consent for the student's participation.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                      <div>
+                        <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                          Guardian First Name<span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" formControlName="guardianFirstName"
+                          [class.border-red-300]="f['guardianFirstName'].invalid && f['guardianFirstName'].touched"
+                          class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                          placeholder="Guardian's first name">
+                        <p class="text-xs text-gray-500 mt-1 hidden md:block">Parent or legal guardian's first name</p>
+                      </div>
+
+                      <div>
+                        <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                          Guardian Last Name<span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" formControlName="guardianLastName"
+                          [class.border-red-300]="f['guardianLastName'].invalid && f['guardianLastName'].touched"
+                          class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                          placeholder="Guardian's last name">
+                        <p class="text-xs text-gray-500 mt-1 hidden md:block">Parent or legal guardian's last name</p>
+                      </div>
+
+                      <div>
+                        <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                          Guardian Email<span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" formControlName="guardianEmail"
+                          [class.border-red-300]="f['guardianEmail'].invalid && f['guardianEmail'].touched"
+                          class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                          placeholder="guardian@example.com">
+                        <p class="text-xs text-gray-500 mt-1 hidden md:block">Guardian's email for important communications</p>
+                      </div>
+
+                      <div>
+                        <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                          Guardian Phone<span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" formControlName="guardianPhone"
+                          [class.border-red-300]="f['guardianPhone'].invalid && f['guardianPhone'].touched"
+                          class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                          placeholder="+1234567890">
+                        <p class="text-xs text-gray-500 mt-1 hidden md:block">Primary contact number for guardian</p>
+                      </div>
+
+                      <div class="sm:col-span-2">
+                        <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                          Relationship<span class="text-red-500">*</span>
+                        </label>
+                        <select formControlName="guardianRelationship"
+                          [class.border-red-300]="f['guardianRelationship'].invalid && f['guardianRelationship'].touched"
+                          class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden">
+                          <option value="">Select Relationship</option>
+                          <option value="parent">Parent</option>
+                          <option value="legal_guardian">Legal Guardian</option>
+                          <option value="sibling">Sibling (18+)</option>
+                          <option value="other">Other</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1 hidden md:block">How is this person related to the student?</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Password Fields (Always shown) -->
+                  <div class="space-y-4">
+                    <h4 class="text-base md:text-lg font-medium text-gray-700">Create Password</h4>
+                    <p class="text-xs md:text-sm text-gray-500 mb-2">Set up a secure password to protect your account</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                      <div>
+                        <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                          Password<span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" formControlName="password"
+                          [class.border-red-300]="f['password'].invalid && f['password'].touched"
+                          class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                          placeholder="••••••••">
+                        <p class="text-xs text-gray-500 mt-1 hidden md:block">At least 6 characters with letters and numbers</p>
+                        <div *ngIf="f['password'].invalid && f['password'].touched" class="mt-1 flex items-center gap-2">
+                          <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          <span class="text-red-600 text-xs md:text-sm">
+                            <span *ngIf="f['password'].errors?.['required']">Password is required</span>
+                            <span *ngIf="f['password'].errors?.['minlength']">Must be at least 6 characters</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label class="mb-1.5 block text-xs md:text-sm font-medium text-gray-700">
+                          Confirm Password<span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" formControlName="confirmPassword"
+                          [class.border-red-300]="f['confirmPassword'].invalid && f['confirmPassword'].touched"
+                          class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 md:h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 md:px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                          placeholder="••••••••">
+                        <p class="text-xs text-gray-500 mt-1 hidden md:block">Re-enter your password to confirm</p>
+                        <div *ngIf="registrationForm.hasError('passwordMismatch') && f['confirmPassword'].touched"
+                          class="mt-1 flex items-center gap-2">
+                          <svg class="w-3 h-3 md:w-4 md:h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          <span class="text-red-600 text-xs md:text-sm">Passwords do not match</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="flex items-start mt-4">
+                      <input type="checkbox" id="terms" formControlName="terms"
+                        class="h-4 w-4 text-[#161950] focus:ring-[#161950] border-gray-300 rounded mt-0.5 flex-shrink-0">
+                      <label for="terms" class="ml-2 text-xs md:text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-[#161950] hover:underline">Terms of Service</a> and
+                        <a href="#" class="text-[#161950] hover:underline">Privacy Policy</a> <span class="text-red-500">*</span>
+                      </label>
+                    </div>
+                    <p class="text-xs text-gray-500 ml-6">Please read and accept our terms to continue</p>
+                    <div *ngIf="f['terms'].invalid && f['terms'].touched" class="mt-1 text-xs md:text-sm text-red-600">
+                      You must agree to the terms to complete registration
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex flex-col sm:flex-row justify-between gap-3 mt-8 pt-6 border-t border-gray-200">
+                  <button type="button" *ngIf="currentStep > 1" (click)="previousStep()"
+                    class="px-4 md:px-6 py-2.5 md:py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition flex items-center justify-center text-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Previous
+                  </button>
+
+                  <div [class.sm:justify-end]="currentStep === 1" class="flex-1 flex">
+                    <button type="button" *ngIf="currentStep < 3" (click)="nextStep()" [disabled]="!isStepValid(currentStep)"
+                      [class]="'px-4 md:px-6 py-2.5 md:py-3 bg-[#161950] text-white rounded-lg hover:bg-[#1a1f6e] transition flex items-center justify-center text-sm w-full sm:w-auto ' +
+                      (!isStepValid(currentStep) ? 'opacity-50 cursor-not-allowed' : '')">
+                      Next Step
+                      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+
+                    <button type="submit" *ngIf="currentStep === 3" [disabled]="registrationForm.invalid || isLoading"
+                      [class]="'px-4 md:px-6 py-2.5 md:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center text-sm w-full sm:w-auto ' +
+                      (registrationForm.invalid || isLoading ? 'opacity-50 cursor-not-allowed' : '')">
+                      <span *ngIf="!isLoading">Complete Registration</span>
+                      <span *ngIf="isLoading">Processing...</span>
+                      <svg *ngIf="!isLoading" class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div class="mt-5">
+              <p class="text-center text-xs md:text-sm font-normal text-gray-700">
+                Already have an account?
+                <a [routerLink]="['/student/login']" class="text-[#161950] hover:text-[#1a1f6e] font-medium">
+                  Sign In
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Simple Preloader Modal -->
+<div *ngIf="isLoading" class="simple-preloader">
+  <div class="simple-loader">
+    <div class="simple-spinner"></div>
+    <h3 class="loading-title">Creating Your Account</h3>
+    <p class="loading-subtitle">Please wait while we process your registration</p>
+    <div class="progress-container">
+      <div class="progress-bar"></div>
+    </div>
+    <div class="status-list">
+      <div class="status-item">
+        <span class="status-text">Processing personal information...</span>
+        <span class="status-check">✓</span>
+      </div>
+      <div class="status-item">
+        <span class="status-text">Setting up education details...</span>
+        <span class="status-check">✓</span>
+      </div>
+      <div class="status-item">
+        <span class="status-text">Creating secure account...</span>
+        <span class="status-check">✓</span>
+      </div>
+    </div>
+    <p class="text-xs text-gray-500 mt-6">You will be redirected to login shortly</p>
+  </div>
+</div>

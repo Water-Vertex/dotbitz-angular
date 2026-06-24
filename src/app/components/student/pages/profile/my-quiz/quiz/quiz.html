@@ -1,0 +1,163 @@
+<!-- Loading -->
+<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+  <div class="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-[#073a89]"></div>
+  <p class="text-gray-500 mt-4">{{ isResume ? 'Resuming quiz...' : 'Starting quiz...' }}</p>
+</div>
+
+<!-- Time Up Modal -->
+<div *ngIf="showTimeUpModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center z-10">
+    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i class="fas fa-clock text-4xl text-red-500"></i>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Time's Up!</h2>
+    <p class="text-gray-500 text-sm">Your quiz is being submitted automatically...</p>
+    <div class="mt-4">
+      <div class="animate-spin rounded-full h-6 w-6 border-2 border-gray-200 border-t-[#073a89] mx-auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div *ngIf="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center z-10">
+    <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+      [ngClass]="successData?.status === 'time_up' ? 'bg-red-100' : 'bg-green-100'">
+      <i class="text-4xl"
+        [ngClass]="successData?.status === 'time_up' ? 'fas fa-clock text-red-500' : 'fas fa-check-circle text-green-500'"></i>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">
+      {{ successData?.status === 'time_up' ? 'Time Up!' : 'Quiz Submitted!' }}
+    </h2>
+    <p class="text-gray-500 text-sm mb-6">
+      {{ successData?.status === 'time_up'
+        ? 'Your time ran out. Quiz has been auto-submitted.'
+        : 'Your quiz has been submitted successfully.' }}
+    </p>
+    <button (click)="goBack()"
+      class="w-full px-6 py-3 bg-[#073a89] text-white rounded-xl font-medium hover:bg-[#052b63] transition-colors">
+      Back to My Courses
+    </button>
+  </div>
+</div>
+
+<!-- Quiz Content -->
+<div *ngIf="!loading && quiz" class="min-h-screen bg-gray-50">
+
+  <!-- Header / Timer Bar -->
+  <div class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+    <div class="container mx-auto px-4 py-4">
+
+      <!-- Overdue Warning Banner -->
+      <div *ngIf="isOverdueAttempt"
+        class="mb-3 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2 text-sm text-orange-700">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>
+          <strong>Overdue Submission:</strong> A 5% penalty will be deducted from your final marks.
+        </span>
+      </div>
+
+      <!-- Resume Banner -->
+      <div *ngIf="isResume"
+        class="mb-3 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2 text-sm text-blue-700">
+        <i class="fas fa-play-circle"></i>
+        <span>Resuming your quiz — your previous answers have been restored.</span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-lg font-bold text-gray-900">{{ quiz.name }}</h1>
+          <p class="text-xs text-gray-500">
+            {{ quiz.mcqs?.length || 0 }} Questions •
+            {{ quiz.marks }} Total Marks
+          </p>
+        </div>
+
+        <!-- Timer -->
+        <div class="flex items-center gap-4">
+          <div class="text-center">
+            <p class="text-xs text-gray-500 mb-1">Time Remaining</p>
+            <div class="flex items-center gap-2 px-4 py-2 rounded-xl border-2"
+              [ngClass]="{
+                'border-green-200 bg-green-50': timerPercent > 50,
+                'border-yellow-200 bg-yellow-50': timerPercent <= 50 && timerPercent > 25,
+                'border-red-200 bg-red-50 animate-pulse': timerPercent <= 25
+              }">
+              <i class="fas fa-clock text-sm" [class]="timerColor"></i>
+              <span class="text-xl font-bold font-mono" [class]="timerColor">{{ timerDisplay }}</span>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <p class="text-xs text-gray-500 mb-1">Answered</p>
+            <p class="text-lg font-bold text-[#073a89]">
+              {{ objectKeys(answers).length }} / {{ quiz.mcqs?.length || 0 }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timer Progress Bar -->
+      <div class="mt-3 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div class="h-full rounded-full transition-all duration-1000"
+          [style.width.%]="timerPercent"
+          [ngClass]="{
+            'bg-green-500': timerPercent > 50,
+            'bg-yellow-500': timerPercent <= 50 && timerPercent > 25,
+            'bg-red-500': timerPercent <= 25
+          }">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="space-y-6">
+      <div *ngFor="let mcq of quiz.mcqs; let i = index"
+        class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+        <div class="px-6 py-4 bg-[#073a89]/5 border-b border-gray-100">
+          <div class="flex items-start gap-3">
+            <span class="w-7 h-7 rounded-full bg-[#073a89] text-white flex items-center justify-center text-xs font-bold shrink-0">
+              {{ i + 1 }}
+            </span>
+            <p class="text-sm font-medium text-gray-800 leading-relaxed">{{ mcq.question }}</p>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-3">
+          <div *ngFor="let option of mcq.options"
+            class="flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all"
+            [ngClass]="isSelected(mcq.id, option)
+              ? 'border-[#073a89] bg-[#073a89]/5'
+              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
+            (click)="onAnswerSelect(mcq.id, option)">
+
+            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+              [ngClass]="isSelected(mcq.id, option) ? 'border-[#073a89] bg-[#073a89]' : 'border-gray-300'">
+              <div *ngIf="isSelected(mcq.id, option)" class="w-2 h-2 rounded-full bg-white"></div>
+            </div>
+
+            <span class="text-sm text-gray-700">{{ option }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="mt-8 flex justify-end">
+      <button (click)="onSubmit()" [disabled]="submitting"
+        class="px-8 py-4 bg-[#073a89] text-white rounded-xl font-bold hover:bg-[#052b63] transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-lg">
+        <span *ngIf="!submitting" class="flex items-center gap-2">
+          <i class="fas fa-paper-plane"></i> Submit Quiz
+        </span>
+        <span *ngIf="submitting" class="flex items-center gap-2">
+          <i class="fas fa-spinner fa-spin"></i> Submitting...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

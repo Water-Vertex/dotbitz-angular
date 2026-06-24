@@ -1,0 +1,144 @@
+<div class="min-h-screen bg-white">
+  <!-- Simple Header -->
+  <div class="border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <h1 class="text-2xl font-bold text-gray-900">My Students' Courses</h1>
+      <p class="text-sm text-gray-500 mt-1">Track your children's learning progress</p>
+    </div>
+  </div>
+
+  <!-- Student Selector -->
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="flex items-center gap-4">
+      <div class="relative w-80">
+        <select
+          #studentSelect
+          [disabled]="loadingStudents"
+          (change)="onStudentSelect(studentSelect.value)"
+          class="w-full appearance-none bg-white border border-gray-300 rounded-md px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#073a89] focus:ring-1 focus:ring-[#073a89] disabled:bg-gray-50 disabled:text-gray-500"
+        >
+          <option value="">
+            {{ loadingStudents ? 'Loading students...' : 'Select a student' }}
+          </option>
+          <option *ngFor="let student of students" [value]="student.id">
+            {{ student.first_name }} {{ student.last_name }}
+          </option>
+        </select>
+        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Results count -->
+      <span *ngIf="!loadingCourses && courses.length > 0" class="text-sm text-gray-500">
+        {{ courses.length }} {{ courses.length === 1 ? 'course' : 'courses' }} found
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loadingCourses" class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div *ngFor="let i of [1,2,3,4]" class="border border-gray-200 rounded-md overflow-hidden">
+        <div class="h-40 bg-gray-100"></div>
+        <div class="p-4 space-y-3">
+          <div class="h-3 bg-gray-100 rounded w-1/4"></div>
+          <div class="h-4 bg-gray-100 rounded w-3/4"></div>
+          <div class="h-4 bg-gray-100 rounded w-1/2"></div>
+          <div class="pt-3">
+            <div class="h-8 bg-gray-100 rounded"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Student Selected -->
+  <div *ngIf="!selectedStudentId && !loadingCourses" class="max-w-7xl mx-auto px-4 py-16">
+    <div class="text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-full mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">Select a student to get started</h3>
+      <p class="text-sm text-gray-500">Choose a student profile to view their enrolled courses</p>
+    </div>
+  </div>
+
+  <!-- No Courses -->
+  <div *ngIf="selectedStudentId && !loadingCourses && courses.length === 0" class="max-w-7xl mx-auto px-4 py-16">
+    <div class="text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-full mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No courses yet</h3>
+      <p class="text-sm text-gray-500">This student hasn't enrolled in any courses</p>
+    </div>
+  </div>
+
+  <!-- Courses Grid -->
+  <div *ngIf="!loadingCourses && courses.length > 0" class="max-w-7xl mx-auto px-4 pb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div
+        *ngFor="let enrollment of courses"
+        class="group border border-gray-200 rounded-md overflow-hidden hover:shadow-md transition-shadow bg-white"
+      >
+        <!-- Course Image -->
+        <div class="relative aspect-[16/9] bg-gray-100 overflow-hidden">
+          <img
+            [src]="enrollment.course?.thumbnail_image || 'https://placehold.co/600x400?text=No+Image'"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            [alt]="enrollment.course?.course_name"
+          />
+
+
+        </div>
+
+        <!-- Course Info -->
+        <div class="p-4">
+          <!-- Level -->
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs text-gray-500">{{ enrollment.course?.course_level }}</span>
+            <span class="text-xs text-gray-300">•</span>
+            <span class="text-xs text-gray-500">{{ enrollment.course?.course_duration }} total hours</span>
+          </div>
+
+          <!-- Title -->
+          <h3 class="font-bold text-gray-900 text-base mb-2 line-clamp-2 group-hover:text-[#073a89] transition-colors">
+            {{ enrollment.course?.course_name }}
+          </h3>
+
+          <!-- Enrolled Date -->
+          <p class="text-xs text-gray-400 mb-3">
+            Enrolled {{ enrollment.enrolled_at | date: 'MMM d, yyyy' }}
+          </p>
+
+          <!-- Price and Button -->
+          <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+            <!-- <div>
+              <span class="text-xs text-gray-400 block">Fee paid</span>
+              <span class="font-bold text-gray-900">
+                {{ enrollment.course?.course_fee | currency: '$' : 'symbol' : '1.0-0' }}
+              </span>
+            </div> -->
+
+            <a
+             [routerLink]="['/guardian/course/', enrollment.course_id]"
+              class="inline-flex items-center gap-1 text-sm font-semibold text-[#073a89] hover:text-[#052b63] transition-colors"
+            >
+              View course
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

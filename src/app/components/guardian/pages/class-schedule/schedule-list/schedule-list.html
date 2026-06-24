@@ -1,0 +1,101 @@
+<div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+  <h1 class="text-xl font-bold text-gray-900">Class Schedules</h1>
+  <p class="text-gray-500 text-sm mt-0.5">Select your child to view their weekly schedule</p>
+</div>
+
+<div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+  <div class="flex items-end justify-between gap-4">
+
+    <div class="flex-1">
+      <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Select Your Child</label>
+      <div class="flex items-center gap-3">
+        <select
+          [(ngModel)]="selectedStudentId"
+          (change)="onStudentChange()"
+          [disabled]="studentsLoading"
+          class="w-full md:w-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none disabled:opacity-60 transition-all"
+        >
+          <option [value]="null">-- Select a Student --</option>
+          <option *ngFor="let s of students" [value]="s.id">
+            {{ s.first_name }} {{ s.last_name }}
+          </option>
+        </select>
+        <div *ngIf="studentsLoading" class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500 flex-shrink-0"></div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedStudentId && !loading" class="flex-shrink-0 text-right">
+      <div class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-1.5 shadow-sm">
+        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Total Classes</p>
+        <p class="text-lg font-black text-orange-600 leading-none mt-0.5">{{ schedules.length }}</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="loading" class="bg-white rounded-xl border border-gray-200 p-10 text-center">
+  <div class="inline-block animate-spin rounded-full h-7 w-7 border-b-2 border-orange-600"></div>
+  <p class="text-gray-500 mt-2 text-sm font-medium">Fetching classes...</p>
+</div>
+
+<div *ngIf="!loading && !selectedStudentId" class="bg-white rounded-xl border border-gray-200 p-10 text-center">
+  <svg class="w-12 h-12 mx-auto text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+  </svg>
+  <p class="text-gray-400 text-sm">Please select a student to display the schedule.</p>
+</div>
+
+<div *ngIf="!loading && selectedStudentId && schedules.length === 0" class="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-500 text-sm font-medium">
+  No classes scheduled for this student yet.
+</div>
+
+<div *ngIf="!loading && selectedStudentId && schedules.length > 0" class="space-y-2 pb-8">
+  <div
+    *ngFor="let item of schedules; let i = index; trackBy: trackByScheduleId"
+    class="bg-white rounded-xl border border-gray-200 overflow-hidden transition-shadow duration-200 hover:shadow-sm"
+  >
+    <div class="p-3 cursor-pointer hover:bg-gray-50 transition-colors" (click)="toggleSchedule(i)">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="flex-shrink-0 w-12 text-center bg-orange-50 rounded-lg p-1.5 border border-orange-100">
+            <p class="text-[10px] font-bold text-orange-600 uppercase tracking-tight">{{ item.day | slice:0:3 }}</p>
+            <p class="text-[10px] font-bold text-orange-700">CLASS</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-semibold text-gray-900">{{ item.course?.course_name }}</h3>
+            <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-100 font-bold uppercase">
+              {{ item.batch?.name }}
+            </span>
+          </div>
+        </div>
+        <svg class="w-4 h-4 text-gray-400 transition-transform duration-300" [class.rotate-180]="expandedIndex === i" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+    </div>
+
+    <div *ngIf="expandedIndex === i" class="border-t border-gray-100 bg-gray-50 p-4">
+      <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">General Information</h4>
+      <div class="bg-white p-3 rounded-lg border border-gray-200 space-y-2 text-xs">
+        <div class="flex justify-between border-b border-gray-50 pb-1.5">
+          <span class="text-gray-500 font-medium">Instructor</span>
+          <span class="font-bold text-gray-900">{{ item.instructor?.first_name }} {{ item.instructor?.last_name }}</span>
+        </div>
+        <div class="flex justify-between border-b border-gray-50 pb-1.5">
+          <span class="text-gray-500 font-medium">Timing</span>
+          <span class="font-bold text-gray-900">{{ item.start_time | date:'shortTime' }} – {{ item.end_time | date:'shortTime' }}</span>
+        </div>
+        <div class="flex justify-between border-b border-gray-50 pb-1.5">
+          <span class="text-gray-500 font-medium">Batch Name</span>
+          <span class="font-bold text-gray-900">{{ item.batch?.name }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500 font-medium">Full Day</span>
+          <span class="font-bold text-gray-900 capitalize">{{ item.day }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

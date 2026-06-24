@@ -1,0 +1,118 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Header - fixed for small screens -->
+  <div class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+    <div>
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Assessment Management</h1>
+      <p class="text-gray-600 mt-1 text-sm sm:text-base">Manage assessments and questions</p>
+    </div>
+    <!-- Buttons: stack on mobile, row on larger screens -->
+    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <button
+        *ngIf="can('view_assessments')"
+        (click)="refreshData()"
+        [disabled]="isLoading"
+        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
+      >
+        <i class="fas fa-sync-alt" [class.animate-spin]="isLoading"></i>
+        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+      <a
+        *ngIf="can('create_assessments')"
+        routerLink="/admin/assessments/add"
+        class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium flex items-center justify-center gap-2 w-full sm:w-auto"
+      >
+        <i class="fas fa-plus"></i> Add Assessment
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Loading Assessments...</p>
+  </div>
+
+  <!-- Search -->
+  <div *ngIf="!isLoading" class="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6">
+    <div class="flex items-center bg-gray-100 rounded-lg px-3 py-2 w-full">
+      <i class="fas fa-search text-gray-400 mr-2"></i>
+      <input
+        type="text"
+        [formControl]="searchControl"
+        placeholder="Search assessments by title or course..."
+        class="bg-transparent border-none focus:outline-none focus:ring-0 w-full text-sm"
+      />
+    </div>
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="!isLoading && assessments.length === 0" class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i class="fas fa-file-alt text-gray-400 text-2xl"></i>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No Assessments Found</h3>
+    <p class="text-gray-600 mb-4">Start by adding your first assessment</p>
+    <a
+      *ngIf="can('create_assessments')"
+      routerLink="/admin/assessments/add"
+      class="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 text-sm font-medium"
+    >
+      <i class="fas fa-plus mr-2"></i> Add Assessment
+    </a>
+  </div>
+
+  <!-- Table with horizontal scroll on all screens -->
+  <div *ngIf="!isLoading && assessments.length > 0" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[700px]">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessment Title</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Marks</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngFor="let assessment of assessments; trackBy: trackById" class="hover:bg-gray-50">
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-900">{{ assessment.id }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium text-gray-900">{{ assessment.assessment_title }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-600">{{ assessment.course?.course_name || 'N/A' }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-600">{{ assessment.total_marks || '-' }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-600">{{ assessment.due_date | date }}</td>
+            <td class="px-3 sm:px-6 py-3 sm:py-4 text-sm whitespace-nowrap">
+              <div class="flex space-x-2">
+                <a
+                  *ngIf="can('edit_assessments')"
+                  [routerLink]="['/admin/assessments/edit', assessment.id]"
+                  class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+                >
+                  Edit
+                </a>
+                <button
+                  *ngIf="can('delete_assessments')"
+                  (click)="deleteAssessment(assessment.id)"
+                  class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0 text-center sm:text-left">
+      <div class="text-sm text-gray-700">
+        Showing {{ assessments.length }} of {{ totalItems }} assessments
+      </div>
+      <div class="text-sm text-gray-500">
+        <i class="fas fa-file-alt mr-1"></i> Total assessments
+      </div>
+    </div>
+  </div>
+</div>

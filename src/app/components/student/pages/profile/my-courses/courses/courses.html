@@ -1,0 +1,127 @@
+<!-- Loading -->
+ <div *ngIf="loading" class="bg-white rounded-lg border border-gray-200 p-8 text-center mb-6">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Loading my courses...</p>
+  </div>
+
+<div *ngIf="!loading" class="min-h-screen bg-white">
+  <!-- Simple Header -->
+  <div class="border-b border-gray-200">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">My Courses</h1>
+          <p class="text-sm text-gray-500 mt-1">{{ enrolledCourses.length }} {{ enrolledCourses.length === 1 ? 'course' : 'courses' }} enrolled</p>
+        </div>
+        <a routerLink="/student/courses/list"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-[#073a89] hover:text-[#052b63] transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Browse more courses
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Courses -->
+  <div *ngIf="enrolledCourses.length === 0" class="container mx-auto px-4 py-16 max-w-6xl">
+    <div class="text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-full mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No courses yet</h3>
+      <p class="text-sm text-gray-500 mb-4">You haven't enrolled in any courses</p>
+      <a routerLink="/student/courses/list"
+        class="inline-block px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition">
+        Browse courses
+      </a>
+    </div>
+  </div>
+
+  <!-- Courses Grid -->
+  <div *ngIf="enrolledCourses.length > 0" class="container mx-auto px-4 py-8 max-w-6xl">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div *ngFor="let enrollment of enrolledCourses"
+        class="group border border-gray-200 rounded-md overflow-hidden hover:shadow-md transition-shadow bg-white">
+
+        <!-- Thumbnail -->
+        <a [routerLink]="['/student/course/', enrollment.course?.id]" class="block relative aspect-[16/9] bg-gray-100 overflow-hidden">
+          <img
+            *ngIf="enrollment.course?.thumbnail_image"
+            [src]="'https://dotbitz.com/public/assets/images/courses/' + enrollment.course.thumbnail_image"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            [alt]="enrollment.course?.course_name"
+          />
+          <div *ngIf="!enrollment.course?.thumbnail_image"
+            class="w-full h-full bg-gray-100 flex items-center justify-center">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+
+
+        </a>
+
+        <!-- Course Info -->
+        <div class="p-4">
+          <!-- Level & Duration -->
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs text-gray-500">{{ enrollment.course?.course_level }}</span>
+            <span class="text-xs text-gray-300">•</span>
+            <span class="text-xs text-gray-500">{{ enrollment.course?.course_duration }} weeks</span>
+          </div>
+
+          <!-- Title -->
+          <a [routerLink]="['/student/course/', enrollment.course?.id]" class="block">
+            <h3 class="font-bold text-gray-900 text-base mb-2 line-clamp-2 group-hover:text-[#073a89] transition-colors">
+              {{ enrollment.course?.course_name }}
+            </h3>
+          </a>
+
+          <!-- Instructor -->
+          <div *ngIf="enrollment.course?.instructor" class="flex items-center gap-2 mb-3">
+            <div class="w-6 h-6 rounded-full bg-[#073a89]/10 flex items-center justify-center text-[#073a89] text-xs font-medium">
+              {{ enrollment.course.instructor.first_name?.charAt(0) }}{{ enrollment.course.instructor.last_name?.charAt(0) }}
+            </div>
+            <span class="text-xs text-gray-600 truncate">
+              {{ enrollment.course.instructor.first_name }} {{ enrollment.course.instructor.last_name }}
+            </span>
+          </div>
+
+          <!-- Enrollment Meta -->
+          <div class="space-y-1.5 mb-3">
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+              <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Enrolled {{ enrollment.enrolled_at | date: 'MMM d, yyyy' }}
+            </div>
+            <div *ngIf="enrollment.completed_at" class="flex items-center gap-2 text-xs text-gray-500">
+              <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Completed {{ enrollment.completed_at | date: 'MMM d, yyyy' }}
+            </div>
+          </div>
+
+          <!-- Price & Button -->
+          <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+            <!-- <span class="font-bold text-gray-900">
+              ${{ enrollment.course?.course_fee }}
+            </span> -->
+            <a [routerLink]="['/student/course/', enrollment.course?.id]"
+              class="inline-flex items-center gap-1 text-sm font-semibold text-[#073a89] hover:text-[#052b63] transition-colors">
+              Go to course
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

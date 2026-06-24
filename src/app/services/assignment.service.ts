@@ -1,0 +1,337 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { AssignmentPayload, AssignmentApiResponse } from '../models/assignment.model';
+import { environment } from '../../environments/environment';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AssignmentService {
+  private apiUrl = environment.AdminApiUrl + '/assignments';
+  private coursesUrl = environment.AdminApiUrl + '/courses';
+  private StudentApiUrl = environment.StudentApiUrl + '/assignments';
+  private guardianApiUrl = environment.GuardianApiUrl + '/courses';
+
+  constructor(private http: HttpClient) {}
+
+  /** =========================
+   *  Headers helper
+   *  ========================= */
+  private getHeaders(isFormData: boolean = false): HttpHeaders {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders({
+      Accept: 'application/json',
+    });
+
+    if (!isFormData) {
+      headers = headers.set('Content-Type', 'application/json');
+    }
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
+  }
+
+  /** =========================
+   *  Get All Assignments
+   *  ========================= */
+  getAssignments(courseId?: number, batchId?: number): Observable<AssignmentApiResponse> {
+  let url = this.apiUrl;
+  const params: string[] = [];
+
+  if (courseId) {
+    params.push(`course_id=${courseId}`);
+  }
+  if (batchId) {
+    params.push(`batch_id=${batchId}`);
+  }
+
+  if (params.length > 0) {
+    url += `?${params.join('&')}`;
+  }
+
+  return this.http.get<AssignmentApiResponse>(url, { headers: this.getHeaders() }).pipe(
+    catchError((err) => {
+      console.error('Error fetching assignments:', err);
+      return throwError(() => err);
+    }),
+  );
+}
+
+  /** =========================
+   *  Get Single Assignment
+   *  ========================= */
+  getAssignment(id: number): Observable<AssignmentApiResponse> {
+    return this.http
+      .get<AssignmentApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(
+        catchError((err) => {
+          console.error(`Error fetching assignment ${id}:`, err);
+          return throwError(() => err);
+        }),
+      );
+  }
+
+  /** =========================
+   *  Create Assignment
+   *  Supports file upload
+   *  ========================= */
+  createAssignment(payload: AssignmentPayload | FormData): Observable<AssignmentApiResponse> {
+    const isFormData = payload instanceof FormData;
+
+    return this.http
+      .post<AssignmentApiResponse>(this.apiUrl, payload, { headers: this.getHeaders(isFormData) })
+      .pipe(
+        catchError((err) => {
+          console.error('Error creating assignment:', err);
+          return throwError(() => err);
+        }),
+      );
+  }
+
+  /** =========================
+   *  Update Assignment
+   *  Supports file upload
+   *  ========================= */
+  updateAssignment(
+    id: number,
+    payload: AssignmentPayload | FormData,
+  ): Observable<AssignmentApiResponse> {
+    const isFormData = payload instanceof FormData;
+
+    // For FormData (file upload) we can send POST with _method=PUT
+    if (isFormData) {
+      payload.append('_method', 'PUT');
+      return this.http
+        .post<AssignmentApiResponse>(`${this.apiUrl}/${id}`, payload, {
+          headers: this.getHeaders(true),
+        })
+        .pipe(
+          catchError((err) => {
+            console.error(`Error updating assignment ${id}:`, err);
+            return throwError(() => err);
+          }),
+        );
+    }
+
+    // Otherwise normal PUT
+    return this.http
+      .put<AssignmentApiResponse>(`${this.apiUrl}/${id}`, payload, { headers: this.getHeaders() })
+      .pipe(
+        catchError((err) => {
+          console.error(`Error updating assignment ${id}:`, err);
+          return throwError(() => err);
+        }),
+      );
+  }
+
+  /** =========================
+   *  Delete Assignment
+   *  ========================= */
+  deleteAssignment(id: number): Observable<AssignmentApiResponse> {
+    return this.http
+      .delete<AssignmentApiResponse>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(
+        catchError((err) => {
+          console.error(`Error deleting assignment ${id}:`, err);
+          return throwError(() => err);
+        }),
+      );
+  }
+
+  /** =========================
+   *  Get Courses (for dropdown)
+   *  ========================= */
+  getCourses(): Observable<any> {
+    return this.http.get<any>(this.coursesUrl, { headers: this.getHeaders() }).pipe(
+      catchError((err) => {
+        console.error('Error fetching courses:', err);
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  /** =========================
+   *  Student - Get Assignments by Course
+   *  ========================= */
+  getAssignmentsByCourse(courseId: number): Observable<any> {
+    return this.http
+      .get<any>(`${this.StudentApiUrl}/course/${courseId}`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        catchError((err) => {
+          console.error('Error fetching assignments by course:', err);
+          return throwError(() => err);
+        }),
+      );
+  }
+getAssignmentsByBatch(batchId: number): Observable<any> {
+  return this.http.get(`${this.StudentApiUrl}/batch/${batchId}`);
+}
+  /** =========================
+   * Guardian: Get Assignments by Course
+   * ========================= */
+  getAssignmentsGuardian(courseId: number): Observable<AssignmentApiResponse> {
+    const token = localStorage.getItem('token');
+
+    // Correct URL: only one 'courses'
+    const url = `${this.guardianApiUrl}/${courseId}/assignments`;
+
+    console.log('Requesting URL:', url); // For debugging
+
+    return this.http
+      .get<AssignmentApiResponse>(url, {
+        headers: new HttpHeaders({
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        }),
+      })
+      .pipe(
+        catchError((err) => {
+          console.error(`Error fetching guardian assignments for course ${courseId}:`, err);
+          return throwError(() => err);
+        }),
+      );
+  }
+
+  checkAssignmentAttempt(assignmentId: number): Observable<any> {
+  return this.http.get(
+    `${environment.StudentApiUrl}/assignment-attempts/check/${assignmentId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+submitAssignment(assignmentId: number, formData: FormData): Observable<any> {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return this.http.post(
+    `${environment.StudentApiUrl}/assignment-attempts/submit/${assignmentId}`,
+    formData,
+    { headers }
+  );
+}
+// Instructor methods
+getInstructorAssignments(): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/assignments`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorAssignment(id: number): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/assignments/${id}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+createInstructorAssignment(payload: FormData): Observable<any> {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignments`,
+    payload,
+    { headers }
+  );
+}
+
+updateInstructorAssignment(id: number, payload: FormData): Observable<any> {
+  const token = localStorage.getItem('token') || '';
+  const headers = new HttpHeaders({
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignments/${id}`,
+    payload,
+    { headers }
+  );
+}
+
+deleteInstructorAssignment(id: number): Observable<any> {
+  return this.http.delete(
+    `${environment.InstructorApiUrl}/assignments/${id}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorCourses(): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/courses`,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorBatchesByCourse(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/courses/${courseId}/batches`,
+    { headers: this.getHeaders() }
+  );
+}
+// Admin methods
+getAssignmentBatchStatus(payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.AdminApiUrl}/assignment-attempts/batch-status`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+getAssignmentAttemptDetail(attemptId: number): Observable<any> {
+  return this.http.get(
+    `${environment.AdminApiUrl}/assignment-attempts/${attemptId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+gradeAssignment(attemptId: number, payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.AdminApiUrl}/assignment-attempts/${attemptId}/grade`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+// Instructor methods
+getInstructorAssignmentBatchStatus(payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignment-attempts/batch-status`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+getInstructorAssignmentAttemptDetail(attemptId: number): Observable<any> {
+  return this.http.get(
+    `${environment.InstructorApiUrl}/assignment-attempts/${attemptId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+gradeInstructorAssignment(attemptId: number, payload: any): Observable<any> {
+  return this.http.post(
+    `${environment.InstructorApiUrl}/assignment-attempts/${attemptId}/grade`,
+    payload,
+    { headers: this.getHeaders() }
+  );
+}
+
+// Batch list by course
+getBatchesByCourse(courseId: number): Observable<any> {
+  return this.http.get(
+    `${environment.AdminApiUrl}/batches/course/${courseId}`,
+    { headers: this.getHeaders() }
+  );
+}
+}

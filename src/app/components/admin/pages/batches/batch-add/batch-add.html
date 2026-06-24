@@ -1,0 +1,288 @@
+<div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">
+                {{ isEditMode ? 'Edit Batch' : 'Add New Batch' }}
+            </h1>
+            <p class="text-gray-600 mt-1">
+                {{ isEditMode ? 'Update batch details' : 'Create new batch for students' }}
+            </p>
+        </div>
+
+        <a routerLink="/admin/batches/list" data-nav-item data-href="/admin/batches/list"
+           class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+    </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+    <p class="text-gray-500 mt-2">Loading batch details...</p>
+</div>
+
+<!-- Form Content -->
+<div *ngIf="!isLoading" class="space-y-6">
+    <!-- Form Card -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <form [formGroup]="batchForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+            <!-- Batch Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Batch Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    formControlName="name"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    placeholder="Enter batch name"
+                    [class.border-red-300]="name?.invalid && name?.touched"
+                    [class.focus:ring-red-500]="name?.invalid && name?.touched"
+                >
+                <div *ngIf="name?.invalid && name?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+                    <div *ngIf="name?.errors?.['required']" class="flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle text-xs"></i>
+                        <span>Batch name is required</span>
+                    </div>
+                    <div *ngIf="name?.errors?.['minlength']" class="flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle text-xs"></i>
+                        <span>Minimum 3 characters required</span>
+                    </div>
+                    <div *ngIf="name?.errors?.['maxlength']" class="flex items-center space-x-1">
+                        <i class="fas fa-exclamation-circle text-xs"></i>
+                        <span>Maximum 255 characters allowed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course & Instructor -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Instructor (First dropdown) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Instructor <span class="text-red-500">*</span>
+                    </label>
+
+                    <select
+                        formControlName="instructor_id"
+                        [disabled]="isLoadingInstructors"
+                        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        [class.border-red-300]="instructor_id?.invalid && instructor_id?.touched"
+                        [class.focus:ring-red-500]="instructor_id?.invalid && instructor_id?.touched"
+                    >
+                        <option [ngValue]="null">-- Select instructor --</option>
+                        <option *ngFor="let instructor of instructors" [ngValue]="instructor.id">
+                            {{ getInstructorDisplayName(instructor) }}
+                        </option>
+                    </select>
+
+                    <div *ngIf="isLoadingInstructors" class="mt-2 text-xs text-gray-500">
+                        <div class="flex items-center space-x-1">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading instructors...</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="instructor_id?.invalid && instructor_id?.touched" class="mt-2 text-xs text-red-600">
+                        <div class="flex items-center space-x-1">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Instructor is required</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course (Second dropdown - depends on instructor) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Course <span class="text-red-500">*</span>
+                    </label>
+
+                    <select
+                        formControlName="course_id"
+                        [disabled]="isLoadingCourses || !instructor_id?.value"
+                        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        [class.border-red-300]="course_id?.invalid && course_id?.touched"
+                        [class.focus:ring-red-500]="course_id?.invalid && course_id?.touched"
+                    >
+                        <option [ngValue]="null">-- Select a course --</option>
+                        <option *ngFor="let course of courses" [ngValue]="course.id">
+                            {{ getCourseDisplayName(course) }}
+                        </option>
+                    </select>
+
+                    <div *ngIf="isLoadingCourses" class="mt-2 text-xs text-gray-500">
+                        <div class="flex items-center space-x-1">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading courses...</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!instructor_id?.value && !isLoadingCourses" class="mt-2 text-xs text-amber-600">
+                        <div class="flex items-center space-x-1">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Please select an instructor first</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="course_id?.invalid && course_id?.touched" class="mt-2 text-xs text-red-600">
+                        <div class="flex items-center space-x-1">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Course is required</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                    <input type="date"
+                           formControlName="start_date"
+                           class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                           [class.border-amber-400]="isEndDateBeforeStartDate() && start_date?.value && end_date?.value"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                    <input type="date"
+                           formControlName="end_date"
+                           class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                           [class.border-amber-400]="isEndDateBeforeStartDate() && start_date?.value && end_date?.value"
+                    >
+                </div>
+            </div>
+
+            <!-- Date validation -->
+            <div *ngIf="isEndDateBeforeStartDate()" class="text-xs text-amber-600">
+                <div class="flex items-center space-x-1">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>End date cannot be before start date.</span>
+                </div>
+            </div>
+
+            <!-- Status & Students -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Status -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+                    <select formControlName="status"
+                            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="active">Active</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Students Limit <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        formControlName="students"
+                        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="Enter students limit"
+                        [class.border-red-300]="students?.invalid && students?.touched"
+                        [class.focus:ring-red-500]="students?.invalid && students?.touched"
+                    >
+                    <div *ngIf="students?.invalid && students?.touched" class="mt-2 text-xs text-red-600 space-y-1">
+                        <div *ngIf="students?.errors?.['required']" class="flex items-center space-x-1">
+                            <i class="fas fa-exclamation-circle text-xs"></i>
+                            <span>Students limit is required</span>
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                </label>
+
+                <textarea
+                    formControlName="description"
+                    rows="4"
+                    maxlength="1000"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                    placeholder="Enter batch description"
+                ></textarea>
+
+                <div class="text-xs text-gray-500 text-right mt-1">
+                    {{ description?.value?.length || 0 }}/1000
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <button
+                    type="button"
+                    (click)="cancel()"
+                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    [disabled]="isSubmitting"
+                >
+                    <span class="flex items-center space-x-2">
+                        <i class="fas fa-times"></i>
+                        <span>Cancel</span>
+                    </span>
+                </button>
+                <button
+                    type="submit"
+                    [disabled]="batchForm.invalid || isSubmitting || isEndDateBeforeStartDate()"
+                    class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <span *ngIf="!isSubmitting" class="flex items-center space-x-2">
+                        <i class="fas fa-save"></i>
+                        <span>{{ isEditMode ? 'Update Batch' : 'Create Batch' }}</span>
+                    </span>
+                    <span *ngIf="isSubmitting" class="flex items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Information -->
+    <div class="bg-orange-50 rounded-lg border border-orange-100 p-6">
+        <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-orange-500 text-lg"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-orange-800 mb-1">Tips for creating effective batches</h3>
+                <ul class="text-xs text-orange-700 space-y-1">
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Choose descriptive batch names that reflect the course and timeline</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Select instructor first to see relevant courses</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>Set appropriate start and end dates for the batch duration</span>
+                    </li>
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-check text-orange-500 text-xs mt-0.5"></i>
+                        <span>You can select multiple students from the course</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

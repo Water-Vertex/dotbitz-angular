@@ -6,6 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil, filter } from '
 import { CourseService } from '../../../../../services/course.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { Course } from '../../../../../models/course.model';
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-course-list',
@@ -17,9 +18,13 @@ import { Course } from '../../../../../models/course.model';
 export class CourseList implements OnInit, OnDestroy {
 
   courses: Course[] = [];
+  filteredCourses: Course[] = [];
   totalItems: number = 0;
   searchTerm: string = '';
+  selectedLevel: string = '';
+  selectedStatus: string = '';
   isLoading: boolean = false;
+  levels: string[] = [];
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -28,7 +33,8 @@ export class CourseList implements OnInit, OnDestroy {
     private courseService: CourseService,
     private toastService: ToastService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth :AuthService
   ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -47,17 +53,41 @@ export class CourseList implements OnInit, OnDestroy {
       debounceTime(500),
       distinctUntilChanged(),
       takeUntil(this.destroy$)
-    ).subscribe(() => this.loadCourses());
+    ).subscribe(() => this.applyFilters());
   }
 
   loadCourses(): void {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    this.courseService.getCourses(this.searchTerm, 50).subscribe({
-      next: (res) => {
-        this.courses = Array.isArray(res.data) ? res.data : [];
-        this.totalItems = this.courses.length;
+    this.courseService.getCourses('', 100).subscribe({
+      next: (res: any) => {
+        let rawData: Course[] = [];
+
+        // Normalize backend response
+        if (res?.data) {
+          rawData = Array.isArray(res.data) ? res.data : [];
+        } else if (Array.isArray(res)) {
+          rawData = res;
+        }
+
+        this.courses = rawData;
+
+        // Extract unique levels
+        this.levels = Array.from(
+          new Set(this.courses.map((c) => c.course_level).filter((l): l is string => !!l)),
+        );
+
+        // Fix thumbnail paths
+        this.courses.forEach((c) => {
+          if (c.thumbnail_image && !c.thumbnail_image.startsWith('http')) {
+            c.thumbnail_image = `https://dotbitz.com/public/assets/images/courses/${c.thumbnail_image}`;
+          } else if (!c.thumbnail_image) {
+            c.thumbnail_image = 'https://placehold.co/600x400?text=No+Image';
+          }
+        });
+
+        this.applyFilters();
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -68,13 +98,58 @@ export class CourseList implements OnInit, OnDestroy {
       }
     });
   }
+can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
+  applyFilters(): void {
+    let result = [...this.courses];
 
-  refreshData(): void {
-    this.loadCourses();
+    // Apply search filter
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase();
+      result = result.filter(
+        (c) =>
+          c.course_name.toLowerCase().includes(term) ||
+          c.course_code.toLowerCase().includes(term) ||
+          `${c.instructor?.first_name} ${c.instructor?.last_name}`.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply level filter
+    if (this.selectedLevel) {
+      result = result.filter((c) => c.course_level === this.selectedLevel);
+    }
+
+    // Apply status filter
+    if (this.selectedStatus) {
+      result = result.filter((c) => c.status === this.selectedStatus);
+    }
+
+    this.filteredCourses = result;
+    this.totalItems = result.length;
   }
 
   onSearch(): void {
     this.searchSubject.next(this.searchTerm);
+  }
+
+  onLevelChange(): void {
+    this.applyFilters();
+  }
+
+  onStatusChange(): void {
+    this.applyFilters();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedLevel = '';
+    this.selectedStatus = '';
+    this.applyFilters();
+  }
+
+  refreshData(): void {
+    this.loadCourses();
   }
 
   editCourse(id?: number): void {

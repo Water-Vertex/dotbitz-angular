@@ -3,6 +3,10 @@ import { Login } from './components/auth/login/login';
 import { AdminLayout } from './components/admin/layouts/admin-layout/admin-layout';
 import { Dashboard } from './components/admin/pages//dashboard/dashboard';
 import { authGuard } from './guards/auth-guard';
+import { instructorAuthGuard } from './guards/instructor-auth-guard';
+import { guardianAuthGuard } from './guards/guardian-auth-guard';
+import { studentAuthGuard } from './guards/student-auth-guard';
+import { permissionGuard } from './guards/permission-guard';  // ✅ ADD THIS LINE
 import { FaqList } from './components/admin/pages/faq/faq-list/faq-list';
 import { FaqAdd } from './components/admin/pages/faq/faq-add/faq-add';
 import { FaqEdit } from './components/admin/pages/faq/faq-edit/faq-edit';
@@ -12,33 +16,470 @@ import { InstructorEdit } from './components/admin/pages/instructor/instructor-e
 import { CourseList } from './components/admin/pages/course/course-list/course-list';
 import { CourseAdd } from './components/admin/pages/course/course-add/course-add';
 import { CourseEdit } from './components/admin/pages/course/course-edit/course-edit';
+import { PolicyList } from './components/admin/pages/policy/policy-list/policy-list';
+import { PolicyAdd } from './components/admin/pages/policy/policy-add/policy-add';
+import { PolicyEdit } from './components/admin/pages/policy/policy-edit/policy-edit';
+import { Logout } from './components/auth/logout/logout';
+import { StudentRegistration } from './components/student/pages/registration/student-registration/student-registration';
+import { StudentLayout } from './components/student/layouts/student-layout/student-layout/student-layout';
+import { CourseCurriculumList } from './components/admin/pages/course-curriculum/course-curriculum-list/course-curriculum-list';
+import { CourseCurriculumAdd } from './components/admin/pages/course-curriculum/course-curriculum-add/course-curriculum-add';
+import { CourseCurriculumEdit } from './components/admin/pages/course-curriculum/course-curriculum-edit/course-curriculum-edit';
+import { StudentList } from './components/admin/pages/student/student-list/student-list';
+import { StudentAdd } from './components/admin/pages/student/student-add/student-add';
+import { StudentEdit } from './components/admin/pages/student/student-edit/student-edit';
+import { AssignmentAdd } from './components/admin/pages/assignment/assignment-add/assignment-add';
+import { AssignmentEdit } from './components/admin/pages/assignment/assignment-edit/assignment-edit';
+import { AssignmentList } from './components/admin/pages/assignment/assignment-list/assignment-list';
+import { CouponAdd } from './components/admin/pages/coupon/coupon-add/coupon-add';
+import { CouponList } from './components/admin/pages/coupon/coupon-list/coupon-list';
+import { CouponEdit } from './components/admin/pages/coupon/coupon-edit/coupon-edit';
+import { McqsList } from './components/admin/pages/mcq/mcq-list/mcq-list';
+import { McqsAdd } from './components/admin/pages/mcq/mcq-add/mcq-add';
+import { McqsEdit } from './components/admin/pages/mcq/mcq-edit/mcq-edit';
+import { AssessmentList } from './components/admin/pages/assessment/assessment-list/assessment-list';
+import { AssessmentAdd } from './components/admin/pages/assessment/assessment-add/assessment-add';
+import { AssessmentEdit } from './components/admin/pages/assessment/assessment-edit/assessment-edit';
+import { GuardianLayout } from './components/guardian/layouts/guardian-layout/guardian-layout';
+import { ProfileShow } from './components/guardian/pages/profile/profile-show/profile-show';
+import { ProfileEdit } from './components/guardian/pages/profile/profile-edit/profile-edit';
+import { GuardianDashboard } from './components/guardian/pages/dashboard/dashboard';
+import { GuardianLogin } from './components/auth/guardian-login/guardian-login';
+import { StudentDashboardLayout } from './components/student/layouts/student-dashboard-layout/student-dashboard-layout';
+import { StudentProfile } from './components/student/pages/profile/profile-show/profile-show';
+import { StudentProfileEdit } from './components/student/pages/profile/profile-edit/profile-edit';
+import { StudentDashboard } from './components/student/pages/dashboard/dashboard';
+import { StudentLogin } from './components/auth/student-login/student-login';
+import { GuardianLogout } from './components/auth/guardian-logout/guardian-logout';
+import { StudentLogout } from './components/auth/student-logout/student-logout';
+import { StudentCourseList } from './components/student/pages/courses/course-list/course-list';
+import { GuardianCourseList } from './components/guardian/pages/courses/course-list/course-list';
+import { GuardianCourseDetail } from './components/guardian/pages/courses/course-detail/course-detail';
+import { StudentCourseDetail } from './components/student/pages/courses/course-detail/course-detail';
+import { StudentCheckout } from './components/student/pages/order/checkout/checkout';
+import { MyCourses } from './components/student/pages/profile/my-courses/courses/courses';
+import { GuardianCheckout } from './components/guardian/pages/order/checkout/checkout';
+import { MyCoursesGuardian } from './components/guardian/pages/profile/my-courses/courses/courses';
+import { InstructorLogin } from './components/auth/instructor-login/instructor-login';
+import { InstructorLogout } from './components/auth/instructor-logout/instructor-logout';
+import { InstructorLayout } from './components/instructor/layouts/instructor-layout/instructor-layout';
+import { InstructorDashboard } from './components/instructor/pages/dashboard/dashboard';
+import { InstructorProfile } from './components/instructor/pages/profile/profile-show/profile-show';
+import { InstructorProfileEdit } from './components/instructor/pages/profile/profile-edit/profile-edit';
+import { MyCourseDetail } from './components/student/pages/profile/my-courses/course-details/course-details';
+import { GuardianCourseDetails } from './components/guardian/pages/profile/my-courses/course-details/course-details';
+import { InstructorCourseList } from './components/instructor/pages/courses/course-list/course-list';
+import { InstructorCourseDetail } from './components/instructor/pages/courses/course-detail/course-detail';
+import { ClassScheduleList } from './components/instructor/pages/class-schedule/schedule-list/schedule-list';
+import { ClassScheduleAdd } from './components/instructor/pages/class-schedule/schedule-add/schedule-add';
+import { ClassScheduleEdit } from './components/instructor/pages/class-schedule/schedule-edit/schedule-edit';
+import { BatchList } from './components/admin/pages/batches/batch-list/batch-list';
+import { BatchAdd } from './components/admin/pages/batches/batch-add/batch-add';
+import { BatchEdit } from './components/admin/pages/batches/batch-edit/batch-edit';
+import { AnnouncementList } from './components/admin/pages/announcement/announcement-list/announcement-list';
+import { AnnouncementAdd } from './components/admin/pages/announcement/announcement-add/announcement-add';
+import { AnnouncementEdit } from './components/admin/pages/announcement/announcement-edit/announcement-edit';
+import { InstructorAnnouncementList } from './components/instructor/pages/announcement/announcement-list/announcement-list';
+import { InstructorAnnouncementAdd } from './components/instructor/pages/announcement/announcement-add/announcement-add';
+import { InstructorAnnouncementEdit } from './components/instructor/pages/announcement/announcement-edit/announcement-edit';
+import { AdminClassScheduleList } from './components/admin/pages/class-schedule/schedule-list/schedule-list';
+import { AdminClassScheduleAdd } from './components/admin/pages/class-schedule/schedule-add/schedule-add';
+import { AdminClassScheduleEdit } from './components/admin/pages/class-schedule/schedule-edit/schedule-edit';
+import { Confirmation } from './components/student/pages/payment/confirmation/confirmation';
+import { Cancellation } from './components/student/pages/payment/cancellation/cancellation';
+import { AssessmentQueries } from './components/admin/pages/assessment/assessment-queries/assessment-queries';
+import { AssignCourseAdd } from './components/admin/pages/course/assign/assign-add/assign-add';
+import { AssignCourseList } from './components/admin/pages/course/assign/assign-list/assign-list';
+import { AssignCourseEdit } from './components/admin/pages/course/assign/assign-edit/assign-edit';
+import { QuizList } from './components/admin/pages/quiz/quiz-list/quiz-list';
+import { QuizAdd } from './components/admin/pages/quiz/quiz-add/quiz-add';
+import { QuizEdit } from './components/admin/pages/quiz/quiz-edit/quiz-edit';
+import { InstructorMcqsList } from './components/instructor/pages/mcq/mcq-list/mcq-list';
+import { InstructorMcqsAdd } from './components/instructor/pages/mcq/mcq-add/mcq-add';
+import { InstructorMcqsEdit } from './components/instructor/pages/mcq/mcq-edit/mcq-edit';
+import { InstructorQuizAdd } from './components/instructor/pages/quiz/quiz-add/quiz-add';
+import { InstructorQuizList } from './components/instructor/pages/quiz/quiz-list/quiz-list';
+import { InstructorQuizEdit } from './components/instructor/pages/quiz/quiz-edit/quiz-edit';
+import { MyQuiz } from './components/student/pages/profile/my-quiz/quiz/quiz';
+import { AssignAssessmentList } from './components/admin/pages/assessment/assigned-assessment/assigned-assessment-list/assigned-assessment-list';
+import { GuardianAssessmentList } from './components/guardian/pages/assessments/assessment-list/assessment-list';
+import { StudentAssessmentList } from './components/student/pages/assessments/assessment-list/assessment-list';
+import { AttemptAssessment } from './components/student/pages/assessments/assessment-attempt/assessment-attempt';
+import { AdminQuizAttempts } from './components/admin/pages/quiz/quiz-attempt/quiz-attempt';
+import { AdminQuizCheck } from './components/admin/pages/quiz/quiz-check/quiz-check';
+import { AdminQuizView } from './components/admin/pages/quiz/quiz-view/quiz-view';
+import { AttemptedAssessment } from './components/admin/pages/assessment/assessment-attempt/assessment-attempt';
+import { AssessmentCheck } from './components/admin/pages/assessment/assessment-check/assessment-check';
+import { AssessmentView } from './components/admin/pages/assessment/assessment-view/assessment-view';
+import { InstructorAssignmentList } from './components/instructor/pages/assignment/assignment-list/assignment-list';
+import { InstructorAssignmentAdd } from './components/instructor/pages/assignment/assignment-add/assignment-add';
+import { InstructorAssignmentEdit } from './components/instructor/pages/assignment/assignment-edit/assignment-edit';
+import { GuestLayout } from './components/guest/layout/guest-layout/guest-layout';
+import { GuestAssessmentList } from './components/guest/pages/assessment/assessment-list/assessment-list';
+import { GuestAssessmentAttempt } from './components/guest/pages/assessment/assessment-attempt/assessment-attempt';
+import { GuestAssessmentView } from './components/guest/pages/assessment/assessment-view/assessment-view';
+import { GuestAssessmentResult } from './components/guest/pages/assessment/assessment-result/assessment-result';
+import { StudentAssessmentView } from './components/student/pages/assessments/assessment-view/assessment-view';
+import { StudentAssessmentResult } from './components/student/pages/assessments/assessment-result/assessment-result';
+import { MyResult } from './components/student/pages/results/my-result/my-result';
+import { InstructorQuizAttempts } from './components/instructor/pages/quiz/quiz-attempts/quiz-attempts';
+import { InstructorQuizCheck } from './components/instructor/pages/quiz/quiz-check/quiz-check';
+import { InstructorQuizView } from './components/instructor/pages/quiz/quiz-view/quiz-view';
+import { InstructorAssignmentAttempts } from './components/instructor/pages/assignment/assignment-attempts/assignment-attempts';
+import { AdminAssignmentAttempts } from './components/admin/pages/assignment/assignment-attempts/assignment-attempts';
+import { AdminGrade } from './components/admin/pages/grades/grade/grade';
+import { InstructorGrade } from './components/instructor/pages/grades/grade/grade';
+import { InstructorStudentList } from './components/instructor/pages/students/student-list/student-list';
+import { InstructorBatchList } from './components/instructor/pages/batches/batch-list/batch-list';
+import { StudentResult } from './components/guardian/pages/results/student-result/student-result';
+import { StudentClassScheduleList } from './components/student/pages/class-schedule/schedule-list/schedule-list';
+import { GuardianConfirmation } from './components/guardian/pages/payment/confirmation/confirmation';
+import { GuardianList } from './components/admin/pages/guardians/guardian-list/guardian-list';
+
+import { RolesPermissionsComponent } from './components/admin/pages/roles-permissions/roles-permissions';
+import { RoleList } from './components/admin/pages/roles/role-list/role-list';
+import { RoleAdd } from './components/admin/pages/roles/role-add/role-add';
+import { RoleEdit } from './components/admin/pages/roles/role-edit/role-edit';
+import {  StudentPasswordReset } from './components/student/pages/profile/password/password-reset/password-reset';
+import { GuardianPasswordReset } from './components/guardian/pages/profile/password/password-reset/password-reset';
+import { InstructorPasswordReset } from './components/instructor/pages/profile/password/password-reset/password-reset';
+import { AdminPasswordReset } from './components/admin/pages/profile/password/password-reset/password-reset';
+
+import { AdminBillList } from './components/admin/pages/bills/bill-list/bill-list';
+import { AdminBillDetail } from './components/admin/pages/bills/bill-details/bill-details';
+import { GuardianMyBills } from './components/guardian/pages/bills/my-bills/my-bills';
+import { StudentMyBills } from './components/student/pages/bills/my-bills/my-bills';
+import { GuardianScheduleList } from './components/guardian/pages/class-schedule/schedule-list/schedule-list';
+import { Setting } from './components/admin/pages/settings/setting/setting';
+import { SeoSetting } from './components/admin/pages/settings/seo-setting/seo-setting';
+import { SitemapComponent } from './components/admin/pages/settings/sitemap/sitemap';
+import { PreRegistrationComponent } from './components/admin/pages/registrations/pre-registration/pre-registration';
+import { ProgramaticSeoList } from './components/admin/pages/settings/programatic-seo/programatic-seo-list/programatic-seo-list';
+import { ProgramaticSeoEdit } from './components/admin/pages/settings/programatic-seo/programatic-seo-edit/programatic-seo-edit';
+import { BlogList } from './components/admin/pages/blogs/blog-list/blog-list';
+import { BlogAdd } from './components/admin/pages/blogs/blog-add/blog-add';
+import { BlogEdit } from './components/admin/pages/blogs/blog-edit/blog-edit';
+
+import { AdminEventList } from './components/admin/pages/events/event-list/event-list';
+import { AdminEventForm } from './components/admin/pages/events/event-add/event-add';
+import { StudentEventList }  from './components/student/pages/events/event-list/event-list';
+import { InstructorEventList } from './components/instructor/pages/events/event-list/event-list';
+import { GuardianEventList }  from './components/guardian/pages/events/event-list/event-list';
+import { ProgramaticSeoAdd } from './components/admin/pages/settings/programatic-seo/programatic-seo-add/programatic-seo-add';
+
+import { StudentSupportTickets }  from './components/student/pages/tickets/ticket-add/ticket-add';
+import { GuardianSupportTickets } from './components/guardian/pages/tickets/ticket-add/ticket-add';
+import { AdminSupportTickets } from './components/admin/pages/tickets/ticket-list/ticket-list';
+
+import { AdminReviews } from './components/admin/pages/reviews/reviews-list/reviews-list';
+import { AppointmentList } from './components/admin/pages/appointments/appointment-list/appointment-list';
+import { StudentForgotPassword } from './components/auth/student-login/student-forget-password/student-forget-password';
+import { StudentResetPassword } from './components/auth/student-login/student-reset-password/student-reset-password';
+import { GuardianForgotPassword } from './components/auth/guardian-login/guardian-forgot-password/guardian-forgot-password';
+import { GuardianResetPassword } from './components/auth/guardian-login/guardian-reset-password/guardian-reset-password';
+import { InstructorForgotPassword } from './components/auth/instructor-login/instructor-forgot-password/instructor-forgot-password';
+import { InstructorResetPassword } from './components/auth/instructor-login/instructor-reset-password/instructor-reset-password';
+import { ForgotPassword } from './components/auth/login/forgot-password/forgot-password';
+import { ResetPassword } from './components/auth/login/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
+  { path: 'admin/forgot-password', component: ForgotPassword },
+  { path: 'admin/reset-password', component: ResetPassword },
+
   {
     path: '',
     component: AdminLayout,
     canActivate: [authGuard],
     children: [
+
+      { path: 'admin/logout', component: Logout },
       { path: 'admin/dashboard', component: Dashboard },
 
-      // FAQ routes
-      { path: 'admin/faq/list', component: FaqList },
-      { path: 'admin/faq/add', component: FaqAdd },
-      { path: 'admin/faq/edit/:id', component: FaqEdit },
+// ✅ Add Password Reset Route here
+          { path: 'admin/password-reset', component: AdminPasswordReset },
 
-      // Instructor routes
-      { path: 'admin/instructor/list', component: InstructorList },
-      { path: 'admin/instructor/add', component: InstructorAdd },
-      { path: 'admin/instructor/edit/:id', component: InstructorEdit },
 
-      // Course routes
-      { path: 'admin/course/list', component: CourseList },
-      { path: 'admin/course/add', component: CourseAdd },
-      { path: 'admin/course/edit/:id', component: CourseEdit },
+      // ✅ FAQ routes with permissions
+      { path: 'admin/faq/list', component: FaqList, canActivate: [permissionGuard], data: { permission: 'view_faqs' } },
+      { path: 'admin/faq/add', component: FaqAdd, canActivate: [permissionGuard], data: { permission: 'create_faqs' } },
+      { path: 'admin/faq/edit/:id', component: FaqEdit, canActivate: [permissionGuard], data: { permission: 'edit_faqs' } },
+
+      // ✅ Instructor routes with permissions
+      { path: 'admin/instructor/list', component: InstructorList, canActivate: [permissionGuard], data: { permission: 'view_instructors' } },
+      { path: 'admin/instructor/add', component: InstructorAdd, canActivate: [permissionGuard], data: { permission: 'create_instructors' } },
+      { path: 'admin/instructor/edit/:id', component: InstructorEdit, canActivate: [permissionGuard], data: { permission: 'edit_instructors' } },
+
+      // ✅ Course routes with permissions
+      { path: 'admin/course/list', component: CourseList, canActivate: [permissionGuard], data: { permission: 'view_courses' } },
+      { path: 'admin/course/add', component: CourseAdd, canActivate: [permissionGuard], data: { permission: 'create_courses' } },
+      { path: 'admin/course/edit/:id', component: CourseEdit, canActivate: [permissionGuard], data: { permission: 'edit_courses' } },
+
+      // ✅ Assign Course routes
+      { path: 'admin/course/assign-list', component: AssignCourseList, canActivate: [permissionGuard], data: { permission: 'view_courses' } },
+      { path: 'admin/course/assign-add', component: AssignCourseAdd, canActivate: [permissionGuard], data: { permission: 'create_courses' } },
+      { path: 'admin/course/assign-edit/:id', component: AssignCourseEdit, canActivate: [permissionGuard], data: { permission: 'edit_courses' } },
+
+      // ✅ Course Curriculum routes
+      { path: 'admin/course/curriculum/list', component: CourseCurriculumList, canActivate: [permissionGuard], data: { permission: 'view_courses' } },
+      { path: 'admin/course/curriculum/add', component: CourseCurriculumAdd, canActivate: [permissionGuard], data: { permission: 'create_courses' } },
+      { path: 'admin/course/curriculum/edit/:id', component: CourseCurriculumEdit, canActivate: [permissionGuard], data: { permission: 'edit_courses' } },
+
+      // ✅ Policy routes with permissions
+      { path: 'admin/policy/list', component: PolicyList, canActivate: [permissionGuard], data: { permission: 'view_policies' } },
+      { path: 'admin/policy/add', component: PolicyAdd, canActivate: [permissionGuard], data: { permission: 'create_policies' } },
+      { path: 'admin/policy/edit/:id', component: PolicyEdit, canActivate: [permissionGuard], data: { permission: 'edit_policies' } },
+
+      // ✅ Student routes with permissions
+      { path: 'admin/student/list', component: StudentList, canActivate: [permissionGuard], data: { permission: 'view_students' } },
+      { path: 'admin/student/add', component: StudentAdd, canActivate: [permissionGuard], data: { permission: 'create_students' } },
+      { path: 'admin/student/edit/:id', component: StudentEdit, canActivate: [permissionGuard], data: { permission: 'edit_students' } },
+
+      // ✅ Guardian routes
+      { path: 'admin/guardian/list', component: GuardianList, canActivate: [permissionGuard], data: { permission: 'view_guardians' } },
+
+      // ✅ Assignment routes
+      { path: 'admin/assignment/list', component: AssignmentList, canActivate: [permissionGuard], data: { permission: 'view_assignments' } },
+      { path: 'admin/assignment/add', component: AssignmentAdd, canActivate: [permissionGuard], data: { permission: 'create_assignments' } },
+      { path: 'admin/assignment/edit/:id', component: AssignmentEdit, canActivate: [permissionGuard], data: { permission: 'edit_assignments' } },
+      { path: 'admin/assignment/attempts', component: AdminAssignmentAttempts, canActivate: [permissionGuard], data: { permission: 'view_assignments' } },
+
+      // ✅ Coupon routes
+      { path: 'admin/coupon/list', component: CouponList, canActivate: [permissionGuard], data: { permission: 'view_coupons' } },
+      { path: 'admin/coupon/add', component: CouponAdd, canActivate: [permissionGuard], data: { permission: 'create_coupons' } },
+      { path: 'admin/coupon/edit/:id', component: CouponEdit, canActivate: [permissionGuard], data: { permission: 'edit_coupons' } },
+
+      // ✅ MCQ routes
+      { path: 'admin/mcqs/list', component: McqsList, canActivate: [permissionGuard], data: { permission: 'view_mcqs' } },
+      { path: 'admin/mcqs/add', component: McqsAdd, canActivate: [permissionGuard], data: { permission: 'create_mcqs' } },
+      { path: 'admin/mcqs/edit/:id', component: McqsEdit, canActivate: [permissionGuard], data: { permission: 'edit_mcqs' } },
+
+      // ✅ Quiz routes
+      { path: 'admin/quiz/list', component: QuizList, canActivate: [permissionGuard], data: { permission: 'view_quizzes' } },
+      { path: 'admin/quiz/add', component: QuizAdd, canActivate: [permissionGuard], data: { permission: 'create_quizzes' } },
+      { path: 'admin/quiz/edit/:id', component: QuizEdit, canActivate: [permissionGuard], data: { permission: 'edit_quizzes' } },
+
+      // ✅ Assessment routes
+      { path: 'admin/assessments/list', component: AssessmentList, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assessments/add', component: AssessmentAdd, canActivate: [permissionGuard], data: { permission: 'create_assessments' } },
+      { path: 'admin/assessments/edit/:id', component: AssessmentEdit, canActivate: [permissionGuard], data: { permission: 'edit_assessments' } },
+      { path: 'admin/assessments/queries', component: AssessmentQueries, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assigned-assessments/list', component: AssignAssessmentList, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assessment-attempts/list', component: AttemptedAssessment, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+      { path: 'admin/assessment/check/:id', component: AssessmentCheck, canActivate: [permissionGuard], data: { permission: 'edit_assessments' } },
+      { path: 'admin/assessment/view/:id', component: AssessmentView, canActivate: [permissionGuard], data: { permission: 'view_assessments' } },
+
+      // ✅ Batch routes
+      { path: 'admin/batches/list', component: BatchList, canActivate: [permissionGuard], data: { permission: 'view_batches' } },
+      { path: 'admin/batches/add', component: BatchAdd, canActivate: [permissionGuard], data: { permission: 'create_batches' } },
+      { path: 'admin/batches/edit/:id', component: BatchEdit, canActivate: [permissionGuard], data: { permission: 'edit_batches' } },
+
+      // ✅ Announcement routes
+      { path: 'admin/announcement/list', component: AnnouncementList, canActivate: [permissionGuard], data: { permission: 'view_announcements' } },
+      { path: 'admin/announcement/add', component: AnnouncementAdd, canActivate: [permissionGuard], data: { permission: 'create_announcements' } },
+      { path: 'admin/announcement/edit/:id', component: AnnouncementEdit, canActivate: [permissionGuard], data: { permission: 'edit_announcements' } },
+
+      // ✅ Class Schedule routes
+      { path: 'admin/class-schedule/list', component: AdminClassScheduleList, canActivate: [permissionGuard], data: { permission: 'view_class_schedules' } },
+      { path: 'admin/class-schedule/add', component: AdminClassScheduleAdd, canActivate: [permissionGuard], data: { permission: 'create_class_schedules' } },
+      { path: 'admin/class-schedule/edit/:id', component: AdminClassScheduleEdit, canActivate: [permissionGuard], data: { permission: 'edit_class_schedules' } },
+
+      // ✅ Quiz attempts
+      { path: 'admin/quiz/attempts', component: AdminQuizAttempts, canActivate: [permissionGuard], data: { permission: 'view_quizzes' } },
+      { path: 'admin/quiz/check/:attemptId', component: AdminQuizCheck, canActivate: [permissionGuard], data: { permission: 'edit_quizzes' } },
+      { path: 'admin/quiz/view/:attemptId', component: AdminQuizView, canActivate: [permissionGuard], data: { permission: 'view_quizzes' } },
+
+      // ✅ Grade routes
+      { path: 'admin/grade', component: AdminGrade, canActivate: [permissionGuard], data: { permission: 'view_reports' } },
+      // Roles routes
+      { path: 'admin/roles/list', component: RoleList },
+      { path: 'admin/roles/add', component: RoleAdd },
+      { path: 'admin/roles/edit/:id', component: RoleEdit },
+      // ✅ ROLES & PERMISSIONS - SIRF ADMIN
+      { path: 'admin/roles-permissions', component: RolesPermissionsComponent, canActivate: [permissionGuard], data: { permission: 'manage_roles' } },
+
+      { path: 'admin/bills',         component: AdminBillList },
+      { path: 'admin/bills/:orderId', component: AdminBillDetail },
+
+      { path: 'admin/settings', component: Setting },
+      { path: 'admin/seo-settings', component: SeoSetting },
+      { path: 'admin/sitemap', component: SitemapComponent },
+
+      { path: 'admin/pre-registrations', component:PreRegistrationComponent},
+
+       {
+          path: 'admin/programatic-seo',
+          component: ProgramaticSeoList
+        },
+         {
+          path: 'admin/programatic-seo/add',
+          component: ProgramaticSeoAdd
+        },
+        {
+          path: 'admin/programatic-seo/edit/:id',
+          component: ProgramaticSeoEdit
+        },
+
+      { path: 'admin/blogs/list', component: BlogList },
+      { path: 'admin/blogs/add', component: BlogAdd },
+      { path: 'admin/blogs/edit/:id', component: BlogEdit },
+
+      { path: 'admin/event/list',component: AdminEventList },
+      { path: 'admin/event/add',component: AdminEventForm },
+      { path: 'admin/event/edit/:id', component: AdminEventForm },
+
+      { path: 'admin/support-tickets', component: AdminSupportTickets },
+      { path: 'admin/reviews', component: AdminReviews },
+      { path: 'admin/appointments', component: AppointmentList },
 
       { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' }
     ]
   },
+
+
+  // Guardian Routes
+
+  { path: 'guardian/login', component: GuardianLogin },
+  { path: 'guardian/forgot-password', component: GuardianForgotPassword },
+  { path: 'guardian/reset-password', component: GuardianResetPassword },
+
+  {
+    path: '',
+    component: GuardianLayout,
+    canActivate: [guardianAuthGuard],
+    children: [
+      { path: 'guardian/logout', component: GuardianLogout },
+      { path: 'guardian/dashboard', component: GuardianDashboard },
+      { path: 'guardian/profile', component: ProfileShow },
+      { path: 'guardian/profile/edit', component: ProfileEdit },
+
+      { path: 'guardian/password-reset', component: GuardianPasswordReset },
+      { path: 'guardian/class-schedule', component: GuardianScheduleList },
+      { path: 'guardian/courses/list', component: GuardianCourseList },
+      { path: 'guardian/course/detail/:id', component: GuardianCourseDetail},
+      { path: 'guardian/checkout/:id', component: GuardianCheckout },
+      { path: 'guardian/my-courses', component: MyCoursesGuardian },
+      { path: 'guardian/course/:id', component: GuardianCourseDetails},
+      { path: 'guardian/student-assessments', component: GuardianAssessmentList },
+      { path: 'guardian/student-results', component: StudentResult },
+      { path: 'guardian/payment/confirmation',  component: GuardianConfirmation  },
+      { path: 'guardian/class-schedule', component: GuardianScheduleList },
+
+      { path: 'guardian/my-bills',   component: GuardianMyBills },
+      { path: 'guardian/event/list', component: GuardianEventList },
+
+      { path: 'guardian/support', component: GuardianSupportTickets },
+
+      { path: '', redirectTo: 'guardian/dashboard', pathMatch: 'full' },
+    ],
+  },
+
+  // Student Routes
+  { path: 'student/login', component: StudentLogin },
+  { path: 'student/forgot-password', component: StudentForgotPassword },
+  { path: 'student/reset-password', component: StudentResetPassword },
+
+  {
+    path: '',
+    canActivate: [studentAuthGuard],
+    component: StudentDashboardLayout, // layout wrapper
+    children: [
+      { path: 'student/logout', component: StudentLogout },
+      { path: 'student/profile', component: StudentProfile },
+      { path: 'student/profile/edit', component: StudentProfileEdit },
+      { path: 'student/dashboard', component: StudentDashboard },
+      { path: 'student/courses/list', component: StudentCourseList },
+      { path: 'student/course/detail/:id', component: StudentCourseDetail},
+      { path: 'student/checkout/:courseId', component: StudentCheckout },
+      { path: 'student/my-courses', component: MyCourses },
+      { path: 'student/class-schedule', component: StudentClassScheduleList },
+      { path: 'student/assignments/:courseId', component: AssignmentList },
+      { path: 'student/course/:courseId', component: MyCourseDetail },
+      { path: 'student/payment/confirmation', component: Confirmation },
+      { path: 'student/payment/cancellation', component: Cancellation },
+      { path: 'student/quiz/:quizId', component: MyQuiz },
+      { path: 'student/my-assessments', component: StudentAssessmentList },
+      { path: 'student/assessment/attempt/:assignAssessmentId', component: AttemptAssessment },
+      { path: 'student/assessment/view/:id', component: StudentAssessmentView },
+      { path: 'student/assessment-result', component: StudentAssessmentResult },
+      { path: 'student/my-results', component: MyResult },
+      { path: 'student/event/list', component: StudentEventList },
+
+      { path: 'student/support',  component: StudentSupportTickets },
+
+  { path: 'student/reset-password', component: StudentPasswordReset,},
+      { path: 'student/my-bills',    component: StudentMyBills }
+
+    ]
+  },
+
+  {
+    path: '',
+    component: StudentLayout,
+    children: [
+      { path: 'student/registration', component: StudentRegistration },
+    ]
+  },
+
+    // Instructor Routes
+  { path: 'instructor/login', component: InstructorLogin },
+  { path: 'instructor/forgot-password', component: InstructorForgotPassword },
+  { path: 'instructor/reset-password', component: InstructorResetPassword },
+  {
+    path: '',
+    canActivate: [instructorAuthGuard],
+    component: InstructorLayout, // layout wrapper
+    children: [
+      { path: 'instructor/logout', component: InstructorLogout },
+      { path: 'instructor/dashboard', component: InstructorDashboard },
+      { path: 'instructor/students/list', component: InstructorStudentList },
+      { path: 'instructor/batches/list', component: InstructorBatchList },
+      { path: 'instructor/profile', component: InstructorProfile },
+      { path: 'instructor/profile/edit', component: InstructorProfileEdit },
+      { path: 'instructor/courses/list', component: InstructorCourseList },
+      { path: 'instructor/course/detail/:id', component: InstructorCourseDetail},
+      { path: 'instructor/class-schedule/list', component: ClassScheduleList },
+      { path: 'instructor/class-schedule/add', component: ClassScheduleAdd },
+      { path: 'instructor/class-schedule/edit/:id', component: ClassScheduleEdit },
+      { path: 'instructor/announcement/list', component: InstructorAnnouncementList },
+      { path: 'instructor/announcement/add', component: InstructorAnnouncementAdd },
+      { path: 'instructor/announcement/edit/:id', component: InstructorAnnouncementEdit },
+      { path: 'instructor/mcqs/list', component: InstructorMcqsList },
+      { path: 'instructor/mcqs/add', component: InstructorMcqsAdd },
+      { path: 'instructor/mcqs/edit/:id', component: InstructorMcqsEdit },
+      // Quiz routes
+      { path: 'instructor/quiz/list', component: InstructorQuizList },
+      { path: 'instructor/quiz/add', component: InstructorQuizAdd },
+      { path: 'instructor/quiz/edit/:id', component: InstructorQuizEdit },
+
+      { path: 'instructor/assignment/list', component: InstructorAssignmentList },
+      { path: 'instructor/assignment/add', component: InstructorAssignmentAdd },
+      { path: 'instructor/assignment/edit/:id', component: InstructorAssignmentEdit },
+
+      { path: 'instructor/quiz/attempts', component: InstructorQuizAttempts },
+      { path: 'instructor/quiz/check/:attemptId', component: InstructorQuizCheck },
+      { path: 'instructor/quiz/view/:attemptId', component: InstructorQuizView },
+      { path: 'instructor/assignment/attempts', component: InstructorAssignmentAttempts },
+
+      { path: 'instructor/grade', component: InstructorGrade   },
+      { path: 'instructor/password-reset', component: InstructorPasswordReset },
+
+       { path: 'instructor/event/list', component: InstructorEventList },
+
+
+    ]
+  },
+  {path: 'guest',component: GuestLayout,
+      children: [
+      {path: 'guest-assessments', component: GuestAssessmentList },
+      { path: 'assessment/attempt/:assignAssessmentId', component: GuestAssessmentAttempt },
+      {path: 'assessment/attempt/:assignAssessmentId',component: GuestAssessmentAttempt },
+      { path: 'assessment/view/:id', component: GuestAssessmentView },
+        { path: 'assessment-result', component: GuestAssessmentResult },
+
+      { path: '', redirectTo: 'guest-assessments', pathMatch: 'full' }
+    ]
+  },
+
   { path: '**', redirectTo: '' }
 ];

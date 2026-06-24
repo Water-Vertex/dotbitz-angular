@@ -1,0 +1,267 @@
+<div class="min-h-screen bg-gray-50">
+
+  <!-- ========== STEP 1: Courses Grid ========== -->
+  <ng-container *ngIf="!selectedCourse">
+
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Course Curriculum</h1>
+            <p class="text-sm text-gray-500 mt-1">Select a course to view and manage its curriculum</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+
+      <!-- Loading courses -->
+      <div *ngIf="isLoadingCourses">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div *ngFor="let i of [1,2,3,4,5,6,7,8]" class="border border-gray-200 rounded-lg overflow-hidden bg-white">
+            <div class="h-40 bg-gray-100 animate-pulse"></div>
+            <div class="p-4 space-y-3">
+              <div class="h-3 bg-gray-100 rounded w-1/4 animate-pulse"></div>
+              <div class="h-4 bg-gray-100 rounded w-3/4 animate-pulse"></div>
+              <div class="pt-3 border-t border-gray-100 flex justify-between">
+                <div class="h-6 bg-gray-100 rounded w-1/4 animate-pulse"></div>
+                <div class="h-6 bg-gray-100 rounded w-1/4 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No courses -->
+      <div *ngIf="!isLoadingCourses && courses.length === 0" class="py-16">
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">No Courses Found</h3>
+          <p class="text-sm text-gray-500">Add courses first before managing curriculum</p>
+        </div>
+      </div>
+
+      <!-- Courses Grid -->
+      <div *ngIf="!isLoadingCourses && courses.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+        <div
+          *ngFor="let course of courses; trackBy: trackById"
+          (click)="selectCourse(course)"
+          class="group border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 bg-white cursor-pointer"
+        >
+          <!-- Course Image -->
+          <div class="relative aspect-[16/9] bg-gray-100 overflow-hidden">
+           <img
+  *ngIf="course.thumbnail_image"
+  [src]="course.thumbnail_image"
+  [alt]="course.course_name"
+  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+  (error)="course.thumbnail_image = 'https://placehold.co/600x400?text=No+Image'"
+/>
+            <div
+              *ngIf="!course.thumbnail_image"
+              class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100"
+            >
+              <svg class="w-10 h-10 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+
+            <!-- Hover overlay -->
+            <div class="absolute inset-0 bg-orange-600/0 group-hover:bg-orange-600/10 transition-all duration-300 flex items-center justify-center">
+              <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-orange-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+                View Curriculum
+              </span>
+            </div>
+          </div>
+
+          <!-- Course Info -->
+          <div class="p-4">
+            <!-- Code & Level -->
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs text-gray-400 uppercase">{{ course.course_code }}</span>
+              <span class="text-xs text-gray-300">•</span>
+              <span class="text-xs text-gray-500">{{ course.course_level || 'N/A' }}</span>
+            </div>
+
+            <!-- Title -->
+            <h3 class="font-bold text-gray-900 text-base mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors">
+              {{ course.course_name }}
+            </h3>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+              <span class="text-xs text-gray-500 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {{ course.course_duration || '—' }} Weeks
+              </span>
+              <span class="text-xs text-orange-600 font-medium flex items-center gap-1">
+                Manage
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- ========== STEP 2: Curriculum List ========== -->
+  <ng-container *ngIf="selectedCourse">
+
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div class="flex items-center gap-4">
+            <!-- Back button -->
+            <button
+              (click)="backToCourses()"
+              class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors shrink-0"
+            >
+              <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">{{ selectedCourse.course_name }}</h1>
+              <p class="text-sm text-gray-500 mt-1">Curriculum — {{ curriculums.length }} item(s)</p>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              (click)="loadCurriculumsByCourse(selectedCourse.id!)"
+              [disabled]="isLoading"
+              class="px-4 py-2 bg-gray-100 text-green-600 rounded-lg hover:bg-green-700 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-50"
+            >
+              <svg class="w-4 h-4" [class.animate-spin]="isLoading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
+            </button>
+            <a
+              routerLink="/admin/course/curriculum/add"
+              class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 text-sm font-semibold shadow-sm"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span>Add Curriculum</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-6 pb-12">
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
+        <p class="text-gray-500 mt-3 text-sm">Loading curriculum...</p>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!isLoading && curriculums.length === 0" class="py-16">
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">No Curriculum Found</h3>
+          <p class="text-sm text-gray-500 mb-4">No curriculum added for this course yet.</p>
+          <a
+            routerLink="/admin/course/curriculum/add"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-semibold"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add First Curriculum
+          </a>
+        </div>
+      </div>
+
+      <!-- Curriculum Table -->
+      <div *ngIf="!isLoading && curriculums.length > 0"
+        class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr
+                *ngFor="let curriculum of curriculums; let i = index; trackBy: trackById"
+                class="hover:bg-gray-50 transition-colors"
+              >
+                <td class="px-6 py-4 text-sm text-gray-400">{{ i + 1 }}</td>
+
+                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ curriculum.title }}</td>
+
+                <td class="px-6 py-4 text-sm text-gray-600">
+                  <span *ngIf="curriculum.duration" class="inline-flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Week {{ curriculum.duration }}
+                  </span>
+                  <span *ngIf="!curriculum.duration" class="text-gray-300">—</span>
+                </td>
+
+                <td class="px-6 py-4 text-sm">
+                  <div class="flex gap-2">
+                    <a
+                      [routerLink]="['/admin/course/curriculum/edit', curriculum.id]"
+                      class="px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 text-xs font-medium transition-colors"
+                    >
+                      Edit
+                    </a>
+                    <button
+                      (click)="deleteCurriculum(curriculum.id!)"
+                      class="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-xs font-medium transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 text-sm text-gray-600">
+          {{ curriculums.length }} curriculum item(s) for
+          <span class="font-semibold text-orange-600">{{ selectedCourse.course_name }}</span>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+</div>

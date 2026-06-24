@@ -9,7 +9,7 @@
       </p>
     </div>
 
-    <a routerLink="/admin/instructor/list" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium">
+    <a routerLink="/admin/instructor/list" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium">
       <i class="fas fa-arrow-left"></i>
       <span>Back</span>
     </a>
@@ -18,7 +18,7 @@
 
 <!-- Loading State -->
 <div *ngIf="isLoading" class="bg-white rounded-lg border border-gray-200 p-8 text-center">
-  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
   <p class="text-gray-500 mt-2">Loading instructor details...</p>
 </div>
 
@@ -34,7 +34,7 @@
           <input
             type="text"
             formControlName="first_name"
-            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             placeholder="Enter first name"
             [class.border-red-300]="first_name?.invalid && first_name?.touched"
             [class.focus:ring-red-500]="first_name?.invalid && first_name?.touched"
@@ -53,7 +53,7 @@
           <input
             type="text"
             formControlName="last_name"
-            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             placeholder="Enter last name"
             [class.border-red-300]="last_name?.invalid && last_name?.touched"
             [class.focus:ring-red-500]="last_name?.invalid && last_name?.touched"
@@ -71,7 +71,7 @@
         <input
           type="email"
           formControlName="email"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter email"
           [class.border-red-300]="email?.invalid && email?.touched"
           [class.focus:ring-red-500]="email?.invalid && email?.touched"
@@ -94,7 +94,7 @@
         <input
           type="text"
           formControlName="phone"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter phone number"
           [class.border-red-300]="phone?.invalid && phone?.touched"
           [class.focus:ring-red-500]="phone?.invalid && phone?.touched"
@@ -112,7 +112,7 @@
         <input
           type="password"
           formControlName="password"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter Password"
           [class.border-red-300]="password?.invalid && password?.touched"
           [class.focus:ring-red-500]="password?.invalid && password?.touched"
@@ -130,7 +130,7 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
         <select
           formControlName="gender"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
         >
           <option value="">Select gender</option>
           <option value="male">Male</option>
@@ -147,7 +147,7 @@
         <textarea
           rows="3"
           formControlName="address"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
           placeholder="Enter address"
         ></textarea>
       </div>
@@ -158,7 +158,7 @@
         <input
           type="text"
           formControlName="state"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter state"
         >
         
@@ -169,7 +169,7 @@
         <input
           type="text"
           formControlName="city"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter city"
         >
         </div>
@@ -179,7 +179,7 @@
         <input
           type="text"
           formControlName="zip_code"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter zip code"
         >
         </div>
@@ -189,7 +189,7 @@
         <input
           type="text"
           formControlName="work_experience"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter work experience"
         >
         </div>
@@ -199,7 +199,7 @@
         <input
           type="text"
           formControlName="salary"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           placeholder="Enter salary"
         >
         </div>
@@ -208,7 +208,7 @@
         <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
         <select
           formControlName="status"
-          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
         >
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
@@ -230,7 +230,7 @@
             <input
               type="text"
               formControlName="institution"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
           </div>
 
@@ -239,7 +239,7 @@
             <input
               type="text"
               formControlName="degree"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
           </div>
 
@@ -248,18 +248,18 @@
             <input
               type="text"
               formControlName="field_of_study"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
-            <input type="date" formControlName="start_date" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <input type="date" formControlName="start_date" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
-            <input type="date" formControlName="end_date" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <input type="date" formControlName="end_date" class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
           </div>
         </div>
       </div>
@@ -279,7 +279,7 @@
         <button
           type="submit"
           [disabled]="instructorForm.invalid || isSubmitting"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span *ngIf="!isSubmitting" class="flex items-center space-x-2">
             <i class="fas fa-save"></i>

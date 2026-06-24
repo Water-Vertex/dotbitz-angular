@@ -1,0 +1,392 @@
+<!-- Loading -->
+<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[70vh]">
+  <div class="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-[#073a89]"></div>
+  <p class="text-gray-500 mt-4">Loading course...</p>
+</div>
+
+<div *ngIf="!loading && course" class="bg-white min-h-screen">
+  <!-- Breadcrumb -->
+  <div class="border-b border-gray-100 bg-gray-50/30">
+    <div class="max-w-7xl mx-auto px-6 py-3">
+      <div class="flex items-center text-sm text-gray-500">
+        <a routerLink="/student/my-courses" class="hover:text-[#073a89] transition-colors">My Courses</a>
+        <span class="mx-2 text-gray-300">/</span>
+        <span class="text-gray-900">{{ course.course_name }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section - Course Info + Image in one row -->
+  <div class="border-b border-gray-100 bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="flex flex-col md:flex-row gap-8">
+
+        <!-- Left Side - Course Details -->
+        <div class="flex-1">
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ course.course_name }}</h1>
+
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+            <span class="flex items-center">
+              <i class="fas fa-signal mr-2 text-gray-400"></i>
+              {{ course.course_level }}
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-clock mr-2 text-gray-400"></i>
+              {{ course.course_duration }} weeks
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-calendar mr-2 text-gray-400"></i>
+              Starts {{ course.start_date | date: 'MMM d, yyyy' }}
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-child mr-2 text-gray-400"></i>
+              Age {{ course.age_limit }}
+            </span>
+          </div>
+
+          </div>
+        </div>
+
+        <!-- Right Side - Course Image -->
+
+      </div>
+    </div>
+  </div>
+
+ <!-- Tabs Section - Full Width -->
+<div class="border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <!-- flex-wrap + responsive gap -->
+    <div class="flex flex-wrap gap-2 sm:gap-8">
+      <button (click)="setTab('curriculum')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'curriculum' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Curriculum
+        <div *ngIf="activeTab === 'curriculum'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
+      <button (click)="setTab('assignment')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'assignment' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Assignments
+        <div *ngIf="activeTab === 'assignment'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
+      <button (click)="setTab('quiz')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'quiz' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Quizzes
+        <div *ngIf="activeTab === 'quiz'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
+      <button (click)="setTab('review')"
+        [class]="'py-3 sm:py-4 text-sm sm:text-base font-medium transition-all relative whitespace-nowrap ' +
+          (activeTab === 'review' ? 'text-[#073a89]' : 'text-gray-500 hover:text-gray-700')">
+        Reviews
+        <div *ngIf="activeTab === 'review'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500 rounded-full"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- Tab Content - Full Width -->
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Curriculum Tab -->
+    <div *ngIf="activeTab === 'curriculum'">
+      <div *ngIf="course.curriculums && course.curriculums.length > 0; else noCurriculum">
+        <div class="space-y-3">
+          <div *ngFor="let item of course.curriculums; let i = index"
+            class="border border-gray-200 rounded-xl overflow-hidden bg-white hover:border-gray-300 transition-all">
+            <div (click)="toggleCurriculum(i)"
+              class="py-4 px-6 bg-white hover:bg-gray-50 cursor-pointer transition-colors flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold">
+                  {{ i + 1 }}
+                </div>
+                <span class="font-medium text-gray-900">{{ item.title }}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span *ngIf="item.duration" class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Week {{ item.duration }}</span>
+                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" [class.rotate-180]="expandedIndices.includes(i)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+            <div *ngIf="expandedIndices.includes(i)" class="px-6 pb-5 pt-3 border-t border-gray-100 bg-gray-50/20">
+              <div class="text-gray-600 text-sm leading-relaxed" [innerHTML]="item.description || 'No description available.'"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #noCurriculum>
+        <div class="text-center py-16">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          <p class="text-gray-500">No curriculum added yet.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Assignments Tab -->
+    <div *ngIf="activeTab === 'assignment'">
+      <div *ngIf="assignmentsLoading" class="flex justify-center py-16">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+      </div>
+
+      <div *ngIf="!assignmentsLoading && assignments.length === 0" class="text-center py-16">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <p class="text-gray-500">No assignments for this course yet.</p>
+      </div>
+
+      <div *ngIf="!assignmentsLoading && assignments.length > 0" class="space-y-4">
+        <div *ngFor="let assignment of assignments; let i = index" class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-sm transition-shadow">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                {{ i + 1 }}
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-900 mb-2">{{ assignment.title }}</h4>
+                <div class="flex flex-wrap gap-4 text-xs text-gray-500 mb-4">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Due {{ assignment.due_date | date: 'MMM d, yyyy' }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    {{ assignment.total_marks || 0 }} marks
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                  <a *ngIf="assignment.assignment_file"
+                    [href]="getBaseUrl() + '/assets/assignments/' + assignment.assignment_file"
+                    target="_blank" download
+                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-[#073a89] border border-[#073a89]/20 rounded-lg hover:bg-orange-500/5 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download Assignment
+                  </a>
+
+                  <ng-container *ngIf="getAssignmentAttempt(assignment.id) as attempt">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg"
+                      [ngClass]="attempt.is_late ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700'">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      {{ attempt.is_late ? 'Submitted (Late)' : 'Submitted' }}
+                    </span>
+                    <a *ngIf="attempt.doc_file"
+                      [href]="getBaseUrl() + '/assets/assignment_attempts/' + attempt.doc_file"
+                      target="_blank" download
+                      class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                      </svg>
+                      My Submission
+                    </a>
+                  </ng-container>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quizzes Tab -->
+    <div *ngIf="activeTab === 'quiz'">
+      <div *ngIf="quizzesLoading" class="flex justify-center py-16">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+      </div>
+
+      <div *ngIf="!quizzesLoading && quizzes.length === 0" class="text-center py-16">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="text-gray-500">No quizzes available yet.</p>
+      </div>
+
+      <div *ngIf="!quizzesLoading && quizzes.length > 0" class="space-y-4">
+        <div *ngFor="let quiz of quizzes; let i = index" class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-sm transition-shadow">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                {{ i + 1 }}
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-2">{{ quiz.name }}</h4>
+                <div class="flex flex-wrap gap-3 text-xs text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ quiz.mcqs?.length || 0 }} Questions
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    {{ quiz.marks }} Marks
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ quiz.duration }} mins
+                  </span>
+                  <span class="flex items-center gap-1" [class]="isOverdue(quiz.due_date) ? 'text-red-600' : 'text-gray-500'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Due {{ quiz.due_date | date: 'MMM d, yyyy' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+     <!-- Reviews Tab -->
+    <div *ngIf="activeTab === 'review'">
+
+      <div *ngIf="reviewsLoading" class="flex justify-center py-16">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#073a89]"></div>
+      </div>
+
+      <div *ngIf="!reviewsLoading" class="space-y-6">
+
+        <!-- Already Reviewed -->
+        <div *ngIf="myReview"
+          class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <p class="font-semibold text-gray-900">Your Review</p>
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize"
+                  [ngClass]="{
+                    'bg-yellow-100 text-yellow-700': myReview.status === 'pending',
+                    'bg-green-100 text-green-700':   myReview.status === 'approved',
+                    'bg-red-100 text-red-700':       myReview.status === 'rejected'
+                  }">
+                  {{ myReview.status }}
+                </span>
+              </div>
+
+              <!-- Stars -->
+              <div class="flex items-center gap-1 mb-3">
+                <ng-container *ngFor="let s of [1,2,3,4,5]">
+                  <i class="text-lg"
+                    [ngClass]="s <= myReview.rating ? 'fas fa-star text-yellow-400' : 'far fa-star text-gray-300'">
+                  </i>
+                </ng-container>
+                <span class="text-sm text-gray-500 ml-1">({{ myReview.rating }}/5)</span>
+              </div>
+
+              <p class="text-sm text-gray-700 leading-relaxed">{{ myReview.review }}</p>
+              <p class="text-xs text-gray-400 mt-2">Submitted on {{ myReview.created_at }}</p>
+
+              <p *ngIf="myReview.status === 'pending'" class="text-xs text-yellow-600 mt-2">
+                <i class="fas fa-clock mr-1"></i>
+                Your review is pending approval. It will appear on the website once approved.
+              </p>
+            </div>
+
+            <button (click)="deleteReview()"
+              class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg
+                    text-xs font-medium hover:bg-red-100 shrink-0">
+              <i class="fas fa-trash mr-1"></i> Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Review Form -->
+        <div *ngIf="!myReview"
+          class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-gray-900 mb-1">Leave a Review</h3>
+          <p class="text-sm text-gray-500 mb-5">Share your experience with this course</p>
+
+          <!-- Star Rating -->
+          <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              Your Rating <span class="text-red-500">*</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <ng-container *ngFor="let s of [1,2,3,4,5]">
+                <button type="button"
+                  (click)="setRating(s)"
+                  (mouseenter)="setHover(s)"
+                  (mouseleave)="clearHover()"
+                  class="text-3xl transition-transform hover:scale-110 focus:outline-none">
+                  <i [ngClass]="s <= (hoverRating || reviewRating)
+                      ? 'fas fa-star text-yellow-400'
+                      : 'far fa-star text-gray-300'">
+                  </i>
+                </button>
+              </ng-container>
+              <span *ngIf="reviewRating" class="text-sm text-gray-500 ml-2">
+                {{ ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][reviewRating] }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Review Text -->
+          <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Your Review <span class="text-red-500">*</span>
+            </label>
+            <textarea [(ngModel)]="reviewText" rows="4"
+              placeholder="Tell others about your experience with this course..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50
+                    focus:outline-none focus:ring-2 focus:ring-[#073a89] resize-none">
+            </textarea>
+            <p class="text-xs text-gray-400 mt-1">{{ reviewText.length }}/1000</p>
+          </div>
+
+          <button (click)="submitReview()" [disabled]="submittingReview"
+            class="px-6 py-2.5 bg-[#073a89] text-white rounded-lg text-sm font-medium
+                  hover:bg-[#052b63] disabled:opacity-60 flex items-center gap-2">
+            <span *ngIf="submittingReview"
+              class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+            <i *ngIf="!submittingReview" class="fas fa-paper-plane"></i>
+            {{ submittingReview ? 'Submitting...' : 'Submit Review' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Not Found -->
+<div *ngIf="!loading && !course" class="min-h-[60vh] flex items-center justify-center px-4">
+  <div class="text-center">
+    <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <h2 class="text-xl font-semibold text-gray-900 mb-2">Course not found</h2>
+    <p class="text-gray-500 mb-6">The course you're looking for doesn't exist or has been removed.</p>
+    <a routerLink="/student/my-courses"
+      class="inline-flex items-center gap-2 px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-[#052b63] transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to My Courses
+    </a>
+  </div>
+</div>
+
